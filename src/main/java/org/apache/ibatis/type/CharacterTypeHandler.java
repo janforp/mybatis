@@ -34,6 +34,7 @@ public class CharacterTypeHandler extends BaseTypeHandler<Character> {
   public Character getNullableResult(ResultSet rs, String columnName) throws SQLException {
     String columnValue = rs.getString(columnName);
     if (columnValue != null) {
+      //TODO ?
       return columnValue.charAt(0);
     } else {
       return null;

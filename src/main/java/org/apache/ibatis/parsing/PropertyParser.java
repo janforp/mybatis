@@ -13,42 +13,53 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.parsing;
 
 import java.util.Properties;
 
 /**
- * @author Clinton Begin
- */
-/**
  * 属性解析器
+ *
+ * @author Clinton Begin
  */
 public class PropertyParser {
 
-  private PropertyParser() {
-    // Prevent Instantiation
-  }
-
-  public static String parse(String string, Properties variables) {
-    VariableTokenHandler handler = new VariableTokenHandler(variables);
-    GenericTokenParser parser = new GenericTokenParser("${", "}", handler);
-    return parser.parse(string);
-  }
-
-  //就是一个map，用相应的value替换key
-  private static class VariableTokenHandler implements TokenHandler {
-    private Properties variables;
-
-    public VariableTokenHandler(Properties variables) {
-      this.variables = variables;
+    private PropertyParser() {
+        // Prevent Instantiation
     }
 
-    @Override
-    public String handleToken(String content) {
-      if (variables != null && variables.containsKey(content)) {
-        return variables.getProperty(content);
-      }
-      return "${" + content + "}";
+    public static String parse(String string, Properties variables) {
+        VariableTokenHandler handler = new VariableTokenHandler(variables);
+        GenericTokenParser parser = new GenericTokenParser("${", "}", handler);
+        return parser.parse(string);
     }
+
+    //就是一个map，用相应的value替换key
+    private static class VariableTokenHandler implements TokenHandler {
+
+        /**
+         * handleToken函数会从该映射中拿值
+         */
+        private Properties variables;
+
+        public VariableTokenHandler(Properties variables) {
+            this.variables = variables;
+        }
+
+        public String handleToken(String content) {
+            if (variables != null && variables.containsKey(content)) {
+                return variables.getProperty(content);
+            }
+            return "${" + content + "}";
+        }
+    }
+
+  public static void main(String[] args) {
+    Properties variables = new Properties();
+    variables.setProperty("name", "张三");
+    variables.setProperty("gender", "2");
+    String name = PropertyParser.parse("name", variables);
+    System.out.println(name);
   }
 }

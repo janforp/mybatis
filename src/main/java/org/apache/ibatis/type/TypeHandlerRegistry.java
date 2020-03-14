@@ -333,6 +333,7 @@ public final class TypeHandlerRegistry {
   public void register(String packageName) {
     ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<Class<?>>();
     resolverUtil.find(new ResolverUtil.IsA(TypeHandler.class), packageName);
+    //返回扫描集合
     Set<Class<? extends Class<?>>> handlerSet = resolverUtil.getClasses();
     for (Class<?> type : handlerSet) {
       //Ignore inner classes and interfaces (including package-info.java) and abstract classes

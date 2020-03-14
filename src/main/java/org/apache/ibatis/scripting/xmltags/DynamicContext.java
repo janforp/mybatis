@@ -122,7 +122,6 @@ public class DynamicContext {
   //上下文访问器，静态内部类,实现OGNL的PropertyAccessor
   static class ContextAccessor implements PropertyAccessor {
 
-    @Override
     public Object getProperty(Map context, Object target, Object name)
         throws OgnlException {
       Map map = (Map) target;
@@ -140,19 +139,16 @@ public class DynamicContext {
       return null;
     }
 
-    @Override
     public void setProperty(Map context, Object target, Object name, Object value)
         throws OgnlException {
       Map<Object, Object> map = (Map<Object, Object>) target;
       map.put(name, value);
     }
 
-    @Override
     public String getSourceAccessor(OgnlContext arg0, Object arg1, Object arg2) {
       return null;
     }
 
-    @Override
     public String getSourceSetter(OgnlContext arg0, Object arg1, Object arg2) {
       return null;
     }

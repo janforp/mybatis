@@ -264,17 +264,14 @@ public class XPathParser {
 		//将DTD放在org\apache\ibatis\builder\xml\mybatis-3-config.dtd,来达到验证xml合法性的目的
       builder.setEntityResolver(entityResolver);
       builder.setErrorHandler(new ErrorHandler() {
-        @Override
         public void error(SAXParseException exception) throws SAXException {
           throw exception;
         }
 
-        @Override
         public void fatalError(SAXParseException exception) throws SAXException {
           throw exception;
         }
 
-        @Override
         public void warning(SAXParseException exception) throws SAXException {
         }
       });
@@ -292,5 +289,4 @@ public class XPathParser {
     XPathFactory factory = XPathFactory.newInstance();
     this.xpath = factory.newXPath();
   }
-
 }
