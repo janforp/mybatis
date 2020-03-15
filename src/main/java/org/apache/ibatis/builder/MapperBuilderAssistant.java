@@ -130,13 +130,20 @@ public class MapperBuilderAssistant extends BaseBuilder {
         }
     }
 
-    public Cache useNewCache(Class<? extends Cache> typeClass,
-            Class<? extends Cache> evictionClass,
-            Long flushInterval,
-            Integer size,
-            boolean readWrite,
-            boolean blocking,
-            Properties props) {
+    /**
+     * 生成cache
+     *
+     * @param typeClass 缓存类型
+     * @param evictionClass 回收策略类
+     * @param flushInterval 刷新时间
+     * @param size 大写
+     * @param readWrite 读写
+     * @param blocking 足赛
+     * @param props 属性配置
+     * @return 生成cache
+     */
+    public Cache useNewCache(Class<? extends Cache> typeClass, Class<? extends Cache> evictionClass,
+            Long flushInterval, Integer size, boolean readWrite, boolean blocking, Properties props) {
         //这里面又判断了一下是否为null就用默认值，有点和XMLMapperBuilder.cacheElement逻辑重复了
         typeClass = valueOrDefault(typeClass, PerpetualCache.class);
         evictionClass = valueOrDefault(evictionClass, LruCache.class);

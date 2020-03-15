@@ -242,7 +242,10 @@ public class Configuration {
      */
     protected final Map<String, MappedStatement> mappedStatements = new StrictMap<>("Mapped Statements collection");
 
-    //缓存,存在Map里
+    /**
+     * key:namespace
+     * value:缓存实例
+     */
     protected final Map<String, Cache> caches = new StrictMap<Cache>("Caches collection");
 
     //结果映射,存在Map里
@@ -270,7 +273,7 @@ public class Configuration {
      * references a cache bound to another namespace and the value is the
      * namespace which the actual cache is bound to.
      */
-    protected final Map<String, String> cacheRefMap = new HashMap<String, String>();
+    protected final Map<String, String> cacheRefMap = new HashMap<>();
 
     public Configuration(Environment environment) {
         this();

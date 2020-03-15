@@ -51,40 +51,40 @@ import java.util.Properties;
 /**
  * XML映射构建器，建造者模式,继承BaseBuilder
  * 每一个xxxMapper.xml，都对应一个XMLMapperBuilder，由XMLMapperBuilder的parse方法解析
- * 
+ *
  * <?xml version="1.0" encoding="UTF-8" ?>
  * <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
  * <mapper namespace="cn.com.janita.employeecore.dao.account.AccountLastChooseDAO">
- *     <resultMap id="BaseResultMap" type="cn.com.janita.employeecore.dao.account.dataobj.AccountLastChooseDO">
- *         <result column="account_id" property="accountId" jdbcType="VARCHAR"/>
- *         <result column="customer_id" property="customerId" jdbcType="BIGINT"/>
- *         <result column="dept_id" property="deptId" jdbcType="INTEGER"/>
- *     </resultMap>
+ * <resultMap id="BaseResultMap" type="cn.com.janita.employeecore.dao.account.dataobj.AccountLastChooseDO">
+ * <result column="account_id" property="accountId" jdbcType="VARCHAR"/>
+ * <result column="customer_id" property="customerId" jdbcType="BIGINT"/>
+ * <result column="dept_id" property="deptId" jdbcType="INTEGER"/>
+ * </resultMap>
  *
- *     <select id="selectByAccountId" resultMap="BaseResultMap">
- *         SELECT account_id, customer_id, dept_id
- *         FROM epc_account_last_choose
- *         WHERE account_id = #{accountId,jdbcType=VARCHAR}
- *         AND is_delete = 0
- *     </select>
+ * <select id="selectByAccountId" resultMap="BaseResultMap">
+ * SELECT account_id, customer_id, dept_id
+ * FROM epc_account_last_choose
+ * WHERE account_id = #{accountId,jdbcType=VARCHAR}
+ * AND is_delete = 0
+ * </select>
  *
- *     <insert id="insert">
- *         INSERT INTO epc_account_last_choose (account_id,
- *         customer_id, dept_id, creator_id, modifier_id)
- *         VALUES (#{accountId,jdbcType=VARCHAR},
- *         #{customerId,jdbcType=BIGINT}, #{deptId,jdbcType=INTEGER},
- *         '${@cn.com.janita.employeecore.dao.util.AccountIdUtils@getAccountId()}',
- *         '${@cn.com.janita.employeecore.dao.util.AccountIdUtils@getAccountId()}')
- *     </insert>
+ * <insert id="insert">
+ * INSERT INTO epc_account_last_choose (account_id,
+ * customer_id, dept_id, creator_id, modifier_id)
+ * VALUES (#{accountId,jdbcType=VARCHAR},
+ * #{customerId,jdbcType=BIGINT}, #{deptId,jdbcType=INTEGER},
+ * '${@cn.com.janita.employeecore.dao.util.AccountIdUtils@getAccountId()}',
+ * '${@cn.com.janita.employeecore.dao.util.AccountIdUtils@getAccountId()}')
+ * </insert>
  *
- *     <update id="update">
- *         UPDATE epc_account_last_choose
- *         SET customer_id = #{customerId,jdbcType=BIGINT},
- *         dept_id = #{deptId,jdbcType=INTEGER},
- *         modifier_id = '${@cn.com.janita.employeecore.dao.util.AccountIdUtils@getAccountId()}'
- *         WHERE account_id = #{accountId,jdbcType=VARCHAR}
- *         AND is_delete = 0
- *     </update>
+ * <update id="update">
+ * UPDATE epc_account_last_choose
+ * SET customer_id = #{customerId,jdbcType=BIGINT},
+ * dept_id = #{deptId,jdbcType=INTEGER},
+ * modifier_id = '${@cn.com.janita.employeecore.dao.util.AccountIdUtils@getAccountId()}'
+ * WHERE account_id = #{accountId,jdbcType=VARCHAR}
+ * AND is_delete = 0
+ * </update>
  * </mapper>
  *
  * @author Clinton Begin
@@ -172,13 +172,15 @@ public class XMLMapperBuilder extends BaseBuilder {
             }
             builderAssistant.setCurrentNamespace(namespace);
             //2.配置cache-ref
+            //<cache-ref namespace="com.someone.application.data.SomeMapper"/>
             cacheRefElement(mapperNode.evalNode("cache-ref"));
             //3.配置cache
             cacheElement(mapperNode.evalNode("cache"));
             //4.配置parameterMap(已经废弃,老式风格的参数映射)
             parameterMapElement(mapperNode.evalNodes("/mapper/parameterMap"));
             //5.配置resultMap(高级功能)
-            resultMapElements(mapperNode.evalNodes("/mapper/resultMap"));
+            List<XNode> resultMapNodeList = mapperNode.evalNodes("/mapper/resultMap");
+            resultMapElements(resultMapNodeList);
             //6.配置sql(定义可重用的 SQL 代码段)
             sqlElement(mapperNode.evalNodes("/mapper/sql"));
             //7.配置select|insert|update|delete TODO
@@ -260,11 +262,12 @@ public class XMLMapperBuilder extends BaseBuilder {
 
     //2.配置cache-ref,在这样的 情况下你可以使用 cache-ref 元素来引用另外一个缓存。
     //<cache-ref namespace="com.someone.application.data.SomeMapper"/>
-    private void cacheRefElement(XNode context) {
-        if (context != null) {
+    private void cacheRefElement(XNode cacheRefNote) {
+        if (cacheRefNote != null) {
             //增加cache-ref
-            configuration.addCacheRef(builderAssistant.getCurrentNamespace(), context.getStringAttribute("namespace"));
-            CacheRefResolver cacheRefResolver = new CacheRefResolver(builderAssistant, context.getStringAttribute("namespace"));
+            String cacheRefNamespace = cacheRefNote.getStringAttribute("namespace");
+            configuration.addCacheRef(builderAssistant.getCurrentNamespace(), cacheRefNamespace);
+            CacheRefResolver cacheRefResolver = new CacheRefResolver(builderAssistant, cacheRefNamespace);
             try {
                 cacheRefResolver.resolveCacheRef();
             } catch (IncompleteElementException e) {
@@ -279,21 +282,23 @@ public class XMLMapperBuilder extends BaseBuilder {
     //  flushInterval="60000"
     //  size="512"
     //  readOnly="true"/>
-    private void cacheElement(XNode context) throws Exception {
-        if (context != null) {
-            String type = context.getStringAttribute("type", "PERPETUAL");
+    private void cacheElement(XNode cacheNode) throws Exception {
+        if (cacheNode != null) {
+            //默认类型：永久
+            String type = cacheNode.getStringAttribute("type", "PERPETUAL");
             Class<? extends Cache> typeClass = typeAliasRegistry.resolveAlias(type);
-            String eviction = context.getStringAttribute("eviction", "LRU");
+            //回收策略
+            String eviction = cacheNode.getStringAttribute("eviction", "LRU");
             Class<? extends Cache> evictionClass = typeAliasRegistry.resolveAlias(eviction);
-            Long flushInterval = context.getLongAttribute("flushInterval");
-            Integer size = context.getIntAttribute("size");
-            boolean readWrite = !context.getBooleanAttribute("readOnly", false);
-            boolean blocking = context.getBooleanAttribute("blocking", false);
+            Long flushInterval = cacheNode.getLongAttribute("flushInterval");
+            Integer size = cacheNode.getIntAttribute("size");
+            boolean readWrite = !cacheNode.getBooleanAttribute("readOnly", false);
+            boolean blocking = cacheNode.getBooleanAttribute("blocking", false);
             //读入额外的配置信息，易于第三方的缓存扩展,例:
             //    <cache type="com.domain.something.MyCustomCache">
             //      <property name="cacheFile" value="/tmp/my-custom-cache.tmp"/>
             //    </cache>
-            Properties props = context.getChildrenAsProperties();
+            Properties props = cacheNode.getChildrenAsProperties();
             //调用builderAssistant.useNewCache
             builderAssistant.useNewCache(typeClass, evictionClass, flushInterval, size, readWrite, blocking, props);
         }
@@ -329,6 +334,17 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
 
     //5.配置resultMap,高级功能
+
+    /**
+     * <resultMap id="BaseResultMap" type="cn.com.janita.employeecore.dao.account.dataobj.AccountLastChooseDO">
+     * <result column="account_id" property="accountId" jdbcType="VARCHAR"/>
+     * <result column="customer_id" property="customerId" jdbcType="BIGINT"/>
+     * <result column="dept_id" property="deptId" jdbcType="INTEGER"/>
+     * </resultMap>
+     *
+     * @param list 一个mapper多个resultMap
+     * @throws Exception
+     */
     private void resultMapElements(List<XNode> list) throws Exception {
         //基本上就是循环把resultMap加入到Configuration里去,保持2份，一份缩略，一分全名
         for (XNode resultMapNode : list) {
@@ -343,7 +359,7 @@ public class XMLMapperBuilder extends BaseBuilder {
 
     //5.1 配置resultMap
     private ResultMap resultMapElement(XNode resultMapNode) throws Exception {
-        return resultMapElement(resultMapNode, Collections.<ResultMapping>emptyList());
+        return resultMapElement(resultMapNode, Collections.emptyList());
     }
 
     //5.1 配置resultMap
@@ -356,8 +372,7 @@ public class XMLMapperBuilder extends BaseBuilder {
         //      <result property="password" column="password"/>
         //    </resultMap>
         ErrorContext.instance().activity("processing " + resultMapNode.getValueBasedIdentifier());
-        String id = resultMapNode.getStringAttribute("id",
-                resultMapNode.getValueBasedIdentifier());
+        String id = resultMapNode.getStringAttribute("id", resultMapNode.getValueBasedIdentifier());
         //一般拿type就可以了，后面3个难道是兼容老的代码？
         String type = resultMapNode.getStringAttribute("type",
                 resultMapNode.getStringAttribute("ofType",
@@ -371,11 +386,14 @@ public class XMLMapperBuilder extends BaseBuilder {
         //autoMapping
         Boolean autoMapping = resultMapNode.getBooleanAttribute("autoMapping");
         Class<?> typeClass = resolveClass(type);
+        // 鉴别器；辨别者
         Discriminator discriminator = null;
-        List<ResultMapping> resultMappings = new ArrayList<ResultMapping>();
-        resultMappings.addAll(additionalResultMappings);
-        List<XNode> resultChildren = resultMapNode.getChildren();
-        for (XNode resultChild : resultChildren) {
+        List<ResultMapping> resultMappings = new ArrayList<>(additionalResultMappings);
+        List<XNode> resultNodeList = resultMapNode.getChildren();
+        //<id property="id" column="user_id" />
+        //<result property="username" column="username"/>
+        //<result property="password" column="password"/>
+        for (XNode resultChild : resultNodeList) {
             if ("constructor".equals(resultChild.getName())) {
                 //解析result map的constructor
                 processConstructorElement(resultChild, typeClass, resultMappings);
@@ -383,7 +401,7 @@ public class XMLMapperBuilder extends BaseBuilder {
                 //解析result map的discriminator
                 discriminator = processDiscriminatorElement(resultChild, typeClass, resultMappings);
             } else {
-                List<ResultFlag> flags = new ArrayList<ResultFlag>();
+                List<ResultFlag> flags = new ArrayList<>();
                 if ("id".equals(resultChild.getName())) {
                     flags.add(ResultFlag.ID);
                 }
