@@ -13,18 +13,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.session;
 
 /**
- * @author Clinton Begin
- */
-/**
  * 结果处理器
- * 
+ *
+ * 具体用法：https://www.jianshu.com/p/8773d0e786d8
+ *
+ * @author Clinton Begin
  */
 public interface ResultHandler {
 
-  //处理结果，给一个结果上下文
-  void handleResult(ResultContext context);
-
+    //处理结果，给一个结果上下文
+    void handleResult(ResultContext context);
 }

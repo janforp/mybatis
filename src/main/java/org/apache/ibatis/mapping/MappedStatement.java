@@ -30,11 +30,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author Clinton Begin
- */
-
-/**
  * 映射的语句
+ *
+ * @author Clinton Begin
  */
 public final class MappedStatement {
 

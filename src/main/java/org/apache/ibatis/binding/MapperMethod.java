@@ -45,12 +45,12 @@ import java.util.TreeMap;
 public class MapperMethod {
 
     /**
-     * sql命令
+     * sql命令--一旦赋值，就永远是该值。
      */
     private final SqlCommand command;
 
     /**
-     * 方法签名
+     * 方法签名--一旦赋值，就永远是该值。
      */
     private final MethodSignature method;
 
@@ -64,6 +64,7 @@ public class MapperMethod {
         Object result;
         //可以看到执行时就是4种情况，insert|update|delete|select，分别调用SqlSession的4大类方法
         if (SqlCommandType.INSERT == command.getType()) {
+            //sql 执行的参数
             Object param = method.convertArgsToSqlCommandParam(args);
             int affectedRowCount = sqlSession.insert(command.getName(), param);
             result = rowCountResult(affectedRowCount);
@@ -211,23 +212,33 @@ public class MapperMethod {
          */
         private final SqlCommandType type;
 
+        /**
+         * 接口 mapperInterface 的方法 method 对应的 sql 命令
+         * 把该方法对应的  statement 准备好，放到配置对象 configuration
+         *
+         * @param configuration 配置
+         * @param mapperInterface DAO
+         * @param method DAO方法
+         */
         public SqlCommand(Configuration configuration, Class<?> mapperInterface, Method method) {
             String statementName = mapperInterface.getName() + "." + method.getName();
-            MappedStatement ms = null;
+            //创建 映射的语句
+            MappedStatement mappedStatement = null;
             if (configuration.hasStatement(statementName)) {
-                ms = configuration.getMappedStatement(statementName);
+                //创建并返回 mappedStatement
+                mappedStatement = configuration.getMappedStatement(statementName);
             } else if (!mapperInterface.equals(method.getDeclaringClass().getName())) { // issue #35
                 //如果不是这个mapper接口的方法，再去查父类
                 String parentStatementName = method.getDeclaringClass().getName() + "." + method.getName();
                 if (configuration.hasStatement(parentStatementName)) {
-                    ms = configuration.getMappedStatement(parentStatementName);
+                    mappedStatement = configuration.getMappedStatement(parentStatementName);
                 }
             }
-            if (ms == null) {
+            if (mappedStatement == null) {
                 throw new BindingException("Invalid bound statement (not found): " + statementName);
             }
-            name = ms.getId();
-            type = ms.getSqlCommandType();
+            name = mappedStatement.getId();
+            type = mappedStatement.getSqlCommandType();
             if (type == SqlCommandType.UNKNOWN) {
                 throw new BindingException("Unknown execution method for: " + name);
             }
@@ -261,19 +272,21 @@ public class MapperMethod {
 
         private final Integer rowBoundsIndex;
 
+        private final boolean hasNamedParameters;
+
         /**
          * 参数
          */
         private final SortedMap<Integer, String> params;
 
-        private final boolean hasNamedParameters;
-
         public MethodSignature(Configuration configuration, Method method) {
             this.returnType = method.getReturnType();
             this.returnsVoid = void.class.equals(this.returnType);
             this.returnsMany = (configuration.getObjectFactory().isCollection(this.returnType) || this.returnType.isArray());
+            //如果返回是 map, 使用什么作为 map 的 key
             this.mapKey = getMapKey(method);
             this.returnsMap = (this.mapKey != null);
+            //是否有 @Param 注解
             this.hasNamedParameters = hasNamedParams(method);
             //以下重复循环2遍调用getUniqueParamIndex，是不是降低效率了
             //记下RowBounds是第几个参数
@@ -283,6 +296,15 @@ public class MapperMethod {
             this.params = Collections.unmodifiableSortedMap(getParams(method, this.hasNamedParameters));
         }
 
+        /**
+         * 多个参数返回 map
+         * 这个内部类是对映射器接口中的方法的封装，
+         * 其核心功能就是convertArgsToSqlCommandParam(Object[] args)方法，用于将方法中的参数转换成为SQL脚本命令中的参数形式，
+         * 其实就是将参数位置作为键，具体的参数作为值保存到一个Map集合中，这样在SQL脚本命令中用键#{1}通过集合就能得到具体的参数。
+         *
+         * @param args 入参数
+         * @return 多个参数返回
+         */
         public Object convertArgsToSqlCommandParam(Object[] args) {
             final int paramCount = params.size();
             if (args == null || paramCount == 0) {
@@ -306,6 +328,7 @@ public class MapperMethod {
                         //你可以传递多个参数给一个映射器方法。如果你这样做了,
                         //默认情况下它们将会以它们在参数列表中的位置来命名,比如:#{param1},#{param2}等。
                         //如果你想改变参数的名称(只在多参数情况下) ,那么你可以在参数上使用@Param(“paramName”)注解。
+                        //此处为了向老版本兼容，故在map中保存着两份参数，一份是老版的与#{0}为键的参数另一种为以#{param1}为键的参数。
                         param.put(genericParamName, args[entry.getKey()]);
                     }
                     i++;
@@ -350,6 +373,13 @@ public class MapperMethod {
             return returnsVoid;
         }
 
+        /**
+         * 获取指定参数的下标
+         *
+         * @param method 方法
+         * @param paramType 参数类型
+         * @return 获取指定参数的下标
+         */
         private Integer getUniqueParamIndex(Method method, Class<?> paramType) {
             Integer index = null;
             final Class<?>[] argTypes = method.getParameterTypes();
@@ -358,6 +388,7 @@ public class MapperMethod {
                     if (index == null) {
                         index = i;
                     } else {
+                        //参数类型重复？
                         throw new BindingException(method.getName() + " cannot have multiple " + paramType.getSimpleName() + " parameters");
                     }
                 }
@@ -377,13 +408,19 @@ public class MapperMethod {
             return mapKey;
         }
 
-        //得到所有参数
+        /**
+         * 得到所有参数
+         *
+         * @param method 方法
+         * @param hasNamedParameters 是否 @Param
+         * @return 得到所有参数
+         */
         private SortedMap<Integer, String> getParams(Method method, boolean hasNamedParameters) {
             //用一个TreeMap,这样就保证还是按参数的先后顺序
-            final SortedMap<Integer, String> params = new TreeMap<Integer, String>();
+            final SortedMap<Integer, String> params = new TreeMap<>();
             final Class<?>[] argTypes = method.getParameterTypes();
             for (int i = 0; i < argTypes.length; i++) {
-                //是否不是RowBounds/ResultHandler类型的参数
+                //是否不是RowBounds/ResultHandler类型的参数，意思就是过滤这2个类型的参数
                 if (!RowBounds.class.isAssignableFrom(argTypes[i]) && !ResultHandler.class.isAssignableFrom(argTypes[i])) {
                     //参数名字默认为0,1,2，这就是为什么xml里面可以用#{1}这样的写法来表示参数了
                     String paramName = String.valueOf(params.size());
@@ -397,8 +434,8 @@ public class MapperMethod {
             return params;
         }
 
-        private String getParamNameFromAnnotation(Method method, int i, String paramName) {
-            final Object[] paramAnnos = method.getParameterAnnotations()[i];
+        private String getParamNameFromAnnotation(Method method, int paramIndex, String paramName) {
+            final Object[] paramAnnos = method.getParameterAnnotations()[paramIndex];
             for (Object paramAnno : paramAnnos) {
                 if (paramAnno instanceof Param) {
                     paramName = ((Param) paramAnno).value();
@@ -409,10 +446,10 @@ public class MapperMethod {
 
         private boolean hasNamedParams(Method method) {
             boolean hasNamedParams = false;
-            final Object[][] paramAnnos = method.getParameterAnnotations();
-            for (Object[] paramAnno : paramAnnos) {
-                for (Object aParamAnno : paramAnno) {
-                    if (aParamAnno instanceof Param) {
+            final Object[][] parameterAnnotations = method.getParameterAnnotations();
+            for (Object[] paramAnnotation : parameterAnnotations) {
+                for (Object aParamAnnotation : paramAnnotation) {
+                    if (aParamAnnotation instanceof Param) {
                         //查找@Param注解,一般不会用注解吧，可以忽略
                         hasNamedParams = true;
                         break;

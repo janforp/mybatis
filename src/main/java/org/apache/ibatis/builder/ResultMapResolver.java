@@ -13,43 +13,50 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.builder;
 
-import java.util.List;
+package org.apache.ibatis.builder;
 
 import org.apache.ibatis.mapping.Discriminator;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.ResultMapping;
 
-/**
- * @author Eduardo Macarron
- */
+import java.util.List;
+
 /**
  * 结果映射解析器
  *
+ * @author Eduardo Macarron
  */
 public class ResultMapResolver {
-  private final MapperBuilderAssistant assistant;
-  private String id;
-  private Class<?> type;
-  private String extend;
-  private Discriminator discriminator;
-  private List<ResultMapping> resultMappings;
-  private Boolean autoMapping;
 
-  public ResultMapResolver(MapperBuilderAssistant assistant, String id, Class<?> type, String extend, Discriminator discriminator, List<ResultMapping> resultMappings, Boolean autoMapping) {
-    this.assistant = assistant;
-    this.id = id;
-    this.type = type;
-    this.extend = extend;
-    this.discriminator = discriminator;
-    this.resultMappings = resultMappings;
-    this.autoMapping = autoMapping;
-  }
+    private final MapperBuilderAssistant assistant;
 
-  public ResultMap resolve() {
-      //解析又去调用MapperBuilderAssistant.addResultMap
-    return assistant.addResultMap(this.id, this.type, this.extend, this.discriminator, this.resultMappings, this.autoMapping);
-  }
+    private String id;
+
+    private Class<?> type;
+
+    private String extend;
+
+    private Discriminator discriminator;
+
+    private List<ResultMapping> resultMappings;
+
+    private Boolean autoMapping;
+
+    public ResultMapResolver(MapperBuilderAssistant assistant, String id, Class<?> type,
+            String extend, Discriminator discriminator, List<ResultMapping> resultMappings, Boolean autoMapping) {
+        this.assistant = assistant;
+        this.id = id;
+        this.type = type;
+        this.extend = extend;
+        this.discriminator = discriminator;
+        this.resultMappings = resultMappings;
+        this.autoMapping = autoMapping;
+    }
+
+    public ResultMap resolve() {
+        //解析又去调用MapperBuilderAssistant.addResultMap
+        return assistant.addResultMap(this.id, this.type, this.extend, this.discriminator, this.resultMappings, this.autoMapping);
+    }
 
 }
