@@ -13,20 +13,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.mapping;
 
 /**
- * Represents the content of a mapped statement read from an XML file or an annotation. 
+ * SQL源码
+ * Represents the content of a mapped statement read from an XML file or an annotation.
  * It creates the SQL that will be passed to the database out of the input parameter received from the user.
+ * 生成不带参数的sql
  *
  * @author Clinton Begin
  */
-/**
- * SQL源码
- * 
- */
 public interface SqlSource {
 
-  BoundSql getBoundSql(Object parameterObject);
-
+    BoundSql getBoundSql(Object parameterObject);
 }

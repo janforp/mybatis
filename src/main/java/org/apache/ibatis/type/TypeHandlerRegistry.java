@@ -174,8 +174,8 @@ public final class TypeHandlerRegistry {
   }
 
   @SuppressWarnings("unchecked")
-  private <T> TypeHandler<T> getTypeHandler(Type type, JdbcType jdbcType) {
-    Map<JdbcType, TypeHandler<?>> jdbcHandlerMap = TYPE_HANDLER_MAP.get(type);
+  private <T> TypeHandler<T> getTypeHandler(Type javaType, JdbcType jdbcType) {
+    Map<JdbcType, TypeHandler<?>> jdbcHandlerMap = TYPE_HANDLER_MAP.get(javaType);
     TypeHandler<?> handler = null;
     if (jdbcHandlerMap != null) {
       handler = jdbcHandlerMap.get(jdbcType);
@@ -183,10 +183,10 @@ public final class TypeHandlerRegistry {
         handler = jdbcHandlerMap.get(null);
       }
     }
-    if (handler == null && type != null && type instanceof Class && Enum.class.isAssignableFrom((Class<?>) type)) {
-      handler = new EnumTypeHandler((Class<?>) type);
+    if (handler == null && javaType != null && javaType instanceof Class && Enum.class.isAssignableFrom((Class<?>) javaType)) {
+      handler = new EnumTypeHandler((Class<?>) javaType);
     }
-    // type drives generics here
+    // javaType drives generics here
     return (TypeHandler<T>) handler;
   }
 
