@@ -56,6 +56,9 @@ public class XMLConfigBuilder extends BaseBuilder {
 
     private XPathParser parser;
 
+    /**
+     * 当前默认的环境名称
+     */
     private String environment;
 
     //以下3个一组
@@ -134,33 +137,33 @@ public class XMLConfigBuilder extends BaseBuilder {
     /**
      * 解析配置
      *
-     * @param root configuration 根下面的所有配置
+     * @param configurationRootNode configuration 根下面的所有配置
      */
-    private void parseConfiguration(XNode root) {
+    private void parseConfiguration(XNode configurationRootNode) {
         try {
             //分步骤解析
             //issue #117 read properties first
             //1.properties
-            propertiesElement(root.evalNode("properties"));
+            propertiesElement(configurationRootNode.evalNode("properties"));
             //2.类型别名，并且注册到别名注册器
-            typeAliasesElement(root.evalNode("typeAliases"));
+            typeAliasesElement(configurationRootNode.evalNode("typeAliases"));
             //3.插件
-            pluginElement(root.evalNode("plugins"));
+            pluginElement(configurationRootNode.evalNode("plugins"));
             //4.对象工厂
-            objectFactoryElement(root.evalNode("objectFactory"));
+            objectFactoryElement(configurationRootNode.evalNode("objectFactory"));
             //5.对象包装工厂
-            objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
+            objectWrapperFactoryElement(configurationRootNode.evalNode("objectWrapperFactory"));
             //6.设置,类似一些开关，配置
-            settingsElement(root.evalNode("settings"));
+            settingsElement(configurationRootNode.evalNode("settings"));
             // read it after objectFactory and objectWrapperFactory issue #631
             //7.环境
-            environmentsElement(root.evalNode("environments"));
+            environmentsElement(configurationRootNode.evalNode("environments"));
             //8.databaseIdProvider
-            databaseIdProviderElement(root.evalNode("databaseIdProvider"));
+            databaseIdProviderElement(configurationRootNode.evalNode("databaseIdProvider"));
             //9.类型处理器
-            typeHandlerElement(root.evalNode("typeHandlers"));
+            typeHandlerElement(configurationRootNode.evalNode("typeHandlers"));
             //10.映射器
-            mapperElement(root.evalNode("mappers"));
+            mapperElement(configurationRootNode.evalNode("mappers"));
         } catch (Exception e) {
             throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
         }
@@ -323,12 +326,12 @@ public class XMLConfigBuilder extends BaseBuilder {
     private void settingsElement(XNode settingsNode) throws Exception {
         if (settingsNode != null) {
             //<setting name="useColumnLabel" value="true"/> name - value
-            Properties settingsNameToValue = settingsNode.getChildrenAsProperties();
+            Properties settingsNameToValueMap = settingsNode.getChildrenAsProperties();
             // Check that all settings are known to the configuration class
             //检查下是否在Configuration类里都有相应的setter方法（没有拼写错误）
             MetaClass metaConfig = MetaClass.forClass(Configuration.class);
             // name
-            Set<Object> settingNameSet = settingsNameToValue.keySet();
+            Set<Object> settingNameSet = settingsNameToValueMap.keySet();
             for (Object name : settingNameSet) {
                 if (!metaConfig.hasSetter(String.valueOf(name))) {
                     //配置文件中拼写错误
@@ -338,48 +341,48 @@ public class XMLConfigBuilder extends BaseBuilder {
 
             //下面非常简单，一个个设置属性
             //如何自动映射列到字段/ 属性
-            configuration.setAutoMappingBehavior(AutoMappingBehavior.valueOf(settingsNameToValue.getProperty("autoMappingBehavior", "PARTIAL")));
+            configuration.setAutoMappingBehavior(AutoMappingBehavior.valueOf(settingsNameToValueMap.getProperty("autoMappingBehavior", "PARTIAL")));
             //缓存
-            configuration.setCacheEnabled(booleanValueOf(settingsNameToValue.getProperty("cacheEnabled"), true));
+            configuration.setCacheEnabled(booleanValueOf(settingsNameToValueMap.getProperty("cacheEnabled"), true));
             //proxyFactory (CGLIB | JAVASSIST)
             //延迟加载的核心技术就是用代理模式，CGLIB/JAVASSIST两者选一
-            configuration.setProxyFactory((ProxyFactory) createInstance(settingsNameToValue.getProperty("proxyFactory")));
+            configuration.setProxyFactory((ProxyFactory) createInstance(settingsNameToValueMap.getProperty("proxyFactory")));
             //延迟加载
-            configuration.setLazyLoadingEnabled(booleanValueOf(settingsNameToValue.getProperty("lazyLoadingEnabled"), false));
+            configuration.setLazyLoadingEnabled(booleanValueOf(settingsNameToValueMap.getProperty("lazyLoadingEnabled"), false));
             //延迟加载时，每种属性是否还要按需加载
-            configuration.setAggressiveLazyLoading(booleanValueOf(settingsNameToValue.getProperty("aggressiveLazyLoading"), true));
+            configuration.setAggressiveLazyLoading(booleanValueOf(settingsNameToValueMap.getProperty("aggressiveLazyLoading"), true));
             //允不允许多种结果集从一个单独 的语句中返回
-            configuration.setMultipleResultSetsEnabled(booleanValueOf(settingsNameToValue.getProperty("multipleResultSetsEnabled"), true));
+            configuration.setMultipleResultSetsEnabled(booleanValueOf(settingsNameToValueMap.getProperty("multipleResultSetsEnabled"), true));
             //使用列标签代替列名
-            configuration.setUseColumnLabel(booleanValueOf(settingsNameToValue.getProperty("useColumnLabel"), true));
+            configuration.setUseColumnLabel(booleanValueOf(settingsNameToValueMap.getProperty("useColumnLabel"), true));
             //允许 JDBC 支持生成的键
-            configuration.setUseGeneratedKeys(booleanValueOf(settingsNameToValue.getProperty("useGeneratedKeys"), false));
+            configuration.setUseGeneratedKeys(booleanValueOf(settingsNameToValueMap.getProperty("useGeneratedKeys"), false));
             //配置默认的执行器
-            configuration.setDefaultExecutorType(ExecutorType.valueOf(settingsNameToValue.getProperty("defaultExecutorType", "SIMPLE")));
+            configuration.setDefaultExecutorType(ExecutorType.valueOf(settingsNameToValueMap.getProperty("defaultExecutorType", "SIMPLE")));
             //超时时间
-            configuration.setDefaultStatementTimeout(integerValueOf(settingsNameToValue.getProperty("defaultStatementTimeout"), null));
+            configuration.setDefaultStatementTimeout(integerValueOf(settingsNameToValueMap.getProperty("defaultStatementTimeout"), null));
             //是否将DB字段自动映射到驼峰式Java属性（A_COLUMN-->aColumn）
-            configuration.setMapUnderscoreToCamelCase(booleanValueOf(settingsNameToValue.getProperty("mapUnderscoreToCamelCase"), false));
+            configuration.setMapUnderscoreToCamelCase(booleanValueOf(settingsNameToValueMap.getProperty("mapUnderscoreToCamelCase"), false));
             //嵌套语句上使用RowBounds
-            configuration.setSafeRowBoundsEnabled(booleanValueOf(settingsNameToValue.getProperty("safeRowBoundsEnabled"), false));
+            configuration.setSafeRowBoundsEnabled(booleanValueOf(settingsNameToValueMap.getProperty("safeRowBoundsEnabled"), false));
             //默认用session级别的缓存
-            configuration.setLocalCacheScope(LocalCacheScope.valueOf(settingsNameToValue.getProperty("localCacheScope", "SESSION")));
+            configuration.setLocalCacheScope(LocalCacheScope.valueOf(settingsNameToValueMap.getProperty("localCacheScope", "SESSION")));
             //为null值设置jdbctype
-            configuration.setJdbcTypeForNull(JdbcType.valueOf(settingsNameToValue.getProperty("jdbcTypeForNull", "OTHER")));
+            configuration.setJdbcTypeForNull(JdbcType.valueOf(settingsNameToValueMap.getProperty("jdbcTypeForNull", "OTHER")));
             //Object的哪些方法将触发延迟加载
-            configuration.setLazyLoadTriggerMethods(stringSetValueOf(settingsNameToValue.getProperty("lazyLoadTriggerMethods"), "equals,clone,hashCode,toString"));
+            configuration.setLazyLoadTriggerMethods(stringSetValueOf(settingsNameToValueMap.getProperty("lazyLoadTriggerMethods"), "equals,clone,hashCode,toString"));
             //使用安全的ResultHandler
-            configuration.setSafeResultHandlerEnabled(booleanValueOf(settingsNameToValue.getProperty("safeResultHandlerEnabled"), true));
+            configuration.setSafeResultHandlerEnabled(booleanValueOf(settingsNameToValueMap.getProperty("safeResultHandlerEnabled"), true));
             //动态SQL生成语言所使用的脚本语言
-            configuration.setDefaultScriptingLanguage(resolveClass(settingsNameToValue.getProperty("defaultScriptingLanguage")));
+            configuration.setDefaultScriptingLanguage(resolveClass(settingsNameToValueMap.getProperty("defaultScriptingLanguage")));
             //当结果集中含有Null值时是否执行映射对象的setter或者Map对象的put方法。此设置对于原始类型如int,boolean等无效。
-            configuration.setCallSettersOnNulls(booleanValueOf(settingsNameToValue.getProperty("callSettersOnNulls"), false));
+            configuration.setCallSettersOnNulls(booleanValueOf(settingsNameToValueMap.getProperty("callSettersOnNulls"), false));
             //logger名字的前缀
-            configuration.setLogPrefix(settingsNameToValue.getProperty("logPrefix"));
+            configuration.setLogPrefix(settingsNameToValueMap.getProperty("logPrefix"));
             //显式定义用什么log框架，不定义则用默认的自动发现jar包机制
-            configuration.setLogImpl(resolveClass(settingsNameToValue.getProperty("logImpl")));
+            configuration.setLogImpl(resolveClass(settingsNameToValueMap.getProperty("logImpl")));
             //配置工厂
-            configuration.setConfigurationFactory(resolveClass(settingsNameToValue.getProperty("configurationFactory")));
+            configuration.setConfigurationFactory(resolveClass(settingsNameToValueMap.getProperty("configurationFactory")));
         }
     }
 
@@ -397,18 +400,31 @@ public class XMLConfigBuilder extends BaseBuilder {
     //	    </dataSource>
     //	  </environment>
     //	</environments>
-    private void environmentsElement(XNode context) throws Exception {
-        if (context != null) {
+    private void environmentsElement(XNode environmentsNode) throws Exception {
+        if (environmentsNode != null) {
             if (environment == null) {
-                environment = context.getStringAttribute("default");
+                //<environments default="development">
+                environment = environmentsNode.getStringAttribute("default");
             }
-            for (XNode child : context.getChildren()) {
+            //可以配置多套数据库环境
+            for (XNode child : environmentsNode.getChildren()) {
+                //<environment id="development">
                 String id = child.getStringAttribute("id");
                 //循环比较id是否就是指定的environment
                 if (isSpecifiedEnvironment(id)) {
                     //7.1事务管理器
-                    TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager"));
+                    //<transactionManager type="JDBC">
+                    //  <property name="..." value="..."/>
+                    //</transactionManager>
+                    XNode transactionManagerNode = child.evalNode("transactionManager");
+                    TransactionFactory txFactory = transactionManagerElement(transactionManagerNode);
                     //7.2数据源
+                    //<dataSource type="POOLED">
+                    //  <property name="driver" value="${driver}"/>
+                    //  <property name="url" value="${url}"/>
+                    //  <property name="username" value="${username}"/>
+                    //  <property name="password" value="${password}"/>
+                    //</dataSource>
                     DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
                     DataSource dataSource = dsFactory.getDataSource();
                     Environment.Builder environmentBuilder = new Environment.Builder(id)
@@ -456,11 +472,12 @@ public class XMLConfigBuilder extends BaseBuilder {
     //<transactionManager type="JDBC">
     //  <property name="..." value="..."/>
     //</transactionManager>
-    private TransactionFactory transactionManagerElement(XNode context) throws Exception {
-        if (context != null) {
-            String type = context.getStringAttribute("type");
-            Properties props = context.getChildrenAsProperties();
-            //根据type="JDBC"解析返回适当的TransactionFactory
+    private TransactionFactory transactionManagerElement(XNode transactionManagerNode) throws Exception {
+        if (transactionManagerNode != null) {
+            String type = transactionManagerNode.getStringAttribute("type");
+            //<property name="..." value="..."/>
+            Properties props = transactionManagerNode.getChildrenAsProperties();
+            //根据type="JDBC"解析返回适当的TransactionFactory,JDBC 别名已经被注册到别名注册器
             TransactionFactory factory = (TransactionFactory) resolveClass(type).newInstance();
             factory.setProperties(props);
             return factory;
@@ -495,22 +512,27 @@ public class XMLConfigBuilder extends BaseBuilder {
     //	<typeHandlers>
     //	  <package name="org.mybatis.example"/>
     //	</typeHandlers>
-    private void typeHandlerElement(XNode parent) throws Exception {
-        if (parent != null) {
-            for (XNode child : parent.getChildren()) {
+    private void typeHandlerElement(XNode typeHandlersNode) throws Exception {
+        if (typeHandlersNode != null) {
+            //<typeHandler handler="org.mybatis.example.ExampleTypeHandler"/>
+            //<package name="org.mybatis.example"/>
+            List<XNode> children = typeHandlersNode.getChildren();
+            for (XNode child : children) {
                 //如果是package
+                //<package name="org.mybatis.example"/>
                 if ("package".equals(child.getName())) {
                     String typeHandlerPackage = child.getStringAttribute("name");
                     //（一）调用TypeHandlerRegistry.register，去包下找所有类
                     typeHandlerRegistry.register(typeHandlerPackage);
                 } else {
+                    //<typeHandler handler="org.mybatis.example.ExampleTypeHandler"/>
                     //如果是typeHandler
                     String javaTypeName = child.getStringAttribute("javaType");
                     String jdbcTypeName = child.getStringAttribute("jdbcType");
-                    String handlerTypeName = child.getStringAttribute("handler");
+                    String fullClassName = child.getStringAttribute("handler");
                     Class<?> javaTypeClass = resolveClass(javaTypeName);
                     JdbcType jdbcType = resolveJdbcType(jdbcTypeName);
-                    Class<?> typeHandlerClass = resolveClass(handlerTypeName);
+                    Class<?> typeHandlerClass = resolveClass(fullClassName);
                     //（二）调用TypeHandlerRegistry.register(以下是3种不同的参数形式)
                     if (javaTypeClass != null) {
                         if (jdbcType == null) {
@@ -552,9 +574,9 @@ public class XMLConfigBuilder extends BaseBuilder {
     //	<mappers>
     //	  <package name="org.mybatis.builder"/>
     //	</mappers>
-    private void mapperElement(XNode parent) throws Exception {
-        if (parent != null) {
-            for (XNode child : parent.getChildren()) {
+    private void mapperElement(XNode mappersNode) throws Exception {
+        if (mappersNode != null) {
+            for (XNode child : mappersNode.getChildren()) {
                 if ("package".equals(child.getName())) {
                     //10.4自动扫描包下所有映射器
                     String mapperPackage = child.getStringAttribute("name");

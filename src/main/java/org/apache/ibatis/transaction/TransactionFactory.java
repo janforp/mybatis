@@ -23,13 +23,10 @@ import java.sql.Connection;
 import java.util.Properties;
 
 /**
+ * 事务工厂
  * Creates {@link Transaction} instances.
  *
  * @author Clinton Begin
- */
-
-/**
- * 事务工厂
  */
 public interface TransactionFactory {
 

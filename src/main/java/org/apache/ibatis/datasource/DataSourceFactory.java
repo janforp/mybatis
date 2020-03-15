@@ -13,24 +13,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.datasource;
 
-import java.util.Properties;
 import javax.sql.DataSource;
+import java.util.Properties;
 
-/**
- * @author Clinton Begin
- */
 /**
  * 数据源工厂
  * 有三种内建的数据源类型 UNPOOLED POOLED JNDI
+ *
+ * @author Clinton Begin
  */
 public interface DataSourceFactory {
 
-  //设置属性,被XMLConfigBuilder所调用
-  void setProperties(Properties props);
+    //设置属性,被XMLConfigBuilder所调用
+    void setProperties(Properties props);
 
-  //生产数据源,直接得到javax.sql.DataSource
-  DataSource getDataSource();
-
+    //生产数据源,直接得到javax.sql.DataSource
+    DataSource getDataSource();
 }
