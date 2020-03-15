@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.plugin;
 
 import java.lang.annotation.ElementType;
@@ -23,16 +24,29 @@ import java.lang.annotation.Target;
 /**
  * @author Clinton Begin
  */
-/**
- * 签名
- */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Signature {
-  //就是定义哪些类，方法，参数需要被拦截
-  Class<?> type();
+    //就是定义哪些类，方法，参数需要被拦截
 
-  String method();
+    /**
+     * 要拦截的接口
+     *
+     * @return
+     */
+    Class<?> type();
 
-  Class<?>[] args();
+    /**
+     * 需要拦截的方法，存在于要拦截的接口之中
+     *
+     * @return
+     */
+    String method();
+
+    /**
+     * 被拦截的方法所需要的参数
+     *
+     * @return
+     */
+    Class<?>[] args();
 }

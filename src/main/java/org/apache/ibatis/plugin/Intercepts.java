@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.plugin;
 
 import java.lang.annotation.ElementType;
@@ -23,12 +24,19 @@ import java.lang.annotation.Target;
 /**
  * @author Clinton Begin
  */
+
 /**
  * 拦截
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Intercepts {
-  Signature[] value();
+
+    /**
+     * 拦截多个方法
+     *
+     * @return
+     */
+    Signature[] value();
 }
 
