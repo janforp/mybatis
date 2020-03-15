@@ -580,10 +580,14 @@ public class XMLConfigBuilder extends BaseBuilder {
                 if ("package".equals(child.getName())) {
                     //10.4自动扫描包下所有映射器
                     String mapperPackage = child.getStringAttribute("name");
+                    //TODO
                     configuration.addMappers(mapperPackage);
                 } else {
+                    //<mapper resource="org/mybatis/builder/AuthorMapper.xml"/>
                     String resource = child.getStringAttribute("resource");
+                    //<mapper url="file:///var/mappers/AuthorMapper.xml"/>
                     String url = child.getStringAttribute("url");
+                    //<mapper class="org.mybatis.builder.AuthorMapper"/>
                     String mapperClass = child.getStringAttribute("class");
                     if (resource != null && url == null && mapperClass == null) {
                         //10.1使用类路径
