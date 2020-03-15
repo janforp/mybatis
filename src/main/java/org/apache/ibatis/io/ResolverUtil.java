@@ -57,6 +57,8 @@ import java.util.Set;
  *
  * 找一个package下满足条件的所有类
  *
+ * 扫描包用，能够获取到一个满足指定条件的类的 set 集合
+ *
  * @author Tim Fennell
  */
 public class ResolverUtil<T> {
@@ -80,7 +82,7 @@ public class ResolverUtil<T> {
          * 则:t.match(Car.class) 为 true
          *
          * @param type 父类型
-         * @return
+         * @return boolean
          */
         boolean matches(Class<?> type);
     }
@@ -98,13 +100,13 @@ public class ResolverUtil<T> {
          * Test t = new Test(Object.class);
          * 则:t.match(Car.class) 为 true
          */
-        private Class<?> parent;
+        private Class<?> superType;
 
         /**
          * Constructs an IsA test using the supplied Class as the parent class/interface.
          */
         public IsA(Class<?> parentType) {
-            this.parent = parentType;
+            this.superType = parentType;
         }
 
         /**
@@ -112,12 +114,12 @@ public class ResolverUtil<T> {
          */
         @Override
         public boolean matches(Class<?> type) {
-            return type != null && parent.isAssignableFrom(type);
+            return type != null && superType.isAssignableFrom(type);
         }
 
         @Override
         public String toString() {
-            return "is assignable to " + parent.getSimpleName();
+            return "is assignable to " + superType.getSimpleName();
         }
     }
 
@@ -152,8 +154,9 @@ public class ResolverUtil<T> {
 
     /**
      * The set of matches being accumulated.
+     * 满足指定条件的 class 集合
      */
-    private Set<Class<? extends T>> matches = new HashSet<Class<? extends T>>();
+    private Set<Class<? extends T>> matches = new HashSet<>();
 
     /**
      * The ClassLoader to use when looking for classes. If null then the ClassLoader returned
@@ -209,7 +212,6 @@ public class ResolverUtil<T> {
         for (String pkg : packageNames) {
             find(test, pkg);
         }
-
         return this;
     }
 
@@ -224,12 +226,10 @@ public class ResolverUtil<T> {
         if (packageNames == null) {
             return this;
         }
-
         Test test = new AnnotatedWith(annotation);
         for (String pkg : packageNames) {
             find(test, pkg);
         }
-
         return this;
     }
 

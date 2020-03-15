@@ -36,6 +36,9 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
 
     private final SqlSession sqlSession;
 
+    /**
+     * mapper/DAO接口类型
+     */
     private final Class<T> mapperInterface;
 
     private final Map<Method, MapperMethod> methodCache;
@@ -50,7 +53,11 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         //代理以后，所有Mapper的方法调用时，都会调用这个invoke方法
         //并不是任何一个方法都需要执行调用代理对象进行执行，如果这个方法是Object中通用的方法（toString、hashCode等）无需执行
-        if (Object.class.equals(method.getDeclaringClass())) {
+
+        //该方法的申明类
+        Class<?> declaringClass = method.getDeclaringClass();
+        //如果该方法是 Object 里面的方法，则直执行即可
+        if (Object.class.equals(declaringClass)) {
             try {
                 return method.invoke(this, args);
             } catch (Throwable t) {
@@ -63,12 +70,18 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
         return mapperMethod.execute(sqlSession, args);
     }
 
-    //去缓存中找MapperMethod
+    /**
+     * 去缓存中找MapperMethod
+     *
+     * @param method DAO 中的方法
+     * @return 代理方法
+     */
     private MapperMethod cachedMapperMethod(Method method) {
         MapperMethod mapperMethod = methodCache.get(method);
         if (mapperMethod == null) {
             //找不到才去new
             mapperMethod = new MapperMethod(mapperInterface, method, sqlSession.getConfiguration());
+            //缓存起来，避免每次都 new
             methodCache.put(method, mapperMethod);
         }
         return mapperMethod;

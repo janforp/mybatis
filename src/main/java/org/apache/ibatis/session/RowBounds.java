@@ -13,42 +13,43 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.session;
 
 /**
- * @author Clinton Begin
- */
-/**
  * 分页用，记录限制
  *
+ * @author Clinton Begin
  */
 public class RowBounds {
 
-  public static final int NO_ROW_OFFSET = 0;
-  public static final int NO_ROW_LIMIT = Integer.MAX_VALUE;
-  public static final RowBounds DEFAULT = new RowBounds();
+    public static final int NO_ROW_OFFSET = 0;
 
-  //offset,limit就等于一般分页的start,limit,
-  private int offset;
-  private int limit;
+    public static final int NO_ROW_LIMIT = Integer.MAX_VALUE;
 
-  //默认是一页Integer.MAX_VALUE条
-  public RowBounds() {
-    this.offset = NO_ROW_OFFSET;
-    this.limit = NO_ROW_LIMIT;
-  }
+    public static final RowBounds DEFAULT = new RowBounds();
 
-  public RowBounds(int offset, int limit) {
-    this.offset = offset;
-    this.limit = limit;
-  }
+    //offset,limit就等于一般分页的start,limit,
+    private int offset;
 
-  public int getOffset() {
-    return offset;
-  }
+    private int limit;
 
-  public int getLimit() {
-    return limit;
-  }
+    //默认是一页Integer.MAX_VALUE条
+    public RowBounds() {
+        this.offset = NO_ROW_OFFSET;
+        this.limit = NO_ROW_LIMIT;
+    }
 
+    public RowBounds(int offset, int limit) {
+        this.offset = offset;
+        this.limit = limit;
+    }
+
+    public int getOffset() {
+        return offset;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
 }

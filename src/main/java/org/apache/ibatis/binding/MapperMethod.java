@@ -59,7 +59,8 @@ public class MapperMethod {
         //可以看到执行时就是4种情况，insert|update|delete|select，分别调用SqlSession的4大类方法
         if (SqlCommandType.INSERT == command.getType()) {
             Object param = method.convertArgsToSqlCommandParam(args);
-            result = rowCountResult(sqlSession.insert(command.getName(), param));
+            int affectedRowCount = sqlSession.insert(command.getName(), param);
+            result = rowCountResult(affectedRowCount);
         } else if (SqlCommandType.UPDATE == command.getType()) {
             Object param = method.convertArgsToSqlCommandParam(args);
             result = rowCountResult(sqlSession.update(command.getName(), param));
@@ -85,6 +86,7 @@ public class MapperMethod {
         } else {
             throw new BindingException("Unknown execution method for: " + command.getName());
         }
+        //如果结果是null,但是方法用原始类型接收，则报错
         if (result == null && method.getReturnType().isPrimitive() && !method.returnsVoid()) {
             throw new BindingException("Mapper method '" + command.getName()
                     + " attempted to return null from a method with a primitive return type (" + method.getReturnType() + ").");
@@ -93,19 +95,19 @@ public class MapperMethod {
     }
 
     //这个方法对返回值的类型进行了一些检查，使得更安全
-    private Object rowCountResult(int rowCount) {
+    private Object rowCountResult(int affectedRowCount) {
         final Object result;
         if (method.returnsVoid()) {
             result = null;
         } else if (Integer.class.equals(method.getReturnType()) || Integer.TYPE.equals(method.getReturnType())) {
             //如果返回值是大int或小int
-            result = Integer.valueOf(rowCount);
+            result = affectedRowCount;
         } else if (Long.class.equals(method.getReturnType()) || Long.TYPE.equals(method.getReturnType())) {
             //如果返回值是大long或小long
-            result = Long.valueOf(rowCount);
+            result = (long) affectedRowCount;
         } else if (Boolean.class.equals(method.getReturnType()) || Boolean.TYPE.equals(method.getReturnType())) {
             //如果返回值是大boolean或小boolean
-            result = Boolean.valueOf(rowCount > 0);
+            result = affectedRowCount > 0;
         } else {
             throw new BindingException("Mapper method '" + command.getName() + "' has an unsupported return type: " + method.getReturnType());
         }
@@ -114,14 +116,15 @@ public class MapperMethod {
 
     //结果处理器
     private void executeWithResultHandler(SqlSession sqlSession, Object[] args) {
-        MappedStatement ms = sqlSession.getConfiguration().getMappedStatement(command.getName());
-        if (void.class.equals(ms.getResultMaps().get(0).getType())) {
+        MappedStatement mappedStatement = sqlSession.getConfiguration().getMappedStatement(command.getName());
+        if (void.class.equals(mappedStatement.getResultMaps().get(0).getType())) {
             throw new BindingException("method " + command.getName()
                     + " needs either a @ResultMap annotation, a @ResultType annotation,"
                     + " or a resultType attribute in XML so a ResultHandler can be used as a parameter.");
         }
         Object param = method.convertArgsToSqlCommandParam(args);
         if (method.hasRowBounds()) {
+            //分页
             RowBounds rowBounds = method.extractRowBounds(args);
             sqlSession.select(command.getName(), param, rowBounds, method.extractResultHandler(args));
         } else {
@@ -136,9 +139,9 @@ public class MapperMethod {
         //代入RowBounds
         if (method.hasRowBounds()) {
             RowBounds rowBounds = method.extractRowBounds(args);
-            result = sqlSession.<E>selectList(command.getName(), param, rowBounds);
+            result = sqlSession.selectList(command.getName(), param, rowBounds);
         } else {
-            result = sqlSession.<E>selectList(command.getName(), param);
+            result = sqlSession.selectList(command.getName(), param);
         }
         // issue #510 Collections & arrays support
         if (!method.getReturnType().isAssignableFrom(result.getClass())) {
@@ -170,9 +173,9 @@ public class MapperMethod {
         Object param = method.convertArgsToSqlCommandParam(args);
         if (method.hasRowBounds()) {
             RowBounds rowBounds = method.extractRowBounds(args);
-            result = sqlSession.<K, V>selectMap(command.getName(), param, method.getMapKey(), rowBounds);
+            result = sqlSession.selectMap(command.getName(), param, method.getMapKey(), rowBounds);
         } else {
-            result = sqlSession.<K, V>selectMap(command.getName(), param, method.getMapKey());
+            result = sqlSession.selectMap(command.getName(), param, method.getMapKey());
         }
         return result;
     }
@@ -249,6 +252,9 @@ public class MapperMethod {
 
         private final Integer rowBoundsIndex;
 
+        /**
+         * 参数
+         */
         private final SortedMap<Integer, String> params;
 
         private final boolean hasNamedParameters;
@@ -275,16 +281,17 @@ public class MapperMethod {
                 return null;
             } else if (!hasNamedParameters && paramCount == 1) {
                 //如果只有一个参数
-                return args[params.keySet().iterator().next().intValue()];
+                Integer firstParamIndex = params.keySet().iterator().next();
+                return args[firstParamIndex];
             } else {
                 //否则，返回一个ParamMap，修改参数名，参数名就是其位置
-                final Map<String, Object> param = new ParamMap<Object>();
+                final Map<String, Object> param = new ParamMap<>();
                 int i = 0;
                 for (Map.Entry<Integer, String> entry : params.entrySet()) {
                     //1.先加一个#{0},#{1},#{2}...参数
-                    param.put(entry.getValue(), args[entry.getKey().intValue()]);
+                    param.put(entry.getValue(), args[entry.getKey()]);
                     // issue #71, add param names as param1, param2...but ensure backward compatibility
-                    final String genericParamName = "param" + String.valueOf(i + 1);
+                    final String genericParamName = "param" + (i + 1);
                     if (!param.containsKey(genericParamName)) {
                         //2.再加一个#{param1},#{param2}...参数
                         //你可以传递多个参数给一个映射器方法。如果你这样做了,
