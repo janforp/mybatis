@@ -36,7 +36,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- * DAO/MAPPER.class 中定义的函数
+ * DAO/MAPPER.class 中定义的函数ji映射器方法
  *
  * @author Clinton Begin
  * @author Eduardo Macarron
@@ -44,8 +44,14 @@ import java.util.TreeMap;
  */
 public class MapperMethod {
 
+    /**
+     * sql命令
+     */
     private final SqlCommand command;
 
+    /**
+     * 方法签名
+     */
     private final MethodSignature method;
 
     public MapperMethod(Class<?> mapperInterface, Method method, Configuration config) {
@@ -200,6 +206,9 @@ public class MapperMethod {
 
         private final String name;
 
+        /**
+         * UNKNOWN, INSERT, UPDATE, DELETE, SELECT
+         */
         private final SqlCommandType type;
 
         public SqlCommand(Configuration configuration, Class<?> mapperInterface, Method method) {

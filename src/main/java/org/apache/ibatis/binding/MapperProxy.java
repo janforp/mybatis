@@ -27,6 +27,8 @@ import java.util.Map;
 /**
  * 映射器代理，代理模式
  *
+ * 在每个映射器代理中都存在以上三个参数，也就是说我们一旦我们使用过某个操作，那么这个操作过程中产生的代理实例将会一直存在，且具体操作方法会保存在这个代理实例的方法缓存中备用
+ *
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
