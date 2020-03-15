@@ -77,7 +77,18 @@ public interface Interceptor {
      */
     Object plugin(Object target);
 
-    //设置属性
+    //MyBatis 允许你在某一点拦截已映射语句执行的调用。默认情况下,MyBatis 允许使用插件来拦截方法调用
+    //<plugins>
+    //  <plugin interceptor="org.mybatis.example.ExamplePlugin">
+    //    <property name="someProperty" value="100"/>
+    //  </plugin>
+    //</plugins>
+
+    /**
+     * 设置属性
+     *
+     * @param properties <property name="someProperty" value="100"/>
+     */
     void setProperties(Properties properties);
 
 }

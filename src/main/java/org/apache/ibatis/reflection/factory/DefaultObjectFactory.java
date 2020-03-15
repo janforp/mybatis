@@ -17,6 +17,7 @@
 package org.apache.ibatis.reflection.factory;
 
 import org.apache.ibatis.reflection.ReflectionException;
+import org.apache.ibatis.session.Configuration;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
@@ -32,11 +33,10 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * @author Clinton Begin
- */
-
-/**
  * 默认对象工厂，所有对象都要由工厂来产生
+ *
+ * @author Clinton Begin
+ * @see Configuration#objectFactory 可以通过配置覆盖使用其他的工厂
  */
 public class DefaultObjectFactory implements ObjectFactory, Serializable {
 
@@ -51,7 +51,7 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
     @Override
     public <T> T create(Class<T> type, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
         //根据接口创建具体的类
-        //1.解析接口
+        //1.一些接口类型的统一转换
         Class<?> classToCreate = resolveInterface(type);
         // we know types are assignable
         //2.实例化类
@@ -64,22 +64,32 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
         // no props for default
     }
 
-    //2.实例化类
-    private <T> T instantiateClass(Class<T> type, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
+    /**
+     * 实例化类
+     *
+     * @param clazz class
+     * @param constructorArgTypes 构造器的入参数
+     * @param constructorArgs 构造器的入参
+     * @param <T> 类型
+     * @return 实例
+     */
+    private <T> T instantiateClass(Class<T> clazz, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
         try {
             Constructor<T> constructor;
             //如果没有传入constructor，调用空构造函数，核心是调用Constructor.newInstance
             if (constructorArgTypes == null || constructorArgs == null) {
-                constructor = type.getDeclaredConstructor();
+                constructor = clazz.getDeclaredConstructor();
                 if (!constructor.isAccessible()) {
+                    //private转public
                     constructor.setAccessible(true);
                 }
                 return constructor.newInstance();
             }
             //如果传入constructor，调用传入的构造函数，核心是调用Constructor.newInstance
             //找到满足入参数类型的格构造器
-            constructor = type.getDeclaredConstructor(constructorArgTypes.toArray(new Class[0]));
+            constructor = clazz.getDeclaredConstructor(constructorArgTypes.toArray(new Class[0]));
             if (!constructor.isAccessible()) {
+                //private转public
                 constructor.setAccessible(true);
             }
             //调用构造器生成对象
@@ -100,7 +110,7 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
                     argValues.append(",");
                 }
             }
-            throw new ReflectionException("Error instantiating " + type + " with invalid types (" + argTypes + ") or values (" + argValues + "). Cause: " + e, e);
+            throw new ReflectionException("Error instantiating " + clazz + " with invalid types (" + argTypes + ") or values (" + argValues + "). Cause: " + e, e);
         }
     }
 
@@ -132,9 +142,9 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
         return Collection.class.isAssignableFrom(type);
     }
 
-  public static void main(String[] args) {
-    Class<List> listClass = List.class;
-    System.out.println(Collection.class.isAssignableFrom(listClass));
-  }
+    public static void main(String[] args) {
+        Class<List> listClass = List.class;
+        System.out.println(Collection.class.isAssignableFrom(listClass));
+    }
 
 }

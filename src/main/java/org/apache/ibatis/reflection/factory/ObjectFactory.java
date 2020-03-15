@@ -52,12 +52,12 @@ public interface ObjectFactory {
      * Creates a new object with the specified constructor and params.
      * 生产对象，使用指定的构造函数和构造函数参数
      *
-     * @param type Object type
-     * @param constructorArgTypes Constructor argument types
-     * @param constructorArgs Constructor argument values
-     * @return
+     * @param clazz Object clazz 类型
+     * @param constructorArgTypes Constructor argument types 实例化时候使用的构造器的参数
+     * @param constructorArgs Constructor argument values 实例化时候使用的构造器的参数值
+     * @return 一个实例对象
      */
-    <T> T create(Class<T> type, List<Class<?>> constructorArgTypes, List<Object> constructorArgs);
+    <T> T create(Class<T> clazz, List<Class<?>> constructorArgTypes, List<Object> constructorArgs);
 
     /**
      * Returns true if this object can have a set of other objects.

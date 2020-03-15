@@ -44,7 +44,7 @@ import java.util.Set;
  */
 public class TypeAliasRegistry {
 
-    private final Map<String, Class<?>> TYPE_ALIASES = new HashMap<String, Class<?>>();
+    private final Map<String, Class<?>> TYPE_ALIASES_MAP = new HashMap<String, Class<?>>();
 
     public TypeAliasRegistry() {
         //构造函数里注册系统内置的类型别名
@@ -118,9 +118,9 @@ public class TypeAliasRegistry {
     @SuppressWarnings("unchecked")
     // throws class cast exception as well if types cannot be assigned
     //解析类型别名
-    public <T> Class<T> resolveAlias(String string) {
+    public <T> Class<T> resolveAlias(String aliasNameOrFullClassName) {
         try {
-            if (string == null) {
+            if (aliasNameOrFullClassName == null) {
                 return null;
             }
             // issue #748
@@ -128,18 +128,18 @@ public class TypeAliasRegistry {
             //这里转个小写也有bug？见748号bug(在google code上)
             //https://code.google.com/p/mybatis/issues
             //比如如果本地语言是Turkish，那i转成大写就不是I了，而是另外一个字符（İ）。这样土耳其的机器就用不了mybatis了！这是一个很大的bug，但是基本上每个人都会犯......
-            String key = string.toLowerCase(Locale.ENGLISH);
+            String key = aliasNameOrFullClassName.toLowerCase(Locale.ENGLISH);
             Class<T> value;
             //原理就很简单了，从HashMap里找对应的键值，找到则返回类型别名对应的Class
-            if (TYPE_ALIASES.containsKey(key)) {
-                value = (Class<T>) TYPE_ALIASES.get(key);
+            if (TYPE_ALIASES_MAP.containsKey(key)) {
+                value = (Class<T>) TYPE_ALIASES_MAP.get(key);
             } else {
                 //找不到，再试着将String直接转成Class(这样怪不得我们也可以直接用java.lang.Integer的方式定义，也可以就int这么定义)
-                value = (Class<T>) Resources.classForName(string);
+                value = (Class<T>) Resources.classForName(aliasNameOrFullClassName);
             }
             return value;
         } catch (ClassNotFoundException e) {
-            throw new TypeException("Could not resolve type alias '" + string + "'.  Cause: " + e, e);
+            throw new TypeException("Could not resolve type alias '" + aliasNameOrFullClassName + "'.  Cause: " + e, e);
         }
     }
 
@@ -174,32 +174,39 @@ public class TypeAliasRegistry {
     /**
      * 注册类型别名
      * 如果有注解，则以注解为主，否则用简单名称
-     * @param type
+     *
+     * @param aliasClass 别名代替的类型
      */
-    public void registerAlias(Class<?> type) {
+    public void registerAlias(Class<?> aliasClass) {
         //如果没有类型别名，用Class.getSimpleName来注册
-        String alias = type.getSimpleName();
+        String alias = aliasClass.getSimpleName();
         //或者通过Alias注解来注册(Class.getAnnotation)
-        Alias aliasAnnotation = type.getAnnotation(Alias.class);
+        Alias aliasAnnotation = aliasClass.getAnnotation(Alias.class);
         if (aliasAnnotation != null) {
+            //以注解优先
             alias = aliasAnnotation.value();
         }
-        registerAlias(alias, type);
+        registerAlias(alias, aliasClass);
     }
 
-    //注册类型别名
-    public void registerAlias(String alias, Class<?> value) {
-        if (alias == null) {
-            throw new TypeException("The parameter alias cannot be null");
+    /**
+     * 注册类型别名
+     *
+     * @param aliasName 代替类的名称
+     * @param aliasClass 被代替的类
+     */
+    public void registerAlias(String aliasName, Class<?> aliasClass) {
+        if (aliasName == null) {
+            throw new TypeException("The parameter aliasName cannot be null");
         }
         // issue #748
-        String key = alias.toLowerCase(Locale.ENGLISH);
+        //真正注册的别名全部小写
+        String finalAliasName = aliasName.toLowerCase(Locale.ENGLISH);
         //如果已经存在key了，且value和之前不一致，报错
-        //这里逻辑略显复杂，感觉没必要，一个key对一个value呗，存在key直接报错不就得了
-        if (TYPE_ALIASES.containsKey(key) && TYPE_ALIASES.get(key) != null && !TYPE_ALIASES.get(key).equals(value)) {
-            throw new TypeException("The alias '" + alias + "' is already mapped to the value '" + TYPE_ALIASES.get(key).getName() + "'.");
+        if (TYPE_ALIASES_MAP.containsKey(finalAliasName) && TYPE_ALIASES_MAP.get(finalAliasName) != null && !TYPE_ALIASES_MAP.get(finalAliasName).equals(aliasClass)) {
+            throw new TypeException("The aliasName '" + aliasName + "' is already mapped to the aliasClass '" + TYPE_ALIASES_MAP.get(finalAliasName).getName() + "'.");
         }
-        TYPE_ALIASES.put(key, value);
+        TYPE_ALIASES_MAP.put(finalAliasName, aliasClass);
     }
 
     public void registerAlias(String alias, String value) {
@@ -214,7 +221,7 @@ public class TypeAliasRegistry {
      * @since 3.2.2
      */
     public Map<String, Class<?>> getTypeAliases() {
-        return Collections.unmodifiableMap(TYPE_ALIASES);
+        return Collections.unmodifiableMap(TYPE_ALIASES_MAP);
     }
 
 }

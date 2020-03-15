@@ -13,15 +13,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.mapping;
 
 /**
+ * 参数模式（给SP用）
+ *
  * @author Clinton Begin
  */
-/**
- * 
- * 参数模式（给SP用）
- */
 public enum ParameterMode {
-  IN, OUT, INOUT
+    IN,
+    OUT,
+    INOUT
 }
