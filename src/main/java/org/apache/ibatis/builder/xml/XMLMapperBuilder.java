@@ -50,6 +50,42 @@ import java.util.Properties;
 
 /**
  * XML映射构建器，建造者模式,继承BaseBuilder
+ * 每一个xxxMapper.xml，都对应一个XMLMapperBuilder，由XMLMapperBuilder的parse方法解析
+ * 
+ * <?xml version="1.0" encoding="UTF-8" ?>
+ * <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+ * <mapper namespace="cn.com.janita.employeecore.dao.account.AccountLastChooseDAO">
+ *     <resultMap id="BaseResultMap" type="cn.com.janita.employeecore.dao.account.dataobj.AccountLastChooseDO">
+ *         <result column="account_id" property="accountId" jdbcType="VARCHAR"/>
+ *         <result column="customer_id" property="customerId" jdbcType="BIGINT"/>
+ *         <result column="dept_id" property="deptId" jdbcType="INTEGER"/>
+ *     </resultMap>
+ *
+ *     <select id="selectByAccountId" resultMap="BaseResultMap">
+ *         SELECT account_id, customer_id, dept_id
+ *         FROM epc_account_last_choose
+ *         WHERE account_id = #{accountId,jdbcType=VARCHAR}
+ *         AND is_delete = 0
+ *     </select>
+ *
+ *     <insert id="insert">
+ *         INSERT INTO epc_account_last_choose (account_id,
+ *         customer_id, dept_id, creator_id, modifier_id)
+ *         VALUES (#{accountId,jdbcType=VARCHAR},
+ *         #{customerId,jdbcType=BIGINT}, #{deptId,jdbcType=INTEGER},
+ *         '${@cn.com.janita.employeecore.dao.util.AccountIdUtils@getAccountId()}',
+ *         '${@cn.com.janita.employeecore.dao.util.AccountIdUtils@getAccountId()}')
+ *     </insert>
+ *
+ *     <update id="update">
+ *         UPDATE epc_account_last_choose
+ *         SET customer_id = #{customerId,jdbcType=BIGINT},
+ *         dept_id = #{deptId,jdbcType=INTEGER},
+ *         modifier_id = '${@cn.com.janita.employeecore.dao.util.AccountIdUtils@getAccountId()}'
+ *         WHERE account_id = #{accountId,jdbcType=VARCHAR}
+ *         AND is_delete = 0
+ *     </update>
+ * </mapper>
  *
  * @author Clinton Begin
  */
@@ -63,6 +99,9 @@ public class XMLMapperBuilder extends BaseBuilder {
     //用来存放sql片段的哈希表
     private Map<String, XNode> sqlFragments;
 
+    /**
+     * 资源地址，只加载一次
+     */
     private String resource;
 
     @Deprecated
@@ -100,7 +139,8 @@ public class XMLMapperBuilder extends BaseBuilder {
         //如果没有加载过再加载，防止重复加载
         if (!configuration.isResourceLoaded(resource)) {
             //配置mapper
-            configurationElement(parser.evalNode("/mapper"));
+            XNode mapperNode = parser.evalNode("/mapper");
+            configurationElement(mapperNode);
             //标记一下，已经加载过了
             configuration.addLoadedResource(resource);
             //绑定映射器到namespace
@@ -123,26 +163,26 @@ public class XMLMapperBuilder extends BaseBuilder {
     //	    select * from Blog where id = #{id}
     //	  </select>
     //	</mapper>
-    private void configurationElement(XNode context) {
+    private void configurationElement(XNode mapperNode) {
         try {
             //1.配置namespace
-            String namespace = context.getStringAttribute("namespace");
-            if (namespace.equals("")) {
+            String namespace = mapperNode.getStringAttribute("namespace");
+            if ("".equals(namespace)) {
                 throw new BuilderException("Mapper's namespace cannot be empty");
             }
             builderAssistant.setCurrentNamespace(namespace);
             //2.配置cache-ref
-            cacheRefElement(context.evalNode("cache-ref"));
+            cacheRefElement(mapperNode.evalNode("cache-ref"));
             //3.配置cache
-            cacheElement(context.evalNode("cache"));
+            cacheElement(mapperNode.evalNode("cache"));
             //4.配置parameterMap(已经废弃,老式风格的参数映射)
-            parameterMapElement(context.evalNodes("/mapper/parameterMap"));
+            parameterMapElement(mapperNode.evalNodes("/mapper/parameterMap"));
             //5.配置resultMap(高级功能)
-            resultMapElements(context.evalNodes("/mapper/resultMap"));
+            resultMapElements(mapperNode.evalNodes("/mapper/resultMap"));
             //6.配置sql(定义可重用的 SQL 代码段)
-            sqlElement(context.evalNodes("/mapper/sql"));
+            sqlElement(mapperNode.evalNodes("/mapper/sql"));
             //7.配置select|insert|update|delete TODO
-            buildStatementFromContext(context.evalNodes("select|insert|update|delete"));
+            buildStatementFromContext(mapperNode.evalNodes("select|insert|update|delete"));
         } catch (Exception e) {
             throw new BuilderException("Error parsing Mapper XML. Cause: " + e, e);
         }

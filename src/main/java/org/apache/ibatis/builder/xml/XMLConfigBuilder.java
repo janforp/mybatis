@@ -46,6 +46,7 @@ import java.util.Set;
 
 /**
  * XML配置构建器，建造者模式,继承BaseBuilder
+ * 解析配置文件
  *
  * @author Clinton Begin
  */

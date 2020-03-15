@@ -64,7 +64,8 @@ public class MapperBuilderAssistant extends BaseBuilder {
 
     private Cache currentCache;
 
-    private boolean unresolvedCacheRef; // issue #676
+    // issue #676
+    private boolean unresolvedCacheRef;
 
     public MapperBuilderAssistant(Configuration configuration, String resource) {
         super(configuration);

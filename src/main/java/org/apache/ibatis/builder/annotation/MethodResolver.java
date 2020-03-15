@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.builder.annotation;
 
 import java.lang.reflect.Method;
@@ -21,16 +22,18 @@ import java.lang.reflect.Method;
  * @author Eduardo Macarron
  */
 public class MethodResolver {
-  private final MapperAnnotationBuilder annotationBuilder;
-  private Method method;
 
-  public MethodResolver(MapperAnnotationBuilder annotationBuilder, Method method) {
-    this.annotationBuilder = annotationBuilder;
-    this.method = method;
-  }
+    private final MapperAnnotationBuilder annotationBuilder;
 
-  public void resolve() {
-    annotationBuilder.parseStatement(method);
-  }
+    private Method method;
+
+    public MethodResolver(MapperAnnotationBuilder annotationBuilder, Method method) {
+        this.annotationBuilder = annotationBuilder;
+        this.method = method;
+    }
+
+    public void resolve() {
+        annotationBuilder.parseStatement(method);
+    }
 
 }
