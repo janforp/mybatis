@@ -240,7 +240,7 @@ public class Configuration {
      * key : mapperInterface.getName() + "." + method.getName()
      * value: 映射的语句
      */
-    protected final Map<String, MappedStatement> mappedStatements = new StrictMap<>("Mapped Statements collection");
+    protected final Map<String, MappedStatement> mappedStatements = new StrictMap<MappedStatement>("Mapped Statements collection");
 
     /**
      * key:namespace
@@ -273,7 +273,7 @@ public class Configuration {
      * references a cache bound to another namespace and the value is the
      * namespace which the actual cache is bound to.
      */
-    protected final Map<String, String> cacheRefMap = new HashMap<>();
+    protected final Map<String, String> cacheRefMap = new HashMap<String, String>();
 
     public Configuration(Environment environment) {
         this();

@@ -156,7 +156,7 @@ public class ResolverUtil<T> {
      * The set of matches being accumulated.
      * 满足指定条件的 class 集合
      */
-    private Set<Class<? extends T>> matches = new HashSet<>();
+    private Set<Class<? extends T>> matches = new HashSet<Class<? extends T>>();
 
     /**
      * The ClassLoader to use when looking for classes. If null then the ClassLoader returned

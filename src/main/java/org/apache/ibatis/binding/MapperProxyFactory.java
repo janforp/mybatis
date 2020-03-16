@@ -45,7 +45,7 @@ public class MapperProxyFactory<T> {
      * 避免每次调用相同的方法的时候都需要重新进行方法的生成。很明显，方法的生成比较复杂，会消耗一定的时间，
      * 将其保存在缓存集合中备用，可以极大的解决这种时耗问题。
      */
-    private Map<Method, MapperMethod> methodCache = new ConcurrentHashMap<>();
+    private Map<Method, MapperMethod> methodCache = new ConcurrentHashMap<Method, MapperMethod>();
 
     public MapperProxyFactory(Class<T> mapperInterface) {
         this.mapperInterfaceClass = mapperInterface;
@@ -66,7 +66,7 @@ public class MapperProxyFactory<T> {
     }
 
     public T newInstance(SqlSession sqlSession) {
-        final MapperProxy<T> mapperProxy = new MapperProxy<>(sqlSession, mapperInterfaceClass, methodCache);
+        final MapperProxy<T> mapperProxy = new MapperProxy<T>(sqlSession, mapperInterfaceClass, methodCache);
         return newInstance(mapperProxy);
     }
 

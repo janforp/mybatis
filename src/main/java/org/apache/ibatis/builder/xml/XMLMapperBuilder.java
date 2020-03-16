@@ -359,7 +359,7 @@ public class XMLMapperBuilder extends BaseBuilder {
 
     //5.1 配置resultMap
     private ResultMap resultMapElement(XNode resultMapNode) throws Exception {
-        return resultMapElement(resultMapNode, Collections.emptyList());
+        return resultMapElement(resultMapNode, Collections.<ResultMapping>emptyList());
     }
 
     //5.1 配置resultMap
@@ -388,7 +388,7 @@ public class XMLMapperBuilder extends BaseBuilder {
         Class<?> typeClass = resolveClass(type);
         // 鉴别器；辨别者
         Discriminator discriminator = null;
-        List<ResultMapping> resultMappings = new ArrayList<>(additionalResultMappings);
+        List<ResultMapping> resultMappings = new ArrayList<ResultMapping>(additionalResultMappings);
         List<XNode> resultNodeList = resultMapNode.getChildren();
         //<id property="id" column="user_id" />
         //<result property="username" column="username"/>
@@ -401,7 +401,7 @@ public class XMLMapperBuilder extends BaseBuilder {
                 //解析result map的discriminator
                 discriminator = processDiscriminatorElement(resultChild, typeClass, resultMappings);
             } else {
-                List<ResultFlag> flags = new ArrayList<>();
+                List<ResultFlag> flags = new ArrayList<ResultFlag>();
                 if ("id".equals(resultChild.getName())) {
                     flags.add(ResultFlag.ID);
                 }
@@ -426,7 +426,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     private void processConstructorElement(XNode resultChild, Class<?> resultType, List<ResultMapping> resultMappings) throws Exception {
         List<XNode> argChildren = resultChild.getChildren();
         for (XNode argChild : argChildren) {
-            List<ResultFlag> flags = new ArrayList<>();
+            List<ResultFlag> flags = new ArrayList<ResultFlag>();
             //结果标志加上ID和CONSTRUCTOR
             flags.add(ResultFlag.CONSTRUCTOR);
             if ("idArg".equals(argChild.getName())) {

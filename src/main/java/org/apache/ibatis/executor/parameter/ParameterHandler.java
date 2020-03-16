@@ -13,27 +13,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.executor.parameter;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
+ * 参数处理器
  * A parameter handler sets the parameters of the {@code PreparedStatement}
  *
  * @author Clinton Begin
  */
-/**
- * 参数处理器
- * 
- */
 public interface ParameterHandler {
 
-  //得到参数
-  Object getParameterObject();
+    //得到参数
+    Object getParameterObject();
 
-  //设置参数
-  void setParameters(PreparedStatement ps)
-      throws SQLException;
+    //设置参数
+    void setParameters(PreparedStatement ps)
+            throws SQLException;
 
 }

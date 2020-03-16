@@ -316,7 +316,7 @@ public class MapperMethod {
                 return args[firstParamIndex];
             } else {
                 //否则，返回一个ParamMap，修改参数名，参数名就是其位置
-                final Map<String, Object> param = new ParamMap<>();
+                final Map<String, Object> param = new ParamMap<Object>();
                 int i = 0;
                 for (Map.Entry<Integer, String> entry : params.entrySet()) {
                     //1.先加一个#{0},#{1},#{2}...参数
@@ -417,7 +417,7 @@ public class MapperMethod {
          */
         private SortedMap<Integer, String> getParams(Method method, boolean hasNamedParameters) {
             //用一个TreeMap,这样就保证还是按参数的先后顺序
-            final SortedMap<Integer, String> params = new TreeMap<>();
+            final SortedMap<Integer, String> params = new TreeMap<Integer, String>();
             final Class<?>[] argTypes = method.getParameterTypes();
             for (int i = 0; i < argTypes.length; i++) {
                 //是否不是RowBounds/ResultHandler类型的参数，意思就是过滤这2个类型的参数

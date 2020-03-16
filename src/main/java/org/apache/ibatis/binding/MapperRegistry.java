@@ -49,7 +49,7 @@ public class MapperRegistry {
      * 而不是映射器实例，映射器实例只在需要的时候使用代理工厂进行创建
      * ，所以我们可以这么来看，MapperProxyFactory会存在多个实例，针对每个映射器有一个实例，这个实例就作为值保存在注册器中
      */
-    private final Map<Class<?>, MapperProxyFactory<?>> knownMappers = new HashMap<>();
+    private final Map<Class<?>, MapperProxyFactory<?>> knownMappers = new HashMap<Class<?>, MapperProxyFactory<?>>();
 
     public MapperRegistry(Configuration config) {
         this.config = config;
@@ -90,7 +90,7 @@ public class MapperRegistry {
             boolean loadCompleted = false;
             try {
                 //先把 mapper/dao 封装到 MapperProxyFactory 中
-                MapperProxyFactory<T> mapperProxyFactory = new MapperProxyFactory<>(mapperClass);
+                MapperProxyFactory<T> mapperProxyFactory = new MapperProxyFactory<T>(mapperClass);
                 //注册
                 knownMappers.put(mapperClass, mapperProxyFactory);
                 // It's important that the mapperClass is added before the parser is run
@@ -127,7 +127,7 @@ public class MapperRegistry {
      */
     public void addMappers(String packageName, Class<?> superType) {
         //查找包下所有是superType的类
-        ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<>();
+        ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<Class<?>>();
         //包下面的类的匹配器，该匹配器专门去匹配传入的class是不是superType类型
         ResolverUtil.IsA test = new ResolverUtil.IsA(superType);
         //在包packageName中找出 superType 的所有子类，并且放到resolverUtil的 matches 集合中

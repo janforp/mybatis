@@ -73,6 +73,22 @@ public class XMLStatementBuilder extends BaseBuilder {
     //  resultSetType="FORWARD_ONLY">
     //  SELECT * FROM PERSON WHERE ID = #{id}
     //</select>
+
+    //<insert id="insertAndgetkey" parameterType="com.soft.mybatis.model.User">
+    //        <!--selectKey  会将 SELECT LAST_INSERT_ID()的结果放入到传入的model的主键里面，
+    //            keyProperty 对应的model中的主键的属性名，这里是 user 中的id，因为它跟数据库的主键对应
+    //            order AFTER 表示 SELECT LAST_INSERT_ID() 在insert执行之后执行,多用与自增主键，
+    //                  BEFORE 表示 SELECT LAST_INSERT_ID() 在insert执行之前执行，这样的话就拿不到主键了，
+    //                        这种适合那种主键不是自增的类型
+    //            resultType 主键类型 -->
+    //        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+    //            SELECT LAST_INSERT_ID()
+    //        </selectKey>
+    //        insert into t_user (username,password,create_date) values(#{username},#{password},#{createDate})
+    //    </insert>
+    //————————————————
+    //版权声明：本文为CSDN博主「第一小菜鸟」的原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接及本声明。
+    //原文链接：https://blog.csdn.net/xu1916659422/article/details/77921912
     public void parseStatementNode() {
         String id = context.getStringAttribute("id");
         String databaseId = context.getStringAttribute("databaseId");
@@ -111,8 +127,9 @@ public class XMLStatementBuilder extends BaseBuilder {
         String nodeName = context.getNode().getNodeName();
         SqlCommandType sqlCommandType = SqlCommandType.valueOf(nodeName.toUpperCase(Locale.ENGLISH));
         boolean isSelect = sqlCommandType == SqlCommandType.SELECT;
+        //如果是查询，默认不刷新缓存
         boolean flushCache = context.getBooleanAttribute("flushCache", !isSelect);
-        //是否要缓存select结果
+        //是否要缓存select结果,如果是查询，默认使用缓存
         boolean useCache = context.getBooleanAttribute("useCache", isSelect);
         //仅针对嵌套结果 select 语句适用：如果为 true，就是假设包含了嵌套结果集或是分组了，这样的话当返回一个主结果行的时候，就不会发生有对前面结果集的引用的情况。
         //这就使得在获取嵌套的结果集的时候不至于导致内存不够用。默认值：false。
@@ -153,6 +170,15 @@ public class XMLStatementBuilder extends BaseBuilder {
                 keyGenerator, keyProperty, keyColumn, databaseId, langDriver, resultSets);
     }
 
+    /**
+     * <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+     * SELECT LAST_INSERT_ID()
+     * </selectKey>
+     *
+     * @param id <insert id="insertAndgetkey" parameterType="com.soft.mybatis.model.User">
+     * @param parameterTypeClass <insert id="insertAndgetkey" parameterType="com.soft.mybatis.model.User">
+     * @param langDriver
+     */
     private void processSelectKeyNodes(String id, Class<?> parameterTypeClass, LanguageDriver langDriver) {
         List<XNode> selectKeyNodes = context.evalNodes("selectKey");
         if (configuration.getDatabaseId() != null) {
@@ -173,13 +199,16 @@ public class XMLStatementBuilder extends BaseBuilder {
     }
 
     private void parseSelectKeyNode(String id, XNode nodeToHandle, Class<?> parameterTypeClass, LanguageDriver langDriver, String databaseId) {
+        //返回主键类型
         String resultType = nodeToHandle.getStringAttribute("resultType");
         Class<?> resultTypeClass = resolveClass(resultType);
         StatementType statementType = StatementType.valueOf(nodeToHandle.getStringAttribute("statementType", StatementType.PREPARED.toString()));
+        //主键的属性名称
         String keyProperty = nodeToHandle.getStringAttribute("keyProperty");
+        //主键列
         String keyColumn = nodeToHandle.getStringAttribute("keyColumn");
+        //order="AFTER"，默认为after
         boolean executeBefore = "BEFORE".equals(nodeToHandle.getStringAttribute("order", "AFTER"));
-
         //defaults
         boolean useCache = false;
         boolean resultOrdered = false;
@@ -190,10 +219,9 @@ public class XMLStatementBuilder extends BaseBuilder {
         String parameterMap = null;
         String resultMap = null;
         ResultSetType resultSetTypeEnum = null;
-
+        //langDriver是一个接口
         SqlSource sqlSource = langDriver.createSqlSource(configuration, nodeToHandle, parameterTypeClass);
         SqlCommandType sqlCommandType = SqlCommandType.SELECT;
-
         builderAssistant.addMappedStatement(id, sqlSource, statementType, sqlCommandType,
                 fetchSize, timeout, parameterMap, parameterTypeClass, resultMap, resultTypeClass,
                 resultSetTypeEnum, flushCache, useCache, resultOrdered,
@@ -213,9 +241,7 @@ public class XMLStatementBuilder extends BaseBuilder {
 
     private boolean databaseIdMatchesCurrent(String id, String databaseId, String requiredDatabaseId) {
         if (requiredDatabaseId != null) {
-            if (!requiredDatabaseId.equals(databaseId)) {
-                return false;
-            }
+            return requiredDatabaseId.equals(databaseId);
         } else {
             if (databaseId != null) {
                 return false;
@@ -223,10 +249,9 @@ public class XMLStatementBuilder extends BaseBuilder {
             // skip this statement if there is a previous one with a not null databaseId
             id = builderAssistant.applyCurrentNamespace(id, false);
             if (this.configuration.hasStatement(id, false)) {
-                MappedStatement previous = this.configuration.getMappedStatement(id, false); // issue #2
-                if (previous.getDatabaseId() != null) {
-                    return false;
-                }
+                // issue #2
+                MappedStatement previous = this.configuration.getMappedStatement(id, false);
+                return previous.getDatabaseId() == null;
             }
         }
         return true;

@@ -147,7 +147,7 @@ public class MetaObject {
     //设置值
     //如person[0].birthdate.year
     public void setValue(String name, Object value) {
-        PropertyTokenizer prop = new PropertyTokenizer(name);
+        PropertyTokenizer prop = new PropertyTokenizer(name);//分词器
         if (prop.hasNext()) {
             MetaObject metaValue = metaObjectForProperty(prop.getIndexedName());
             if (metaValue == SystemMetaObject.NULL_META_OBJECT) {

@@ -37,7 +37,7 @@ public class PerpetualCache implements Cache {
     private String id;
 
     //内部就是一个HashMap,所有方法基本就是直接调用HashMap的方法,不支持多线程？
-    private Map<Object, Object> cache = new HashMap<>();
+    private Map<Object, Object> cache = new HashMap<Object, Object>();
 
     public PerpetualCache(String id) {
         this.id = id;
