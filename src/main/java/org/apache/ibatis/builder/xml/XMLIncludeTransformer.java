@@ -26,6 +26,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * XML include转换器
+ * select <include refid="Base_Column_List"/>
  *
  * @author Frank D. Martinez [mnesarco]
  */
@@ -46,11 +47,16 @@ public class XMLIncludeTransformer {
     //  where id = #{id}
     //</select>
     public void applyIncludes(Node source) {
-        if (source.getNodeName().equals("include")) {
+        if ("include".equals(source.getNodeName())) {
             //走到这里，单独解析<include refid="userColumns"/>
             //拿到SQL片段
-            Node toInclude = findSqlFragment(getStringAttribute(source, "refid"));
-            //递归调用自己,应用上?
+            String refid = getStringAttribute(source, "refid");
+            Node toInclude = findSqlFragment(refid);
+            //递归调用自己,应用上
+            // <sql id="Base_Column_List">
+            //        <include refid="Id_name"/>,
+            //        config_id, config_key, config_value,config_start_time, config_end_time, location_code,channel
+            //    </sql>
             applyIncludes(toInclude);
             //总之下面就是将字符串拼接进来，看不懂。。。
             if (toInclude.getOwnerDocument() != source.getOwnerDocument()) {

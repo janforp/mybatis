@@ -426,7 +426,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     private void processConstructorElement(XNode resultChild, Class<?> resultType, List<ResultMapping> resultMappings) throws Exception {
         List<XNode> argChildren = resultChild.getChildren();
         for (XNode argChild : argChildren) {
-            List<ResultFlag> flags = new ArrayList<ResultFlag>();
+            List<ResultFlag> flags = new ArrayList<>();
             //结果标志加上ID和CONSTRUCTOR
             flags.add(ResultFlag.CONSTRUCTOR);
             if ("idArg".equals(argChild.getName())) {
@@ -503,7 +503,15 @@ public class XMLMapperBuilder extends BaseBuilder {
         return true;
     }
 
-    //5.1.1 构建resultMap
+    /**
+     * 5.1.1 构建resultMap
+     *
+     * @param context <result column="config_key" property="configKey" jdbcType="VARCHAR"/>
+     * @param resultType <resultMap id="BaseResultMap" type="com.janita.hermes.model.FrontConfig">
+     * @param flags <id column="config_id" property="configId" jdbcType="BIGINT"/>
+     * @return
+     * @throws Exception
+     */
     private ResultMapping buildResultMappingFromContext(XNode context, Class<?> resultType, List<ResultFlag> flags) throws Exception {
         //<id property="id" column="author_id"/>
         //<result property="username" column="author_username"/>
@@ -526,7 +534,8 @@ public class XMLMapperBuilder extends BaseBuilder {
         Class<? extends TypeHandler<?>> typeHandlerClass = (Class<? extends TypeHandler<?>>) resolveClass(typeHandler);
         JdbcType jdbcTypeEnum = resolveJdbcType(jdbcType);
         //又去调builderAssistant.buildResultMapping
-        return builderAssistant.buildResultMapping(resultType, property, column, javaTypeClass, jdbcTypeEnum, nestedSelect, nestedResultMap, notNullColumn, columnPrefix, typeHandlerClass, flags, resulSet, foreignColumn, lazy);
+        return builderAssistant.buildResultMapping(resultType, property, column, javaTypeClass, jdbcTypeEnum,
+                nestedSelect, nestedResultMap, notNullColumn, columnPrefix, typeHandlerClass, flags, resulSet, foreignColumn, lazy);
     }
 
     //5.1.1.1 处理嵌套的result map

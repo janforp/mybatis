@@ -417,22 +417,14 @@ public class MapperBuilderAssistant extends BaseBuilder {
         statementBuilder.timeout(timeout);
     }
 
-    //构建result map
-    public ResultMapping buildResultMapping(
-            Class<?> resultType,
-            String property,
-            String column,
-            Class<?> javaType,
-            JdbcType jdbcType,
-            String nestedSelect,
-            String nestedResultMap,
-            String notNullColumn,
-            String columnPrefix,
-            Class<? extends TypeHandler<?>> typeHandler,
-            List<ResultFlag> flags,
-            String resultSet,
-            String foreignColumn,
-            boolean lazy) {
+    /**
+     * 构建result map
+     * <result column="config_key" property="configKey" jdbcType="VARCHAR"/>
+     */
+    public ResultMapping buildResultMapping(Class<?> resultType, String property, String column, Class<?> javaType,
+            JdbcType jdbcType, String nestedSelect, String nestedResultMap, String notNullColumn, String columnPrefix,
+            Class<? extends TypeHandler<?>> typeHandler, List<ResultFlag> flags, String resultSet, String foreignColumn, boolean lazy) {
+
         Class<?> javaTypeClass = resolveResultJavaType(resultType, property, javaType);
         TypeHandler<?> typeHandlerInstance = resolveTypeHandler(javaTypeClass, typeHandler);
         //解析复合的列名,一般用不到，返回的是空
@@ -487,6 +479,15 @@ public class MapperBuilderAssistant extends BaseBuilder {
         return composites;
     }
 
+    /**
+     * <id column="config_id" property="configId" jdbcType="BIGINT"/>
+     * <result column="config_value" property="configValue" jdbcType="VARCHAR"/>
+     *
+     * @param resultType <resultMap id="BaseResultMap" type="com.servyou.hermes.model.FrontConfig">
+     * @param property configId
+     * @param javaType BIGINT
+     * @return
+     */
     private Class<?> resolveResultJavaType(Class<?> resultType, String property, Class<?> javaType) {
         if (javaType == null && property != null) {
             try {
