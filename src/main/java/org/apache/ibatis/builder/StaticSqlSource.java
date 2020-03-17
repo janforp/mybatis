@@ -13,41 +13,44 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.builder;
 
-import java.util.List;
+package org.apache.ibatis.builder;
 
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.session.Configuration;
 
+import java.util.List;
+
 /**
  * @author Clinton Begin
  */
+
 /**
  * 静态SQL源码
- * 
  */
 public class StaticSqlSource implements SqlSource {
 
-  private String sql;
-  private List<ParameterMapping> parameterMappings;
-  private Configuration configuration;
+    private String sql;
 
-  public StaticSqlSource(Configuration configuration, String sql) {
-    this(configuration, sql, null);
-  }
+    private List<ParameterMapping> parameterMappings;
 
-  public StaticSqlSource(Configuration configuration, String sql, List<ParameterMapping> parameterMappings) {
-    this.sql = sql;
-    this.parameterMappings = parameterMappings;
-    this.configuration = configuration;
-  }
+    private Configuration configuration;
 
-  @Override
-  public BoundSql getBoundSql(Object parameterObject) {
-    return new BoundSql(configuration, sql, parameterMappings, parameterObject);
-  }
+    public StaticSqlSource(Configuration configuration, String sql) {
+        this(configuration, sql, null);
+    }
+
+    public StaticSqlSource(Configuration configuration, String sql, List<ParameterMapping> parameterMappings) {
+        this.sql = sql;
+        this.parameterMappings = parameterMappings;
+        this.configuration = configuration;
+    }
+
+    @Override
+    public BoundSql getBoundSql(Object parameterObject) {
+        return new BoundSql(configuration, sql, parameterMappings, parameterObject);
+    }
 
 }

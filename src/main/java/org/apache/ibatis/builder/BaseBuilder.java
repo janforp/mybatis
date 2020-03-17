@@ -16,6 +16,7 @@
 
 package org.apache.ibatis.builder;
 
+import lombok.Getter;
 import org.apache.ibatis.mapping.ParameterMode;
 import org.apache.ibatis.mapping.ResultSetType;
 import org.apache.ibatis.session.Configuration;
@@ -39,6 +40,7 @@ import java.util.regex.Pattern;
 public abstract class BaseBuilder {
 
     //需要配置，类型别名注册，类型处理器注册3个东西
+    @Getter
     protected final Configuration configuration;
 
     protected final TypeAliasRegistry typeAliasRegistry;
@@ -49,10 +51,6 @@ public abstract class BaseBuilder {
         this.configuration = configuration;
         this.typeAliasRegistry = this.configuration.getTypeAliasRegistry();
         this.typeHandlerRegistry = this.configuration.getTypeHandlerRegistry();
-    }
-
-    public Configuration getConfiguration() {
-        return configuration;
     }
 
     protected Pattern parseExpression(String regex, String defaultValue) {
@@ -145,8 +143,9 @@ public abstract class BaseBuilder {
         if (type != null && !TypeHandler.class.isAssignableFrom(type)) {
             throw new BuilderException("Type " + type.getName() + " is not a valid TypeHandler because it does not implement TypeHandler interface");
         }
-        @SuppressWarnings("unchecked") // already verified it is a TypeHandler
-                Class<? extends TypeHandler<?>> typeHandlerType = (Class<? extends TypeHandler<?>>) type;
+        // already verified it is a TypeHandler
+        @SuppressWarnings("unchecked")
+        Class<? extends TypeHandler<?>> typeHandlerType = (Class<? extends TypeHandler<?>>) type;
         //再去调用另一个重载的方法
         return resolveTypeHandler(javaType, typeHandlerType);
     }
