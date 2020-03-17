@@ -68,13 +68,17 @@ public class SelectKeyGenerator implements KeyGenerator {
                     // Do not close keyExecutor.
                     // The transaction will be closed by parent executor.
                     Executor keyExecutor = configuration.newExecutor(executor.getTransaction(), ExecutorType.SIMPLE);
+                    //插入的时候对象带主键的原理：其实是mybatis去查询了一次
                     List<Object> values = keyExecutor.query(keyStatement, parameter, RowBounds.DEFAULT, Executor.NO_RESULT_HANDLER);
                     if (values.size() == 0) {
+                        //没有返回数据-报错
                         throw new ExecutorException("SelectKey returned no data.");
                     } else if (values.size() > 1) {
+                        //返回数组多余1条-报错
                         throw new ExecutorException("SelectKey returned more than one value.");
                     } else {
                         MetaObject metaResult = configuration.newMetaObject(values.get(0));
+                        //单个的情况
                         if (keyProperties.length == 1) {
                             if (metaResult.hasGetter(keyProperties[0])) {
                                 setValue(metaParam, keyProperties[0], metaResult.getValue(keyProperties[0]));
@@ -84,6 +88,7 @@ public class SelectKeyGenerator implements KeyGenerator {
                                 setValue(metaParam, keyProperties[0], values.get(0));
                             }
                         } else {
+                            //处理多个的情况
                             handleMultipleProperties(keyProperties, metaParam, metaResult);
                         }
                     }
@@ -96,10 +101,8 @@ public class SelectKeyGenerator implements KeyGenerator {
         }
     }
 
-    private void handleMultipleProperties(String[] keyProperties,
-            MetaObject metaParam, MetaObject metaResult) {
+    private void handleMultipleProperties(String[] keyProperties, MetaObject metaParam, MetaObject metaResult) {
         String[] keyColumns = keyStatement.getKeyColumns();
-
         if (keyColumns == null || keyColumns.length == 0) {
             // no key columns specified, just use the property names
             for (int i = 0; i < keyProperties.length; i++) {
@@ -107,9 +110,11 @@ public class SelectKeyGenerator implements KeyGenerator {
             }
         } else {
             if (keyColumns.length != keyProperties.length) {
+                //数量不匹配-报错
                 throw new ExecutorException("If SelectKey has key columns, the number must match the number of key properties.");
             }
             for (int i = 0; i < keyProperties.length; i++) {
+                //数量匹配-赋值
                 setValue(metaParam, keyProperties[i], metaResult.getValue(keyColumns[i]));
             }
         }

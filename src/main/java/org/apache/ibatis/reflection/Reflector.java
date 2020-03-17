@@ -44,6 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 反射器, 属性->getter/setter的映射器，而且加了缓存
  * 可参考ReflectorTest来理解这个类的用处
+ * 其实就是一个缓存，一个类型有一个 Reflector 缓存实例
  *
  * @author Clinton Begin
  */
@@ -83,7 +84,7 @@ public class Reflector {
 
     private Reflector(Class<?> clazz) {
         type = clazz;
-        //加入构造函数
+        //解析获取构造函数，并且赋值给 defaultConstructor 属性
         addDefaultConstructor(clazz);
         //加入getter
         addGetMethods(clazz);
@@ -91,8 +92,8 @@ public class Reflector {
         addSetMethods(clazz);
         //加入字段
         addFields(clazz);
-        readablePropertyNames = getMethods.keySet().toArray(new String[getMethods.keySet().size()]);
-        writeablePropertyNames = setMethods.keySet().toArray(new String[setMethods.keySet().size()]);
+        readablePropertyNames = getMethods.keySet().toArray(new String[0]);
+        writeablePropertyNames = setMethods.keySet().toArray(new String[0]);
         for (String propName : readablePropertyNames) {
             //这里为了能找到某一个属性，就把他变成大写作为map的key。。。
             caseInsensitivePropertyMap.put(propName.toUpperCase(Locale.ENGLISH), propName);
@@ -103,8 +104,8 @@ public class Reflector {
     }
 
     private void addDefaultConstructor(Class<?> clazz) {
-        Constructor<?>[] consts = clazz.getDeclaredConstructors();
-        for (Constructor<?> constructor : consts) {
+        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+        for (Constructor<?> constructor : constructors) {
             if (constructor.getParameterTypes().length == 0) {
                 if (canAccessPrivateMethods()) {
                     try {
@@ -126,18 +127,19 @@ public class Reflector {
         Method[] methods = getClassMethods(cls);
         for (Method method : methods) {
             String name = method.getName();
-            if (name.startsWith("get") && name.length() > 3) {
-                if (method.getParameterTypes().length == 0) {
-                    name = PropertyNamer.methodToProperty(name);
-                    addMethodConflict(conflictingGetters, name, method);
+            if (name.startsWith("get") && name.length() > 3) {//从一个方法的名称判断是否为get方法的基本条件：以get开头，并且get后还有其他字符
+                if (method.getParameterTypes().length == 0) {//从一个方法的名称判断是否为get方法的毕业条件：get方法是无参数的
+                    name = PropertyNamer.methodToProperty(name);//方法转属性，如 getId -> id
+                    addMethodConflict(conflictingGetters, name, method);//把该 name method 对放进 Map<String, List<Method>> conflictingGetters
                 }
-            } else if (name.startsWith("is") && name.length() > 2) {
+            } else if (name.startsWith("is") && name.length() > 2) {//如果为 boolean 类型的属性
                 if (method.getParameterTypes().length == 0) {
                     name = PropertyNamer.methodToProperty(name);
                     addMethodConflict(conflictingGetters, name, method);
                 }
             }
         }
+        //删除冲突的方法
         resolveGetterConflicts(conflictingGetters);
     }
 
@@ -196,6 +198,13 @@ public class Reflector {
         resolveSetterConflicts(conflictingSetters);
     }
 
+    /**
+     * 把name - method 对塞入 conflictingMethods
+     *
+     * @param conflictingMethods 最终需要的
+     * @param name 属性名称
+     * @param method 属性对应的方法
+     */
     private void addMethodConflict(Map<String, List<Method>> conflictingMethods, String name, Method method) {
         List<Method> list = conflictingMethods.get(name);
         if (list == null) {
@@ -494,6 +503,7 @@ public class Reflector {
      * @return The method cache for the class
      */
     public static Reflector forClass(Class<?> clazz) {
+        //如果开启来缓存，则先走缓存逻辑
         if (classCacheEnabled) {
             // synchronized (clazz) removed see issue #461
             //对于每个类来说，我们假设它是不会变的，这样可以考虑将这个类的信息(构造函数，getter,setter,字段)加入缓存，以提高速度
@@ -504,6 +514,7 @@ public class Reflector {
             }
             return cached;
         } else {
+            //如果关闭来缓存，则每次都创建一个新实例
             return new Reflector(clazz);
         }
     }

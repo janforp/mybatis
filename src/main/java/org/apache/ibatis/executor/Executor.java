@@ -28,11 +28,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * @author Clinton Begin
- */
-
-/**
  * 执行器
+ *
+ * @author Clinton Begin
  */
 public interface Executor {
 

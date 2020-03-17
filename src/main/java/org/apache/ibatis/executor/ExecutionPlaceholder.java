@@ -13,14 +13,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.executor;
 
 /**
  * @author Clinton Begin
  */
+
 /**
  * 执行占位符
  */
 public enum ExecutionPlaceholder {
-  EXECUTION_PLACEHOLDER
+
+    /**
+     * 执行占位符
+     */
+    EXECUTION_PLACEHOLDER
 }
