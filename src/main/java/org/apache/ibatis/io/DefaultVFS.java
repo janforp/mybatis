@@ -209,6 +209,7 @@ public class DefaultVFS extends VFS {
 
         // If the file part of the URL is itself a URL, then that URL probably points to the JAR
         try {
+            //用发生异常的方式跳出循环
             for (; ; ) {
                 url = new URL(url.getFile());
                 log.debug("Inner URL: " + url);

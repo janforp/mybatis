@@ -67,7 +67,9 @@ public abstract class VFS {
 
         // Try the user implementations first, then the built-ins
         List<Class<? extends VFS>> impls = new ArrayList<Class<? extends VFS>>();
+        //用户自定义的vfs实现
         impls.addAll(USER_IMPLEMENTATIONS);
+        //系统提供的默认的实现
         impls.addAll(Arrays.asList((Class<? extends VFS>[]) IMPLEMENTATIONS));
 
         // Try each implementation class until a valid one is found
@@ -78,6 +80,7 @@ public abstract class VFS {
             try {
                 vfs = impl.newInstance();
                 if (vfs == null || !vfs.isValid()) {
+                    //找不到继续循环
                     log.debug("VFS implementation " + impl.getName() +
                             " is not valid in this environment.");
                 }
@@ -91,6 +94,7 @@ public abstract class VFS {
         }
 
         log.debug("Using VFS adapter " + vfs.getClass().getName());
+        //此时也有可能是null
         VFS.instance = vfs;
         return VFS.instance;
     }
@@ -122,6 +126,7 @@ public abstract class VFS {
 
     /**
      * Get a method by name and parameter types. If the method is not found then return null.
+     * 根据 class 查询该class中的方法名称为methodName，参数类型为parameterTypes方法对象
      *
      * @param clazz The class to which the method belongs.
      * @param methodName The name of the method.
@@ -143,6 +148,8 @@ public abstract class VFS {
     }
 
     /**
+     * 调用 object 对象的 method 方法，入参数为 parameters
+     *
      * Invoke a method on an object and return whatever it returns.
      *
      * @param method The method to invoke.
@@ -189,6 +196,7 @@ public abstract class VFS {
 
     /**
      * Return true if the {@link VFS} implementation is valid for the current environment.
+     * 不同的环境可以使用不同的 vfs 实现
      */
     public abstract boolean isValid();
 

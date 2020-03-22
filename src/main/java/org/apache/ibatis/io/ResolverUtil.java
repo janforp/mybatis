@@ -210,8 +210,10 @@ public class ResolverUtil<T> {
 
         Test test = new IsA(parent);
         for (String pkg : packageNames) {
+            //把匹配到到数据就保存在该对象到一个属性，然后返回该对象
             find(test, pkg);
         }
+        //然后返回该对象，调用者直接get即可
         return this;
     }
 
