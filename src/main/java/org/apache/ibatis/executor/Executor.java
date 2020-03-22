@@ -29,6 +29,7 @@ import java.util.List;
 
 /**
  * 执行器
+ * SqlSession向用户提供操作数据库的方法，但和数据库操作有关的职责都会委托给Executor。
  *
  * @author Clinton Begin
  */
@@ -73,5 +74,4 @@ public interface Executor {
     boolean isClosed();
 
     void setExecutorWrapper(Executor executor);
-
 }

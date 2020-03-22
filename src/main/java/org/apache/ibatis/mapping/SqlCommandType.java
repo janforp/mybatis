@@ -13,15 +13,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.mapping;
 
 /**
  * @author Clinton Begin
  */
+
 /**
  * SQL命令类型
- *
  */
 public enum SqlCommandType {
-  UNKNOWN, INSERT, UPDATE, DELETE, SELECT;
+    UNKNOWN,
+    INSERT,
+    UPDATE,
+    DELETE,
+    SELECT;
 }

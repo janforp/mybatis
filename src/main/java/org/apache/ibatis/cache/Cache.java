@@ -19,6 +19,9 @@ package org.apache.ibatis.cache;
 import java.util.concurrent.locks.ReadWriteLock;
 
 /**
+ * https://tech.meituan.com/2018/01/19/mybatis-cache.html
+ *
+ *
  * SPI for cache providers.
  *
  * 每个 namespace 都有一个 cache 实例
@@ -47,6 +50,19 @@ import java.util.concurrent.locks.ReadWriteLock;
  * <insert ... flushCache="true"/>
  * <update ... flushCache="true"/>
  * <delete ... flushCache="true"/>
+ *
+ *
+ *
+ * Mybatis 使用到了两种缓存：本地缓存（local cache）和二级缓存（second level cache）。
+ *
+ * 每当一个新 session 被创建，MyBatis 就会创建一个与之相关联的本地缓存。任何在 session 执行过的查询结果都会被保存在本地缓存中，
+ * 所以，当再次执行参数相同的相同查询时，就不需要实际查询数据库了。本地缓存将会在做出修改、事务提交或回滚，以及关闭 session 时清空。
+ *
+ * 默认情况下，本地缓存数据的生命周期等同于整个 session 的周期。由于缓存会被用来解决循环引用问题和加快重复嵌套查询的速度，所以无法将其完全禁用。
+ * 但是你可以通过设置 localCacheScope=STATEMENT 来只在语句执行时使用缓存。
+ *
+ * 注意，如果 localCacheScope 被设置为 SESSION，对于某个对象，MyBatis 将返回在本地缓存中唯一对象的引用。
+ * 对返回的对象（例如 list）做出的任何修改将会影响本地缓存的内容，进而将会影响到在本次 session 中从缓存返回的值。因此，不要对 MyBatis 所返回的对象作出更改，以防后患。
  *
  * @author Clinton Begin
  */

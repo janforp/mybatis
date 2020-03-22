@@ -32,7 +32,8 @@ public interface ResultContext {
 
   boolean isStopped();
 
-  //停止?
+  /**
+   * 使用该值让mybatis停止加载更多的数据
+   */
   void stop();
-
 }

@@ -48,6 +48,11 @@ import static org.apache.ibatis.executor.ExecutionPlaceholder.EXECUTION_PLACEHOL
  */
 
 /**
+ * 总结
+ * MyBatis一级缓存的生命周期和SqlSession一致。
+ * MyBatis一级缓存内部设计简单，只是一个没有容量限定的HashMap，在缓存的功能性上有所欠缺。
+ * MyBatis的一级缓存最大范围是SqlSession内部，有多个SqlSession或者分布式的环境下，数据库写操作会引起脏数据，建议设定缓存级别为Statement。
+ *
  * 执行器基类
  */
 public abstract class BaseExecutor implements Executor {
@@ -172,7 +177,7 @@ public abstract class BaseExecutor implements Executor {
         try {
             //加一,这样递归调用到上面的时候就不会再清局部缓存了
             queryStack++;
-            //先根据cachekey从localCache去查
+            //先根据cachekey从localCache去查，如果有 resultHandler ，则无法使用缓存
             list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
             if (list != null) {
                 //若查到localCache缓存，处理localOutputParameterCache
@@ -193,6 +198,7 @@ public abstract class BaseExecutor implements Executor {
             // issue #601
             //清空延迟加载队列
             deferredLoads.clear();
+            //在query方法执行的最后，会判断一级缓存级别是否是STATEMENT级别，如果是的话，就清空缓存，这也就是STATEMENT级别的一级缓存无法共享localCache的原因。代码如下所示：
             if (configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) {
                 // issue #482
                 //如果是STATEMENT，清本地缓存

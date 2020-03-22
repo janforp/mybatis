@@ -26,6 +26,11 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
+ * resultMap 元素是 MyBatis 中最重要最强大的元素。它可以让你从 90% 的 JDBC ResultSets
+ * 数据提取代码中解放出来，并在一些情形下允许你进行一些 JDBC 不支持的操作。
+ * 实际上，在为一些比如连接的复杂语句编写映射代码的时候，一份 resultMap 能够代替实现同等功能的数千行代码。
+ * ResultMap 的设计思想是，对简单的语句做到零配置，对于复杂一点的语句，只需要描述语句之间的关系就行了。
+ *
  * 结果映射
  * MyBatis 中最重要最强大的元素
  *

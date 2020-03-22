@@ -27,6 +27,11 @@ import javax.sql.DataSource;
 /**
  * 环境
  * 决定加载哪种环境(开发环境/生产环境)
+ *
+ * 不同环境均有：
+ * 1.不同的数据库
+ * 2.不同的事务
+ * 3.不同的数据源
  */
 public final class Environment {
 

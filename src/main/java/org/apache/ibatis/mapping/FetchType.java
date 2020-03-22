@@ -13,11 +13,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.mapping;
 
 /**
  * @author Eduardo Macarron
  */
 public enum FetchType {
-  LAZY, EAGER, DEFAULT
+
+    /**
+     * 延迟加载
+     */
+    LAZY,
+
+    /**
+     * 贪婪模型
+     */
+    EAGER,
+
+    /**
+     * 默认
+     */
+    DEFAULT
 }
