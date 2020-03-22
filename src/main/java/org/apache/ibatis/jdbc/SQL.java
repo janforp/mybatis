@@ -28,5 +28,4 @@ public class SQL extends AbstractSQL<SQL> {
   public SQL getSelf() {
     return this;
   }
-
 }
