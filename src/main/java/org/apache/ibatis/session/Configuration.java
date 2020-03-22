@@ -139,6 +139,8 @@ public class Configuration {
 
     /**
      * 全局性地开启或关闭所有映射器配置文件中已配置的任何缓存。
+     *
+     * <setting name="cacheEnabled" value="true"/>
      */
     protected boolean cacheEnabled = true;
 
@@ -620,6 +622,8 @@ public class Configuration {
         }
         //如果要求缓存，生成另一种CachingExecutor(默认就是有缓存),装饰者模式,所以默认都是返回CachingExecutor
         if (cacheEnabled) {
+            //一级缓存中，其最大的共享范围就是一个SqlSession内部，如果多个SqlSession之间需要共享缓存，则需要使用到二级缓存。
+            // 开启二级缓存后，会使用CachingExecutor装饰Executor，进入一级缓存的查询流程前，先在CachingExecutor进行二级缓存的查询
             executor = new CachingExecutor(executor);
         }
         //此处调用插件,通过插件可以改变Executor行为

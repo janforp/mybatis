@@ -53,12 +53,18 @@ public final class MappedStatement {
     //SQL源码
     private SqlSource sqlSource;
 
+    /**
+     * namespace下的缓存，也就是二级缓存
+     */
     private Cache cache;
 
     private ParameterMap parameterMap;
 
     private List<ResultMap> resultMaps;
 
+    /**
+     * 该条sql执行的时候是否需要清楚缓存
+     */
     private boolean flushCacheRequired;
 
     private boolean useCache;

@@ -30,7 +30,30 @@ import java.util.Map;
  * The primary Java interface for working with MyBatis.
  * Through this interface you can execute commands, get mappers and manage transactions.
  *
- * @author Clinton Begin
+ *
+ * 一个映射器类就是一个仅需声明与 SqlSession 方法相匹配方法的接口。下面的示例展示了一些方法签名以及它们是如何映射到 SqlSession 上的。
+ *
+ * public interface AuthorMapper {
+ *
+ * (Author) selectOne("selectAuthor",5);
+ * Author selectAuthor(int id);
+ *
+ * (List<Author>) selectList(“selectAuthors”)
+ * List<Author> selectAuthors();
+ *
+ * (Map<Integer,Author>) selectMap("selectAuthors", "id")
+ *
+ * @ MapKey("id") Map<Integer, Author> selectAuthors();
+ *
+ * insert("insertAuthor", author)
+ * int insertAuthor(Author author);
+ *
+ * updateAuthor("updateAuthor", author)
+ * int updateAuthor(Author author);
+ *
+ * delete("deleteAuthor",5)
+ * int deleteAuthor(int id);
+ * }
  */
 public interface SqlSession extends Closeable {
 
