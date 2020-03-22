@@ -43,12 +43,18 @@ import java.util.Map;
  */
 public class SqlRunner {
 
+    /**
+     * 没有自增主键的时候返回的值
+     */
     public static final int NO_GENERATED_KEY = Integer.MIN_VALUE + 1001;
 
     private Connection connection;
 
     private TypeHandlerRegistry typeHandlerRegistry;
 
+    /**
+     * 是否使用自增主键
+     */
     private boolean useGeneratedKeySupport;
 
     public SqlRunner(Connection connection) {
@@ -60,10 +66,11 @@ public class SqlRunner {
         this.useGeneratedKeySupport = useGeneratedKeySupport;
     }
 
-    /*
+    /**
      * Executes a SELECT statement that returns one row.
+     * 其实调用的是 java.sql.PreparedStatement#executeQuery()
      *
-     * @param sql  The SQL
+     * @param sql The SQL
      * @param args The arguments to be set on the statement.
      * @return The row expected.
      * @throws SQLException If less or more than one row is returned
@@ -76,10 +83,10 @@ public class SqlRunner {
         return results.get(0);
     }
 
-    /*
+    /**
      * Executes a SELECT statement that returns multiple rows.
      *
-     * @param sql  The SQL
+     * @param sql The SQL
      * @param args The arguments to be set on the statement.
      * @return The list of rows expected.
      * @throws SQLException If statement preparation or execution fails
@@ -119,7 +126,9 @@ public class SqlRunner {
             setParameters(ps, args);
             ps.executeUpdate();
             if (useGeneratedKeySupport) {
-                List<Map<String, Object>> keys = getResults(ps.getGeneratedKeys());
+                //获取自增主键结果
+                ResultSet generatedKeysResultSet = ps.getGeneratedKeys();
+                List<Map<String, Object>> keys = getResults(generatedKeysResultSet);
                 if (keys.size() == 1) {
                     Map<String, Object> key = keys.get(0);
                     Iterator<Object> i = key.values().iterator();
@@ -145,10 +154,11 @@ public class SqlRunner {
         }
     }
 
-    /*
+    /**
+     * 修改sql以及参数
      * Executes an UPDATE statement.
      *
-     * @param sql  The SQL
+     * @param sql The SQL
      * @param args The arguments to be set on the statement.
      * @return The number of rows impacted or BATCHED_RESULTS if the statements are being batched.
      * @throws SQLException If statement preparation or execution fails
@@ -207,37 +217,57 @@ public class SqlRunner {
         }
     }
 
-    //设置参数
+    /**
+     * 设置参数 PreparedStatement 中的占位符
+     *
+     * @param ps PreparedStatement
+     * @param args 参数
+     * @throws SQLException
+     */
     private void setParameters(PreparedStatement ps, Object... args) throws SQLException {
         for (int i = 0, n = args.length; i < n; i++) {
-            if (args[i] == null) {
+            Object arg = args[i];
+            //数据库的 null 值需要转换为特定的类型
+            if (arg == null) {
                 throw new SQLException("SqlRunner requires an instance of Null to represent typed null values for JDBC compatibility");
-            } else if (args[i] instanceof Null) {
-                ((Null) args[i]).getTypeHandler().setParameter(ps, i + 1, null, ((Null) args[i]).getJdbcType());
+            } else if (arg instanceof Null) {
+                ((Null) arg).getTypeHandler().setParameter(ps, i + 1, null, ((Null) arg).getJdbcType());
             } else {
                 //巧妙的利用TypeHandler来设置参数
-                TypeHandler typeHandler = typeHandlerRegistry.getTypeHandler(args[i].getClass());
+                Class<?> argClass = arg.getClass();
+                TypeHandler typeHandler = typeHandlerRegistry.getTypeHandler(argClass);
                 if (typeHandler == null) {
-                    throw new SQLException("SqlRunner could not find a TypeHandler instance for " + args[i].getClass());
+                    throw new SQLException("SqlRunner could not find a TypeHandler instance for " + argClass);
                 } else {
-                    typeHandler.setParameter(ps, i + 1, args[i], null);
+                    typeHandler.setParameter(ps, i + 1, arg, null);
                 }
             }
         }
     }
 
-    //取得结果
+    /**
+     * 取得结果
+     *
+     * @param rs 结果
+     * @return 每一条记录就是list的每一个元素，每个元素记录着 key:column,value:该column的值
+     * @throws SQLException
+     */
     private List<Map<String, Object>> getResults(ResultSet rs) throws SQLException {
         try {
+            //结果
             List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+            //结果的 column
             List<String> columns = new ArrayList<String>();
+            //类型处理器
             List<TypeHandler<?>> typeHandlers = new ArrayList<TypeHandler<?>>();
-            ResultSetMetaData rsmd = rs.getMetaData();
+            //元数据
+            ResultSetMetaData resultSetMetaData = rs.getMetaData();
             //先计算要哪些列，已经列的类型（TypeHandler）
-            for (int i = 0, n = rsmd.getColumnCount(); i < n; i++) {
-                columns.add(rsmd.getColumnLabel(i + 1));
+            for (int i = 0, n = resultSetMetaData.getColumnCount(); i < n; i++) {
+                String columnLabel = resultSetMetaData.getColumnLabel(i + 1);
+                columns.add(columnLabel);
                 try {
-                    Class<?> type = Resources.classForName(rsmd.getColumnClassName(i + 1));
+                    Class<?> type = Resources.classForName(resultSetMetaData.getColumnClassName(i + 1));
                     TypeHandler<?> typeHandler = typeHandlerRegistry.getTypeHandler(type);
                     if (typeHandler == null) {
                         typeHandler = typeHandlerRegistry.getTypeHandler(Object.class);
@@ -253,7 +283,8 @@ public class SqlRunner {
                     String name = columns.get(i);
                     TypeHandler<?> handler = typeHandlers.get(i);
                     //巧妙的利用TypeHandler来取得结果
-                    row.put(name.toUpperCase(Locale.ENGLISH), handler.getResult(rs, name));
+                    Object result = handler.getResult(rs, name);
+                    row.put(name.toUpperCase(Locale.ENGLISH), result);
                 }
                 list.add(row);
             }

@@ -247,14 +247,14 @@ public abstract class AbstractSQL<T> {
             // Prevent Synthetic Access
         }
 
-      /**
-       * @param builder SafeAppendable
-       * @param keyword
-       * @param parts
-       * @param open
-       * @param close
-       * @param conjunction 连接词
-       */
+        /**
+         * @param builder SafeAppendable
+         * @param keyword
+         * @param parts
+         * @param open
+         * @param close
+         * @param conjunction 连接词
+         */
         private void sqlClause(SafeAppendable builder, String keyword, List<String> parts, String open, String close, String conjunction) {
             if (!parts.isEmpty()) {
                 if (!builder.isEmpty()) {
@@ -352,19 +352,5 @@ public abstract class AbstractSQL<T> {
 
             return answer;
         }
-    }
-
-    public static String insertPersonSql() {
-        String sql = new SQL()
-                .INSERT_INTO("PERSON")
-                .VALUES("ID, FIRST_NAME", "#{id}, #{firstName}")
-                .VALUES("LAST_NAME", "#{lastName}")
-                .toString();
-        return sql;
-    }
-
-    public static void main(String[] args) {
-        String s = insertPersonSql();
-        System.out.println(s);
     }
 }

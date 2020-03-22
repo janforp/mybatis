@@ -78,7 +78,8 @@ public class SQLTest {
             "FROM PERSON P\n" +
             "WHERE (P.ID like #id# AND P.FIRST_NAME like #firstName# AND P.LAST_NAME like #lastName#)\n" +
             "ORDER BY P.LAST_NAME";
-    assertEquals(expected, example2("a", "b", "c"));
+    String example2 = example2("a", "b", "c");
+    assertEquals(expected, example2);
   }
 
   @Test
@@ -107,7 +108,8 @@ public class SQLTest {
         "SELECT P.ID, P.USERNAME, P.PASSWORD, P.FIRST_NAME, P.LAST_NAME\n" +
             "FROM PERSON P\n" +
             "ORDER BY P.LAST_NAME";
-    assertEquals(expected, example2(null, null, null));
+    String example2 = example2(null, null, null);
+    assertEquals(expected, example2);
   }
 
   @Test
@@ -164,4 +166,14 @@ public class SQLTest {
     }}.toString();
   }
 
+
+  @Test
+  public void main() {
+    String sql = new SQL()
+            .INSERT_INTO("PERSON")
+            .VALUES("ID, FIRST_NAME", "#{id}, #{firstName}")
+            .VALUES("LAST_NAME", "#{lastName}")
+            .toString();
+    System.out.println(sql);
+  }
 }

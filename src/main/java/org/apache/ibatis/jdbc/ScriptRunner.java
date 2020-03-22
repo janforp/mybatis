@@ -220,11 +220,14 @@ public class ScriptRunner {
     }
 
     /**
-     * 按行提交执行sql
+     * 按行提交执行sql，逻辑：
+     * 如果注释，忽略
+     * 如果结尾是分号，则执行，并且清空 command 返回
+     * 如果不满足执行条件，则comman.append(line)，分号command，执行满足执行条件的时候一并执行，比如建表语句
      *
      * @param command 所有的sql
      * @param line 一行数据
-     * @return
+     * @return command
      * @throws SQLException
      * @throws UnsupportedEncodingException
      */
@@ -235,10 +238,11 @@ public class ScriptRunner {
             println(trimmedLine);
         } else if (commandReadyToExecute(trimmedLine)) {
             //如果有分号，执行
-            command.append(line, 0, line.lastIndexOf(delimiter));
+            command.append(line, 0, line.lastIndexOf(delimiter));//去掉最后的分号
             command.append(LINE_SEPARATOR);
             println(command);
             executeStatement(command.toString());
+            //执行之后，清空 command
             command.setLength(0);
         } else if (trimmedLine.length() > 0) {
             //没有分号，先加入，等后面的分号
