@@ -71,10 +71,18 @@ public class XMLConfigBuilder extends BaseBuilder {
         this(reader, environment, null);
     }
 
-    //构造函数，转换成XPathParser再去调用构造函数
+    /**
+     * 构造函数，转换成XPathParser再去调用构造函数
+     *
+     * @param reader 配置文件
+     * @param environment 环境，可以空
+     * @param props 属性，可以空
+     */
     public XMLConfigBuilder(Reader reader, String environment, Properties props) {
-        //构造一个需要验证，XMLMapperEntityResolver的XPathParser
-        this(new XPathParser(reader, true, props, new XMLMapperEntityResolver()), environment, props);
+        //构造一个需要验证，XMLMapperEntityResolver的XPathParser。
+        this(new XPathParser(reader, true, props, new XMLMapperEntityResolver()),
+                environment,
+                props);
     }
 
     //以下3个一组
@@ -131,7 +139,8 @@ public class XMLConfigBuilder extends BaseBuilder {
         //  </configuration>
 
         //根节点是configuration
-        parseConfiguration(parser.evalNode("/configuration"));
+        XNode rootNode = parser.evalNode("/configuration");
+        parseConfiguration(rootNode);
         return configuration;
     }
 
@@ -285,7 +294,7 @@ public class XMLConfigBuilder extends BaseBuilder {
             //  <property name="username" value="dev_user"/>
             //  <property name="password" value="F2Fa3!33TYyg"/>
             //</properties>
-            String resourceUrl = propertiesElementNode.getStringAttribute("resourceUrl");
+            String resourceUrl = propertiesElementNode.getStringAttribute("resource");
             String url = propertiesElementNode.getStringAttribute("url");
             if (resourceUrl != null && url != null) {
                 //url,resources二选一
