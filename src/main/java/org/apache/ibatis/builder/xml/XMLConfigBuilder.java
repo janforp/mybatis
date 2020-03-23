@@ -154,26 +154,45 @@ public class XMLConfigBuilder extends BaseBuilder {
             //分步骤解析
             //issue #117 read properties first
             //1.properties
-            propertiesElement(configurationRootNode.evalNode("properties"));
+            XNode properties = configurationRootNode.evalNode("properties");
+            propertiesElement(properties);
+
             //2.类型别名，并且注册到别名注册器
-            typeAliasesElement(configurationRootNode.evalNode("typeAliases"));
+            XNode typeAliases = configurationRootNode.evalNode("typeAliases");
+            typeAliasesElement(typeAliases);
+
             //3.插件
-            pluginElement(configurationRootNode.evalNode("plugins"));
+            XNode plugins = configurationRootNode.evalNode("plugins");
+            pluginElement(plugins);
+
             //4.对象工厂
-            objectFactoryElement(configurationRootNode.evalNode("objectFactory"));
+            XNode objectFactory = configurationRootNode.evalNode("objectFactory");
+            objectFactoryElement(objectFactory);
+
             //5.对象包装工厂
-            objectWrapperFactoryElement(configurationRootNode.evalNode("objectWrapperFactory"));
+            XNode objectWrapperFactory = configurationRootNode.evalNode("objectWrapperFactory");
+            objectWrapperFactoryElement(objectWrapperFactory);
+
             //6.设置,类似一些开关，配置
-            settingsElement(configurationRootNode.evalNode("settings"));
+            XNode settings = configurationRootNode.evalNode("settings");
+            settingsElement(settings);
+
             // read it after objectFactory and objectWrapperFactory issue #631
             //7.环境
-            environmentsElement(configurationRootNode.evalNode("environments"));
+            XNode environments = configurationRootNode.evalNode("environments");
+            environmentsElement(environments);
+
             //8.databaseIdProvider
-            databaseIdProviderElement(configurationRootNode.evalNode("databaseIdProvider"));
+            XNode databaseIdProvider = configurationRootNode.evalNode("databaseIdProvider");
+            databaseIdProviderElement(databaseIdProvider);
+
             //9.类型处理器
-            typeHandlerElement(configurationRootNode.evalNode("typeHandlers"));
+            XNode typeHandlers = configurationRootNode.evalNode("typeHandlers");
+            typeHandlerElement(typeHandlers);
+
             //10.映射器
-            mapperElement(configurationRootNode.evalNode("mappers"));
+            XNode mappers = configurationRootNode.evalNode("mappers");
+            mapperElement(mappers);
         } catch (Exception e) {
             throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
         }
@@ -233,7 +252,8 @@ public class XMLConfigBuilder extends BaseBuilder {
     //</plugins>
     private void pluginElement(XNode pluginsNode) throws Exception {
         if (pluginsNode != null) {
-            for (XNode pluginNode : pluginsNode.getChildren()) {
+            List<XNode> children = pluginsNode.getChildren();
+            for (XNode pluginNode : children) {
                 //拦截器类全名称
                 String interceptorFullClassName = pluginNode.getStringAttribute("interceptor");
                 //拿到 name - value
@@ -301,7 +321,8 @@ public class XMLConfigBuilder extends BaseBuilder {
                 throw new BuilderException("The properties element cannot specify both a URL and a resourceUrl based property file reference.  Please specify one or the other.");
             }
             if (resourceUrl != null) {
-                defaults.putAll(Resources.getResourceAsProperties(resourceUrl));
+                Properties resourceAsProperties = Resources.getResourceAsProperties(resourceUrl);
+                defaults.putAll(resourceAsProperties);
             } else if (url != null) {
                 defaults.putAll(Resources.getUrlAsProperties(url));
             }
@@ -343,6 +364,7 @@ public class XMLConfigBuilder extends BaseBuilder {
             // name
             Set<Object> settingNameSet = settingsNameToValueMap.keySet();
             for (Object name : settingNameSet) {
+                //保证配置没有拼写错误
                 if (!metaConfig.hasSetter(String.valueOf(name))) {
                     //配置文件中拼写错误
                     throw new BuilderException("The setting " + name + " is not known.  Make sure you spelled it correctly (case sensitive).");
@@ -417,7 +439,8 @@ public class XMLConfigBuilder extends BaseBuilder {
                 environment = environmentsNode.getStringAttribute("default");
             }
             //可以配置多套数据库环境
-            for (XNode child : environmentsNode.getChildren()) {
+            List<XNode> children = environmentsNode.getChildren();
+            for (XNode child : children) {
                 //<environment id="development">
                 String id = child.getStringAttribute("id");
                 //循环比较id是否就是指定的environment
@@ -435,12 +458,14 @@ public class XMLConfigBuilder extends BaseBuilder {
                     //  <property name="username" value="${username}"/>
                     //  <property name="password" value="${password}"/>
                     //</dataSource>
-                    DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
+                    XNode dataSourceNode = child.evalNode("dataSource");
+                    DataSourceFactory dsFactory = dataSourceElement(dataSourceNode);
                     DataSource dataSource = dsFactory.getDataSource();
                     Environment.Builder environmentBuilder = new Environment.Builder(id)
                             .transactionFactory(txFactory)
                             .dataSource(dataSource);
-                    configuration.setEnvironment(environmentBuilder.build());
+                    Environment environment = environmentBuilder.build();
+                    configuration.setEnvironment(environment);
                 }
             }
         }
@@ -507,7 +532,8 @@ public class XMLConfigBuilder extends BaseBuilder {
             String type = context.getStringAttribute("type");
             Properties props = context.getChildrenAsProperties();
             //根据type="POOLED"解析返回适当的DataSourceFactory
-            DataSourceFactory factory = (DataSourceFactory) resolveClass(type).newInstance();
+            Class<?> resolveClass = resolveClass(type);
+            DataSourceFactory factory = (DataSourceFactory) resolveClass.newInstance();
             factory.setProperties(props);
             return factory;
         }
@@ -586,7 +612,8 @@ public class XMLConfigBuilder extends BaseBuilder {
     //	</mappers>
     private void mapperElement(XNode mappersNode) throws Exception {
         if (mappersNode != null) {
-            for (XNode child : mappersNode.getChildren()) {
+            List<XNode> children = mappersNode.getChildren();
+            for (XNode child : children) {
                 if ("package".equals(child.getName())) {
                     //10.4自动扫描包下所有映射器
                     String mapperPackage = child.getStringAttribute("name");
@@ -606,6 +633,7 @@ public class XMLConfigBuilder extends BaseBuilder {
                         //映射器比较复杂，调用XMLMapperBuilder
                         //注意在for循环里每个mapper都重新new一个XMLMapperBuilder，来解析
                         XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
+                        //解析mapper文件
                         mapperParser.parse();
                     } else if (resource == null && url != null && mapperClass == null) {
                         //10.2使用绝对url路径
