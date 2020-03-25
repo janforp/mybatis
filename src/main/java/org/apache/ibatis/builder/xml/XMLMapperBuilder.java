@@ -406,7 +406,8 @@ public class XMLMapperBuilder extends BaseBuilder {
                     flags.add(ResultFlag.ID);
                 }
                 //调5.1.1 buildResultMappingFromContext,得到ResultMapping
-                resultMappings.add(buildResultMappingFromContext(resultChild, typeClass, flags));
+                ResultMapping resultMapping = buildResultMappingFromContext(resultChild, typeClass, flags);
+                resultMappings.add(resultMapping);
             }
         }
         //最后再调ResultMapResolver得到ResultMap
@@ -506,35 +507,37 @@ public class XMLMapperBuilder extends BaseBuilder {
     /**
      * 5.1.1 构建resultMap
      *
-     * @param context <result column="config_key" property="configKey" jdbcType="VARCHAR"/>
-     * @param resultType <resultMap id="BaseResultMap" type="com.janita.hermes.model.FrontConfig">
+     * @param resultMapEleNode <result column="config_key" property="configKey" jdbcType="VARCHAR"/>
+     * @param resultMapType <resultMap id="BaseResultMap" type="com.janita.hermes.model.FrontConfig">
      * @param flags <id column="config_id" property="configId" jdbcType="BIGINT"/>
      * @return
      * @throws Exception
      */
-    private ResultMapping buildResultMappingFromContext(XNode context, Class<?> resultType, List<ResultFlag> flags) throws Exception {
+    private ResultMapping buildResultMappingFromContext(XNode resultMapEleNode, Class<?> resultMapType, List<ResultFlag> flags) throws Exception {
         //<id property="id" column="author_id"/>
         //<result property="username" column="author_username"/>
-        String property = context.getStringAttribute("property");
-        String column = context.getStringAttribute("column");
-        String javaType = context.getStringAttribute("javaType");
-        String jdbcType = context.getStringAttribute("jdbcType");
-        String nestedSelect = context.getStringAttribute("select");
+        String property = resultMapEleNode.getStringAttribute("property");
+        String column = resultMapEleNode.getStringAttribute("column");
+        String javaType = resultMapEleNode.getStringAttribute("javaType");
+        String jdbcType = resultMapEleNode.getStringAttribute("jdbcType");
+        String nestedSelect = resultMapEleNode.getStringAttribute("select");
         //处理嵌套的result map
-        String nestedResultMap = context.getStringAttribute("resultMap",
-                processNestedResultMappings(context, Collections.<ResultMapping>emptyList()));
-        String notNullColumn = context.getStringAttribute("notNullColumn");
-        String columnPrefix = context.getStringAttribute("columnPrefix");
-        String typeHandler = context.getStringAttribute("typeHandler");
-        String resulSet = context.getStringAttribute("resultSet");
-        String foreignColumn = context.getStringAttribute("foreignColumn");
-        boolean lazy = "lazy".equals(context.getStringAttribute("fetchType", configuration.isLazyLoadingEnabled() ? "lazy" : "eager"));
+        String nestedResultMap = resultMapEleNode.getStringAttribute("resultMap",
+                processNestedResultMappings(resultMapEleNode, Collections.<ResultMapping>emptyList()));
+        String notNullColumn = resultMapEleNode.getStringAttribute("notNullColumn");
+        String columnPrefix = resultMapEleNode.getStringAttribute("columnPrefix");
+        String typeHandler = resultMapEleNode.getStringAttribute("typeHandler");
+        String resulSet = resultMapEleNode.getStringAttribute("resultSet");
+        String foreignColumn = resultMapEleNode.getStringAttribute("foreignColumn");
+        String fetchType = configuration.isLazyLoadingEnabled() ? "lazy" : "eager";
+        boolean lazy = "lazy".equals(resultMapEleNode.getStringAttribute("fetchType", fetchType));
         Class<?> javaTypeClass = resolveClass(javaType);
         @SuppressWarnings("unchecked")
+                //该列的类型处理器
         Class<? extends TypeHandler<?>> typeHandlerClass = (Class<? extends TypeHandler<?>>) resolveClass(typeHandler);
         JdbcType jdbcTypeEnum = resolveJdbcType(jdbcType);
         //又去调builderAssistant.buildResultMapping
-        return builderAssistant.buildResultMapping(resultType, property, column, javaTypeClass, jdbcTypeEnum,
+        return builderAssistant.buildResultMapping(resultMapType, property, column, javaTypeClass, jdbcTypeEnum,
                 nestedSelect, nestedResultMap, notNullColumn, columnPrefix, typeHandlerClass, flags, resulSet, foreignColumn, lazy);
     }
 
@@ -568,7 +571,8 @@ public class XMLMapperBuilder extends BaseBuilder {
                 //ignore, bound type is not required
             }
             if (boundType != null) {
-                if (!configuration.hasMapper(boundType)) {
+                boolean hasMapper = configuration.hasMapper(boundType);
+                if (!hasMapper) {
                     // Spring may not know the real resource name so we set a flag
                     // to prevent loading again this resource from the mapper interface
                     // look at MapperAnnotationBuilder#loadXmlResource

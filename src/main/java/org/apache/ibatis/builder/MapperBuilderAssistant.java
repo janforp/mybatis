@@ -196,14 +196,19 @@ public class MapperBuilderAssistant extends BaseBuilder {
         return builder.build();
     }
 
-    //增加ResultMap
-    public ResultMap addResultMap(
-            String id,
-            Class<?> type,
-            String extend,
-            Discriminator discriminator,
-            List<ResultMapping> resultMappings,
-            Boolean autoMapping) {
+    /**
+     * 增加ResultMap 传入的 resultMap 的解析结果 ，把 ResultMap 对象存入 configuration
+     *
+     * @param id
+     * @param type
+     * @param extend
+     * @param discriminator
+     * @param resultMappings
+     * @param autoMapping
+     * @return
+     */
+    public ResultMap addResultMap(String id, Class<?> type, String extend, Discriminator discriminator, List<ResultMapping> resultMappings, Boolean autoMapping) {
+
         id = applyCurrentNamespace(id, false);
         extend = applyCurrentNamespace(extend, true);
 
@@ -421,11 +426,11 @@ public class MapperBuilderAssistant extends BaseBuilder {
      * 构建result map
      * <result column="config_key" property="configKey" jdbcType="VARCHAR"/>
      */
-    public ResultMapping buildResultMapping(Class<?> resultType, String property, String column, Class<?> javaType,
+    public ResultMapping buildResultMapping(Class<?> resultMapType, String property, String column, Class<?> javaType,
             JdbcType jdbcType, String nestedSelect, String nestedResultMap, String notNullColumn, String columnPrefix,
             Class<? extends TypeHandler<?>> typeHandler, List<ResultFlag> flags, String resultSet, String foreignColumn, boolean lazy) {
-
-        Class<?> javaTypeClass = resolveResultJavaType(resultType, property, javaType);
+        //根据 resultMap 的 java 类型， 该列的 属性 以及 该列的 java 类型，推断出最终的 列类型
+        Class<?> javaTypeClass = resolveResultJavaType(resultMapType, property, javaType);
         TypeHandler<?> typeHandlerInstance = resolveTypeHandler(javaTypeClass, typeHandler);
         //解析复合的列名,一般用不到，返回的是空
         List<ResultMapping> composites = parseCompositeColumnName(column);
@@ -480,13 +485,15 @@ public class MapperBuilderAssistant extends BaseBuilder {
     }
 
     /**
+     * 根据 resultMap 的 java 类型， 该列的 属性 以及 该列的 java 类型，推断出最终的 列类型
+     *
      * <id column="config_id" property="configId" jdbcType="BIGINT"/>
      * <result column="config_value" property="configValue" jdbcType="VARCHAR"/>
      *
-     * @param resultType <resultMap id="BaseResultMap" type="com.servyou.hermes.model.FrontConfig">
-     * @param property configId
-     * @param javaType BIGINT
-     * @return
+     * @param resultType <resultMap id="BaseResultMap" type="com.servyou.hermes.model.FrontConfig"> 该 resultMap 的 java类型
+     * @param property configId 该列的属性名称
+     * @param javaType BIGINT 用户指定的类型
+     * @return 根据 resultMap 的 java 类型， 该列的 属性 以及 该列的 java 类型，推断出最终的 列类型
      */
     private Class<?> resolveResultJavaType(Class<?> resultType, String property, Class<?> javaType) {
         if (javaType == null && property != null) {

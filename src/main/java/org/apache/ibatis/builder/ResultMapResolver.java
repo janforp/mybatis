@@ -43,6 +43,15 @@ public class ResultMapResolver {
 
     private Boolean autoMapping;
 
+    /**
+     * @param assistant
+     * @param id resultMap 的 id
+     * @param type resultMap 的 type
+     * @param extend
+     * @param discriminator
+     * @param resultMappings resultMap 的具体映射字段列表
+     * @param autoMapping
+     */
     public ResultMapResolver(MapperBuilderAssistant assistant, String id, Class<?> type,
             String extend, Discriminator discriminator, List<ResultMapping> resultMappings, Boolean autoMapping) {
         this.assistant = assistant;

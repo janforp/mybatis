@@ -79,6 +79,12 @@ public class MetaClass {
         return reflector.getSetablePropertyNames();
     }
 
+    /**
+     * 根据属性名称得类型
+     *
+     * @param name 属性名称
+     * @return 类型
+     */
     public Class<?> getSetterType(String name) {
         PropertyTokenizer prop = new PropertyTokenizer(name);
         if (prop.hasNext()) {

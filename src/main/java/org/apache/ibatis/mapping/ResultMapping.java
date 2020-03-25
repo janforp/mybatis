@@ -30,7 +30,19 @@ import java.util.Set;
  * 结果映射
  * MyBatis 中最重要最强大的元素
  *
- *  @author Clinton Begin
+ * 如果配置如下：
+ * <resultMap id="selectAuthor" type="org.apache.ibatis.domain.blog.Author">
+ * <id column="id" property="id" />
+ * <result property="username" column="username" />
+ * <result property="password" column="password" />
+ * <result property="email" column="email" />
+ * <result property="bio" column="bio" />
+ * <result property="favouriteSection" column="favourite_section" />
+ * </resultMap>
+ *
+ * 则会生成 6  个 ResultMapping 对象
+ *
+ * @author Clinton Begin
  */
 public class ResultMapping {
 
