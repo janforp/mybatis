@@ -51,6 +51,14 @@ public class XMLStatementBuilder extends BaseBuilder {
         this(configuration, builderAssistant, context, null);
     }
 
+    /**
+     * sql语句构造器
+     *
+     * @param configuration
+     * @param builderAssistant
+     * @param context update|insert|update|select
+     * @param databaseId
+     */
     public XMLStatementBuilder(Configuration configuration, MapperBuilderAssistant builderAssistant, XNode context, String databaseId) {
         super(configuration);
         this.builderAssistant = builderAssistant;
@@ -90,6 +98,7 @@ public class XMLStatementBuilder extends BaseBuilder {
     //版权声明：本文为CSDN博主「第一小菜鸟」的原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接及本声明。
     //原文链接：https://blog.csdn.net/xu1916659422/article/details/77921912
     public void parseStatementNode() {
+        //<delete id="deleteAuthor" parameterType="int">
         String id = context.getStringAttribute("id");
         String databaseId = context.getStringAttribute("databaseId");
 
@@ -105,7 +114,9 @@ public class XMLStatementBuilder extends BaseBuilder {
         //引用外部 parameterMap,已废弃
         String parameterMap = context.getStringAttribute("parameterMap");
         //参数类型
+        //<update id="updateAuthor" parameterType="org.apache.ibatis.domain.blog.Author">
         String parameterType = context.getStringAttribute("parameterType");
+        //参数
         Class<?> parameterTypeClass = resolveClass(parameterType);
         //引用外部的 resultMap(高级功能)
         String resultMap = context.getStringAttribute("resultMap");
@@ -120,13 +131,14 @@ public class XMLStatementBuilder extends BaseBuilder {
         //结果集类型，FORWARD_ONLY|SCROLL_SENSITIVE|SCROLL_INSENSITIVE 中的一种
         String resultSetType = context.getStringAttribute("resultSetType");
         //语句类型, STATEMENT|PREPARED|CALLABLE 的一种
+        //默认 PREPARED
         StatementType statementType = StatementType.valueOf(context.getStringAttribute("statementType", StatementType.PREPARED.toString()));
         ResultSetType resultSetTypeEnum = resolveResultSetType(resultSetType);
 
         //获取命令类型(select|insert|update|delete)
         String nodeName = context.getNode().getNodeName();
         SqlCommandType sqlCommandType = SqlCommandType.valueOf(nodeName.toUpperCase(Locale.ENGLISH));
-        boolean isSelect = sqlCommandType == SqlCommandType.SELECT;
+        boolean isSelect = (sqlCommandType == SqlCommandType.SELECT);
         //如果是查询，默认不刷新缓存
         boolean flushCache = context.getBooleanAttribute("flushCache", !isSelect);
         //是否要缓存select结果,如果是查询，默认使用缓存
@@ -175,7 +187,7 @@ public class XMLStatementBuilder extends BaseBuilder {
      * SELECT LAST_INSERT_ID()
      * </selectKey>
      *
-     * @param id <insert id="insertAndgetkey" parameterType="com.soft.mybatis.model.User">
+     * @param id  sql方法的id <insert id="insertAndgetkey" parameterType="com.soft.mybatis.model.User">
      * @param parameterTypeClass <insert id="insertAndgetkey" parameterType="com.soft.mybatis.model.User">
      * @param langDriver
      */

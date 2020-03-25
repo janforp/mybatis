@@ -90,7 +90,15 @@ public class MapperBuilderAssistant extends BaseBuilder {
         this.currentNamespace = currentNamespace;
     }
 
-    //为id加上namespace前缀，如selectPerson-->org.a.b.selectPerson
+    /**
+     * 为id加上namespace前缀，如selectPerson-->org.a.b.selectPerson
+     *
+     * base ------>   currentNamespace + "." + base;
+     *
+     * @param base
+     * @param isReference
+     * @return
+     */
     public String applyCurrentNamespace(String base, boolean isReference) {
         if (base == null) {
             return null;
@@ -199,11 +207,11 @@ public class MapperBuilderAssistant extends BaseBuilder {
     /**
      * 增加ResultMap 传入的 resultMap 的解析结果 ，把 ResultMap 对象存入 configuration
      *
-     * @param id
-     * @param type
+     * @param id resultMap 的 id
+     * @param type resultMap 的 type
      * @param extend
      * @param discriminator
-     * @param resultMappings
+     * @param resultMappings resultMap 的具体映射字段列表
      * @param autoMapping
      * @return
      */
@@ -423,22 +431,22 @@ public class MapperBuilderAssistant extends BaseBuilder {
     }
 
     /**
-     * 构建result map
+     * 构建result map 中的每一列
      * <result column="config_key" property="configKey" jdbcType="VARCHAR"/>
      */
     public ResultMapping buildResultMapping(Class<?> resultMapType, String property, String column, Class<?> javaType,
             JdbcType jdbcType, String nestedSelect, String nestedResultMap, String notNullColumn, String columnPrefix,
             Class<? extends TypeHandler<?>> typeHandler, List<ResultFlag> flags, String resultSet, String foreignColumn, boolean lazy) {
         //根据 resultMap 的 java 类型， 该列的 属性 以及 该列的 java 类型，推断出最终的 列类型
-        Class<?> javaTypeClass = resolveResultJavaType(resultMapType, property, javaType);
-        TypeHandler<?> typeHandlerInstance = resolveTypeHandler(javaTypeClass, typeHandler);
+        Class<?> propertyJavaTypeClass = resolveResultJavaType(resultMapType, property, javaType);
+        TypeHandler<?> typeHandlerInstance = resolveTypeHandler(propertyJavaTypeClass, typeHandler);
         //解析复合的列名,一般用不到，返回的是空
         List<ResultMapping> composites = parseCompositeColumnName(column);
         if (composites.size() > 0) {
             column = null;
         }
         //构建result map
-        ResultMapping.Builder builder = new ResultMapping.Builder(configuration, property, column, javaTypeClass);
+        ResultMapping.Builder builder = new ResultMapping.Builder(configuration, property, column, propertyJavaTypeClass);
         builder.jdbcType(jdbcType);
         builder.nestedQueryId(applyCurrentNamespace(nestedSelect, true));
         builder.nestedResultMapId(applyCurrentNamespace(nestedResultMap, true));
@@ -469,14 +477,26 @@ public class MapperBuilderAssistant extends BaseBuilder {
         return columns;
     }
 
-    //解析复合列名，即列名由多个组成，可以先忽略
+    /**
+     * 解析复合列名，即列名由多个组成，可以先忽略
+     *
+     * 解析混合列
+     *
+     * @param columnName
+     * @return
+     */
     private List<ResultMapping> parseCompositeColumnName(String columnName) {
         List<ResultMapping> composites = new ArrayList<ResultMapping>();
+        //如果columnName不为null 同时colunmnName中含有"=" 或者含有","号
         if (columnName != null && (columnName.indexOf('=') > -1 || columnName.indexOf(',') > -1)) {
+            //分割字符串
             StringTokenizer parser = new StringTokenizer(columnName, "{}=, ", false);
             while (parser.hasMoreTokens()) {
+                //获取属性
                 String property = parser.nextToken();
+                //获取列
                 String column = parser.nextToken();
+                //构建复合的ResultMapping
                 ResultMapping.Builder complexBuilder = new ResultMapping.Builder(configuration, property, column, configuration.getTypeHandlerRegistry().getUnknownTypeHandler());
                 composites.add(complexBuilder.build());
             }

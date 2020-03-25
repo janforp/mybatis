@@ -62,6 +62,17 @@
 		</constructor>
 	</resultMap>
 
+	<update id="updateAuthorIfNecessary" parameterType="org.apache.ibatis.domain.blog.Author">
+		update Author
+		<set>
+			<if test="username != null">username=#{username},</if>
+			<if test="password != null">password=#{password},</if>
+			<if test="email != null">email=#{email},</if>
+			<if test="bio != null">bio=#{bio}</if>
+		</set>
+		where id=#{id}
+	</update>
+
 	<select id="selectAllAuthors" resultType="org.apache.ibatis.domain.blog.Author">
 		select * from author
 	</select>
@@ -124,18 +135,5 @@
 	<delete id="deleteAuthor" parameterType="int">
 		delete from Author where id = #{id}
 	</delete>
-
-
-	<update id="updateAuthorIfNecessary" parameterType="org.apache.ibatis.domain.blog.Author">
-		update Author
-		<set>
-			<if test="username != null">username=#{username},</if>
-			<if test="password != null">password=#{password},</if>
-			<if test="email != null">email=#{email},</if>
-			<if test="bio != null">bio=#{bio}</if>
-		</set>
-		where id=#{id}
-	</update>
-
 
 </mapper>

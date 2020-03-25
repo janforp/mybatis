@@ -182,9 +182,11 @@ public class XMLMapperBuilder extends BaseBuilder {
             List<XNode> resultMapNodeList = mapperNode.evalNodes("/mapper/resultMap");
             resultMapElements(resultMapNodeList);
             //6.配置sql(定义可重用的 SQL 代码段)
-            sqlElement(mapperNode.evalNodes("/mapper/sql"));
+            List<XNode> sqlXNodes = mapperNode.evalNodes("/mapper/sql");
+            sqlElement(sqlXNodes);
             //7.配置select|insert|update|delete TODO
-            buildStatementFromContext(mapperNode.evalNodes("select|insert|update|delete"));
+            List<XNode> xNodeList = mapperNode.evalNodes("select|insert|update|delete");
+            buildStatementFromContext(xNodeList);
         } catch (Exception e) {
             throw new BuilderException("Error parsing Mapper XML. Cause: " + e, e);
         }
@@ -469,14 +471,15 @@ public class XMLMapperBuilder extends BaseBuilder {
 
     //6.1 配置sql
     //<sql id="userColumns"> id,username,password </sql>
-    private void sqlElement(List<XNode> list, String requiredDatabaseId) throws Exception {
-        for (XNode context : list) {
-            String databaseId = context.getStringAttribute("databaseId");
-            String id = context.getStringAttribute("id");
+    private void sqlElement(List<XNode> list, String requiredDatabaseId) {
+        for (XNode sqlNode : list) {
+            String databaseId = sqlNode.getStringAttribute("databaseId");
+            String id = sqlNode.getStringAttribute("id");
+            //id ------>   currentNamespace + "." + id;
             id = builderAssistant.applyCurrentNamespace(id, false);
             //比较简单，就是将sql片段放入hashmap,不过此时还没有解析sql片段
             if (databaseIdMatchesCurrent(id, databaseId, requiredDatabaseId)) {
-                sqlFragments.put(id, context);
+                sqlFragments.put(id, sqlNode);
             }
         }
     }

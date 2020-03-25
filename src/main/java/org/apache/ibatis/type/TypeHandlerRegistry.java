@@ -179,7 +179,7 @@ public final class TypeHandlerRegistry {
 
     @SuppressWarnings("unchecked")
     private <T> TypeHandler<T> getTypeHandler(Type javaType, JdbcType jdbcType) {
-        Map<JdbcType, TypeHandler<?>> jdbcHandlerMap = TYPE_HANDLER_MAP.get(javaType);
+            Map<JdbcType, TypeHandler<?>> jdbcHandlerMap = TYPE_HANDLER_MAP.get(javaType);
         TypeHandler<?> handler = null;
         if (jdbcHandlerMap != null) {
             handler = jdbcHandlerMap.get(jdbcType);
