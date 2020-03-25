@@ -599,9 +599,20 @@ public class Configuration {
         return resultSetHandler;
     }
 
-    //创建语句处理器
-    public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
-        //创建路由选择语句处理器
+    /**
+     * 创建语句处理器
+     *
+     * @param executor 执行器
+     * @param mappedStatement 映射语句
+     * @param parameterObject 传输对象
+     * @param rowBounds 分页传输
+     * @param resultHandler 结果处理器
+     * @param boundSql 绑定的sql
+     * @return 创建语句处理器
+     */
+    public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement,
+            Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
+        //创建路由选择语句处理器，这个 RoutingStatementHandler 是具体三中类型的代理
         StatementHandler statementHandler = new RoutingStatementHandler(executor, mappedStatement, parameterObject, rowBounds, resultHandler, boundSql);
         //插件在这里插入
         statementHandler = (StatementHandler) interceptorChain.pluginAll(statementHandler);
@@ -614,9 +625,9 @@ public class Configuration {
 
     //产生执行器
     public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
-        executorType = executorType == null ? defaultExecutorType : executorType;
+        executorType = (executorType == null ? defaultExecutorType : executorType);
         //这句再做一下保护,囧,防止粗心大意的人将defaultExecutorType设成null?
-        executorType = executorType == null ? ExecutorType.SIMPLE : executorType;
+        executorType = (executorType == null ? ExecutorType.SIMPLE : executorType);
         Executor executor;
         //然后就是简单的3个分支，产生3种执行器BatchExecutor/ReuseExecutor/SimpleExecutor
         if (ExecutorType.BATCH == executorType) {

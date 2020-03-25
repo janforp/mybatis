@@ -310,6 +310,12 @@ public final class MappedStatement {
         return resultSets;
     }
 
+    /**
+     * 获取 BoundSql
+     *
+     * @param parameterObject 参数
+     * @return BoundSql
+     */
     public BoundSql getBoundSql(Object parameterObject) {
         //其实就是调用sqlSource.getBoundSql
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
@@ -318,7 +324,6 @@ public final class MappedStatement {
         if (parameterMappings == null || parameterMappings.isEmpty()) {
             boundSql = new BoundSql(configuration, boundSql.getSql(), parameterMap.getParameterMappings(), parameterObject);
         }
-
         // check for nested result maps in parameter mappings (issue #30)
         for (ParameterMapping pm : boundSql.getParameterMappings()) {
             String rmId = pm.getResultMapId();
@@ -329,7 +334,6 @@ public final class MappedStatement {
                 }
             }
         }
-
         return boundSql;
     }
 

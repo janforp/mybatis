@@ -60,7 +60,9 @@ public class SqlSessionFactoryBuilder {
         try {
             //委托XMLConfigBuilder来解析xml文件，并构建
             XMLConfigBuilder parser = new XMLConfigBuilder(reader, environment, properties);
+            //解析配置文件
             Configuration configuration = parser.parse();
+            //通过 Configuration 构建 SqlSessionFactory
             SqlSessionFactory build = build(configuration);
             System.out.println(build.getConfiguration() != null);
             return build;

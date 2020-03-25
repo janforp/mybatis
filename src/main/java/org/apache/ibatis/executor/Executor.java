@@ -20,6 +20,7 @@ import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.transaction.Transaction;
@@ -31,7 +32,10 @@ import java.util.List;
  * 执行器
  * SqlSession向用户提供操作数据库的方法，但和数据库操作有关的职责都会委托给Executor。
  *
+ * 有三种类型的执行器：ExecutorType
+ *
  * @author Clinton Begin
+ * @see ExecutorType
  */
 public interface Executor {
 

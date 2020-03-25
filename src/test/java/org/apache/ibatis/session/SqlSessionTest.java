@@ -60,9 +60,12 @@ public class SqlSessionTest extends BaseDataTest {
 
     @BeforeClass
     public static void setup() throws Exception {
+        //加载数据库驱动以及¬初始化数据库脚本以及数据
         createBlogDataSource();
         final String resource = "org/apache/ibatis/builder/MapperConfig.xml";
+        //mybatis配置文件
         final Reader reader = Resources.getResourceAsReader(resource);
+        //实例化单例模式的 SqlSessionFactory
         sqlMapper = new SqlSessionFactoryBuilder().build(reader);
     }
 

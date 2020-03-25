@@ -46,12 +46,14 @@ public class PreparedStatementHandler extends BaseStatementHandler {
   @Override
   public int update(Statement statement) throws SQLException {
     //调用PreparedStatement.execute和PreparedStatement.getUpdateCount
-    PreparedStatement ps = (PreparedStatement) statement;
-    ps.execute();
-    int rows = ps.getUpdateCount();
+    PreparedStatement preparedStatement = (PreparedStatement) statement;
+    //执行
+    preparedStatement.execute();
+    //修改行，the current result as an update count; -1 if the current result is a
+    int rows = preparedStatement.getUpdateCount();
     Object parameterObject = boundSql.getParameterObject();
     KeyGenerator keyGenerator = mappedStatement.getKeyGenerator();
-    keyGenerator.processAfter(executor, mappedStatement, ps, parameterObject);
+    keyGenerator.processAfter(executor, mappedStatement, preparedStatement, parameterObject);
     return rows;
   }
 
@@ -63,9 +65,9 @@ public class PreparedStatementHandler extends BaseStatementHandler {
 
   @Override
   public <E> List<E> query(Statement statement, ResultHandler resultHandler) throws SQLException {
-    PreparedStatement ps = (PreparedStatement) statement;
-    ps.execute();
-    return resultSetHandler.<E> handleResultSets(ps);
+    PreparedStatement preparedStatement = (PreparedStatement) statement;
+    preparedStatement.execute();
+    return resultSetHandler.<E> handleResultSets(preparedStatement);
   }
 
   @Override

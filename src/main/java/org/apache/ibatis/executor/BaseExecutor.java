@@ -61,6 +61,9 @@ public abstract class BaseExecutor implements Executor {
 
     protected Transaction transaction;
 
+    /**
+     * 被代理者
+     */
     protected Executor wrapper;
 
     //延迟加载队列（线程安全）
@@ -163,14 +166,14 @@ public abstract class BaseExecutor implements Executor {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
-        ErrorContext.instance().resource(ms.getResource()).activity("executing a query").object(ms.getId());
+    public <E> List<E> query(MappedStatement mappedStatement, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
+        ErrorContext.instance().resource(mappedStatement.getResource()).activity("executing a query").object(mappedStatement.getId());
         //如果已经关闭，报错
         if (closed) {
             throw new ExecutorException("Executor was closed.");
         }
         //先清局部缓存，再查询.但仅查询堆栈为0，才清。为了处理递归调用
-        if (queryStack == 0 && ms.isFlushCacheRequired()) {
+        if (queryStack == 0 && mappedStatement.isFlushCacheRequired()) {
             clearLocalCache();
         }
         List<E> list;
@@ -178,13 +181,13 @@ public abstract class BaseExecutor implements Executor {
             //加一,这样递归调用到上面的时候就不会再清局部缓存了
             queryStack++;
             //先根据cachekey从localCache去查，如果有 resultHandler ，则无法使用缓存
-            list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
+            list = (resultHandler == null ? (List<E>) localCache.getObject(key) : null);
             if (list != null) {
                 //若查到localCache缓存，处理localOutputParameterCache
-                handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
+                handleLocallyCachedOutputParameters(mappedStatement, key, parameter, boundSql);
             } else {
                 //从数据库查
-                list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
+                list = queryFromDatabase(mappedStatement, parameter, rowBounds, resultHandler, key, boundSql);
             }
         } finally {
             //清空堆栈
@@ -343,21 +346,21 @@ public abstract class BaseExecutor implements Executor {
     }
 
     //从数据库查
-    private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
+    private <E> List<E> queryFromDatabase(MappedStatement mappedStatement, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey cacheKey, BoundSql boundSql) throws SQLException {
         List<E> list;
         //先向缓存中放入占位符？？？
-        localCache.putObject(key, EXECUTION_PLACEHOLDER);
+        localCache.putObject(cacheKey, EXECUTION_PLACEHOLDER);
         try {
-            list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);
+            list = doQuery(mappedStatement, parameter, rowBounds, resultHandler, boundSql);
         } finally {
             //最后删除占位符
-            localCache.removeObject(key);
+            localCache.removeObject(cacheKey);
         }
         //加入缓存
-        localCache.putObject(key, list);
+        localCache.putObject(cacheKey, list);
         //如果是存储过程，OUT参数也加入缓存
-        if (ms.getStatementType() == StatementType.CALLABLE) {
-            localOutputParameterCache.putObject(key, parameter);
+        if (mappedStatement.getStatementType() == StatementType.CALLABLE) {
+            localOutputParameterCache.putObject(cacheKey, parameter);
         }
         return list;
     }
