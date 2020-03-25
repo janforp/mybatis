@@ -13,10 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.domain.blog;
 
 import java.io.Serializable;
 
 public enum Section implements Serializable {
-  NEWS, VIDEOS, IMAGES, PODCASTS
+    NEWS,
+    VIDEOS,
+    IMAGES,
+    PODCASTS
 }
