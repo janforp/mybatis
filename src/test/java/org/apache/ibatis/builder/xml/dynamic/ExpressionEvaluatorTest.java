@@ -25,6 +25,7 @@ import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 
+@SuppressWarnings("all")
 public class ExpressionEvaluatorTest {
 
     private ExpressionEvaluator evaluator = new ExpressionEvaluator();
@@ -79,14 +80,15 @@ public class ExpressionEvaluatorTest {
 
     @Test
     public void shouldIterateOverIterable() {
-        final HashMap<String, String[]> parameterObject = new HashMap<String, String[]>() {{
-            put("array", new String[] { "1", "2", "3" });
-        }};
+        final HashMap<String, String[]> parameterObject = new HashMap<String, String[]>() {
+            {
+                put("array", new String[] { "1", "2", "3" });
+            }
+        };
         final Iterable<?> iterable = evaluator.evaluateIterable("array", parameterObject);
         int i = 0;
         for (Object o : iterable) {
             assertEquals(String.valueOf(++i), o);
         }
     }
-
 }

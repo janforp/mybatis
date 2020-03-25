@@ -24,7 +24,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 映射器代理工厂，通过这个工厂类可以获取到对应的映射器代理类MapperProxy，这里只需要保存一个映射器的代理工厂，根据工厂就可以获取到对应的映射器。
+ * 映射器代理工厂，通过这个工厂类可以获取到对应的映射器代理类MapperProxy，
+ * 这里只需要保存一个映射器的代理工厂，根据工厂就可以获取到对应的映射器。
  *
  * @author Lasse Voss
  */
@@ -62,7 +63,9 @@ public class MapperProxyFactory<T> {
     @SuppressWarnings("unchecked")
     protected T newInstance(MapperProxy<T> mapperProxy) {
         //用JDK自带的动态代理生成映射器
-        return (T) Proxy.newProxyInstance(mapperInterfaceClass.getClassLoader(), new Class[] { mapperInterfaceClass }, mapperProxy);
+        ClassLoader classLoader = mapperInterfaceClass.getClassLoader();
+        Class[] classes = { mapperInterfaceClass };
+        return (T) Proxy.newProxyInstance(classLoader, classes, mapperProxy);
     }
 
     public T newInstance(SqlSession sqlSession) {

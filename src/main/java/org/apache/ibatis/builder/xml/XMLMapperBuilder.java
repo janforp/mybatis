@@ -536,8 +536,8 @@ public class XMLMapperBuilder extends BaseBuilder {
         boolean lazy = "lazy".equals(resultMapEleNode.getStringAttribute("fetchType", fetchType));
         Class<?> javaTypeClass = resolveClass(javaType);
         @SuppressWarnings("unchecked")
-                //该列的类型处理器
-        Class<? extends TypeHandler<?>> typeHandlerClass = (Class<? extends TypeHandler<?>>) resolveClass(typeHandler);
+        //该列的类型处理器
+                Class<? extends TypeHandler<?>> typeHandlerClass = (Class<? extends TypeHandler<?>>) resolveClass(typeHandler);
         JdbcType jdbcTypeEnum = resolveJdbcType(jdbcType);
         //又去调builderAssistant.buildResultMapping
         return builderAssistant.buildResultMapping(resultMapType, property, column, javaTypeClass, jdbcTypeEnum,
@@ -569,12 +569,14 @@ public class XMLMapperBuilder extends BaseBuilder {
         if (namespace != null) {
             Class<?> boundType = null;
             try {
+                //命名空间类
                 boundType = Resources.classForName(namespace);
             } catch (ClassNotFoundException e) {
                 //ignore, bound type is not required
             }
             if (boundType != null) {
                 boolean hasMapper = configuration.hasMapper(boundType);
+                //避免重复添加
                 if (!hasMapper) {
                     // Spring may not know the real resource name so we set a flag
                     // to prevent loading again this resource from the mapper interface

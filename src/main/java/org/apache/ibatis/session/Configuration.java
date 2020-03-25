@@ -257,6 +257,7 @@ public class Configuration {
 
     protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<KeyGenerator>("Key Generators collection");
 
+    //加载过的资源，避免重复加载
     protected final Set<String> loadedResources = new HashSet<String>();
 
     protected final Map<String, XNode> sqlFragments = new StrictMap<XNode>("XML fragments parsed from previous mappers");
@@ -266,6 +267,7 @@ public class Configuration {
 
     protected final Collection<CacheRefResolver> incompleteCacheRefs = new LinkedList<CacheRefResolver>();
 
+    //未完成的映射
     protected final Collection<ResultMapResolver> incompleteResultMaps = new LinkedList<ResultMapResolver>();
 
     protected final Collection<MethodResolver> incompleteMethods = new LinkedList<MethodResolver>();
