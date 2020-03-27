@@ -38,10 +38,18 @@ public final class OgnlCache {
         // Prevent Instantiation of Static Class
     }
 
+    /**
+     * 从表达式 expression 中获取 root 中对应的值
+     *
+     * @param expression 表达式
+     * @param root 参数
+     * @return 从表达式 expression 中获取 root 中对应的值
+     */
     public static Object getValue(String expression, Object root) {
         try {
             Map<Object, OgnlClassResolver> context = Ognl.createDefaultContext(root, new OgnlClassResolver());
-            return Ognl.getValue(parseExpression(expression), context, root);
+            Object parseExpression = parseExpression(expression);
+            return Ognl.getValue(parseExpression, context, root);
         } catch (OgnlException e) {
             throw new BuilderException("Error evaluating expression '" + expression + "'. Cause: " + e, e);
         }

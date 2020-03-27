@@ -36,11 +36,12 @@ public class OgnlClassResolver implements ClassResolver {
 
     @Override
     public Class classForName(String className, Map context) throws ClassNotFoundException {
-        Class<?> result;
-        if ((result = classes.get(className)) == null) {
+        Class<?> result = classes.get(className);
+        if (result == null) {
             try {
                 result = Resources.classForName(className);
             } catch (ClassNotFoundException e1) {
+                //如果类名称没有 . 则试图在 java.lang包下加载该类
                 if (className.indexOf('.') == -1) {
                     result = Resources.classForName("java.lang." + className);
                     classes.put("java.lang." + className, result);

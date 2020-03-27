@@ -44,9 +44,14 @@ public class BoundSql {
 
     /**
      * xml中的参数
+     *
+     * #{property,javaType=int,jdbcType=NUMERIC}
      */
     private List<ParameterMapping> parameterMappings;
 
+    /**
+     * 入参数
+     */
     private Object parameterObject;
 
     private Map<String, Object> additionalParameters;

@@ -13,26 +13,29 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.scripting.xmltags;
 
 /**
  * @author Clinton Begin
  */
+
 /**
  * 静态文本SQL节点
  */
 public class StaticTextSqlNode implements SqlNode {
-  private String text;
 
-  public StaticTextSqlNode(String text) {
-    this.text = text;
-  }
+    private String text;
 
-  @Override
-  public boolean apply(DynamicContext context) {
-	//将文本加入context
-    context.appendSql(text);
-    return true;
-  }
+    public StaticTextSqlNode(String text) {
+        this.text = text;
+    }
+
+    @Override
+    public boolean apply(DynamicContext context) {
+        //将文本加入context
+        context.appendSql(text);
+        return true;
+    }
 
 }

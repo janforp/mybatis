@@ -20,6 +20,8 @@ package org.apache.ibatis.scripting.xmltags;
  * @author Clinton Begin
  */
 
+import java.util.Map;
+
 /**
  * if SQL节点
  */
@@ -40,7 +42,9 @@ public class IfSqlNode implements SqlNode {
     @Override
     public boolean apply(DynamicContext context) {
         //如果满足条件，则apply，并返回true
-        if (evaluator.evaluateBoolean(test, context.getBindings())) {
+        Map<String, Object> bindings = context.getBindings();
+        boolean aBoolean = evaluator.evaluateBoolean(test, bindings);
+        if (aBoolean) {
             contents.apply(context);
             return true;
         }

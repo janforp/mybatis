@@ -119,5 +119,4 @@ public class TextSqlNode implements SqlNode {
             return null;
         }
     }
-
 }
