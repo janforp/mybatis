@@ -20,6 +20,9 @@ public class DynamicSqlSource implements SqlSource {
 
     private SqlNode rootSqlNode;
 
+    /**
+     * @param rootSqlNode 由sql语句经过初步解析得到的SqlNodeList
+     */
     public DynamicSqlSource(Configuration configuration, SqlNode rootSqlNode) {
         this.configuration = configuration;
         this.rootSqlNode = rootSqlNode;
@@ -44,5 +47,4 @@ public class DynamicSqlSource implements SqlSource {
         }
         return boundSql;
     }
-
 }

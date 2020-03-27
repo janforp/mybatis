@@ -6,7 +6,15 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ *
  * @author Clinton Begin
+ */
+/**
+ * <where>
+ * ***<if test="true">
+ * *****ORDER_TYPE = #{value}
+ * ***</if>
+ * </where>
  */
 public class WhereSqlNode extends TrimSqlNode {
 

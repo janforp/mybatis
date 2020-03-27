@@ -43,8 +43,14 @@ public abstract class BaseBuilder {
     @Getter
     protected final Configuration configuration;
 
+    /**
+     * 别名注册机
+     */
     protected final TypeAliasRegistry typeAliasRegistry;
 
+    /**
+     * 类型处理器注册机
+     */
     protected final TypeHandlerRegistry typeHandlerRegistry;
 
     public BaseBuilder(Configuration configuration) {

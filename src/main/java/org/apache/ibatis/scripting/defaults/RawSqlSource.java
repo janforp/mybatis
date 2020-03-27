@@ -35,12 +35,20 @@ import java.util.HashMap;
  */
 
 /**
+ * 静态sql，没有一些如：where/if/when标签的纯静态sql语句
  * 原始SQL源码，比DynamicSqlSource快
  */
 public class RawSqlSource implements SqlSource {
 
     private final SqlSource sqlSource;
 
+    /**
+     * 静态sql
+     *
+     * @param configuration 配置
+     * @param rootSqlNode List<SqlNode> sqlNodeList = parseDynamicTags(xmlNode);MixedSqlNode rootSqlNode = new MixedSqlNode(sqlNodeList); 由sql语句经过初步解析得到的SqlNodeList
+     * @param parameterType 参数类型
+     */
     public RawSqlSource(Configuration configuration, SqlNode rootSqlNode, Class<?> parameterType) {
         this(configuration, getSql(configuration, rootSqlNode), parameterType);
     }

@@ -9,6 +9,12 @@ public class VarDeclSqlNode implements SqlNode {
 
     private final String expression;
 
+    /**
+     * <bind name="pattern" value="'%' + _parameter + '%'" />
+     *
+     * @param var pattern
+     * @param exp '%' + _parameter + '%'
+     */
     public VarDeclSqlNode(String var, String exp) {
         name = var;
         expression = exp;

@@ -12,7 +12,10 @@ import java.util.Map;
 
 /**
  * foreach SQL节点
- * TODO
+ * /**
+ * *  <foreach item="item" index="index" collection="list" open="(" close=")" separator=",">
+ * *       <if test="index != 0">,</if> #{item}
+ * *     </foreach>
  */
 public class ForEachSqlNode implements SqlNode {
 

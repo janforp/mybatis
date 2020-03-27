@@ -23,26 +23,41 @@ import java.util.Map;
  */
 public class XMLScriptBuilder extends BaseBuilder {
 
-    private XNode context;
+    /**
+     * xml节点
+     */
+    private XNode xmlNode;
 
+    /**
+     * 是否动态sql
+     */
     private boolean isDynamic;
 
+    /**
+     * 参数类型
+     */
     private Class<?> parameterType;
 
     public XMLScriptBuilder(Configuration configuration, XNode context) {
         this(configuration, context, null);
     }
 
-    public XMLScriptBuilder(Configuration configuration, XNode context, Class<?> parameterType) {
+    public XMLScriptBuilder(Configuration configuration, XNode xmlNode, Class<?> parameterType) {
+        //org.apache.ibatis.builder.BaseBuilder.BaseBuilder
         super(configuration);
-        this.context = context;
+        this.xmlNode = xmlNode;
         this.parameterType = parameterType;
     }
 
+    /**
+     * 通过xml node 获取一个动态或者静态的 SqlSource
+     *
+     * @return SqlSource
+     */
     public SqlSource parseScriptNode() {
-        List<SqlNode> contents = parseDynamicTags(context);
-        MixedSqlNode rootSqlNode = new MixedSqlNode(contents);
-        SqlSource sqlSource = null;
+        List<SqlNode> sqlNodeList = parseDynamicTags(xmlNode);
+        MixedSqlNode rootSqlNode = new MixedSqlNode(sqlNodeList);
+        SqlSource sqlSource;
         if (isDynamic) {
             sqlSource = new DynamicSqlSource(configuration, rootSqlNode);
         } else {
@@ -73,7 +88,10 @@ public class XMLScriptBuilder extends BaseBuilder {
             Node item = children.item(i);
             //<if test="username != null">username=#{username},</if>
             XNode child = node.newXNode(item);
-            if (child.getNode().getNodeType() == Node.CDATA_SECTION_NODE || child.getNode().getNodeType() == Node.TEXT_NODE) {
+            short childNodeType = child.getNode().getNodeType();
+            //CDATASection || Text
+            boolean isTextOrCdata = (childNodeType == Node.CDATA_SECTION_NODE || childNodeType == Node.TEXT_NODE);
+            if (isTextOrCdata) {
                 String data = child.getStringBody("");
                 TextSqlNode textSqlNode = new TextSqlNode(data);
                 if (textSqlNode.isDynamic()) {
@@ -82,13 +100,16 @@ public class XMLScriptBuilder extends BaseBuilder {
                 } else {
                     contents.add(new StaticTextSqlNode(data));
                 }
-            } else if (child.getNode().getNodeType() == Node.ELEMENT_NODE) { // issue #628
+            } else if (childNodeType == Node.ELEMENT_NODE) { // issue #628
+                //Element
                 String nodeName = child.getNode().getNodeName();
                 NodeHandler handler = nodeHandlers(nodeName);
+                //瞎几把写的nodeName,报错
                 if (handler == null) {
                     throw new BuilderException("Unknown element <" + nodeName + "> in SQL statement.");
                 }
                 handler.handleNode(child, contents);
+                //有这些元素，必须是动态sql
                 isDynamic = true;
             }
         }
@@ -97,6 +118,7 @@ public class XMLScriptBuilder extends BaseBuilder {
 
     /**
      * sql中支持的动态元素
+     * 根据node名称来获取对应类型的node处理器
      *
      * @param nodeName 元素名称
      * @return 根据名称查询
@@ -120,6 +142,9 @@ public class XMLScriptBuilder extends BaseBuilder {
         void handleNode(XNode nodeToHandle, List<SqlNode> targetContents);
     }
 
+    /**
+     * <bind name="pattern" value="'%' + _parameter + '%'" />
+     */
     private class BindHandler implements NodeHandler {
 
         public BindHandler() {
@@ -127,14 +152,35 @@ public class XMLScriptBuilder extends BaseBuilder {
         }
 
         @Override
-        public void handleNode(XNode nodeToHandle, List<SqlNode> targetContents) {
-            final String name = nodeToHandle.getStringAttribute("name");
-            final String expression = nodeToHandle.getStringAttribute("value");
+        public void handleNode(XNode bindNode, List<SqlNode> targetContents) {
+            final String name = bindNode.getStringAttribute("name");
+            final String expression = bindNode.getStringAttribute("value");
             final VarDeclSqlNode node = new VarDeclSqlNode(name, expression);
             targetContents.add(node);
         }
     }
 
+    /**
+     * <update id="testTrim" parameterType="com.mybatis.pojo.User">
+     * update user
+     * <trim prefix="set" suffixOverrides=",">
+     * <if test="cash!=null and cash!=''">cash= #{cash},</if>
+     * <if test="address!=null and address!=''">address= #{address},</if>
+     * </trim>
+     * <where>id = #{id}</where>
+     * </update>
+     *
+     * <trim prefix="(" suffix=")" suffixOverrides="," >
+     * 1.<trim prefix="" suffix="" suffixOverrides="" prefixOverrides=""></trim>
+     * prefix:在trim标签内sql语句加上前缀。
+     * suffix:在trim标签内sql语句加上后缀。
+     * suffixOverrides:指定去除多余的后缀内容，如：suffixOverrides=","，去除trim标签内sql语句多余的后缀","。
+     * prefixOverrides:指定去除多余的前缀内容
+     *
+     * 执行的sql语句也许是这样的：insert into cart (id,user_id,deal_id,) values(1,2,1,);显然是错误的
+     * 指定之后语句就会变成insert into cart (id,user_id,deal_id) values(1,2,1);这样就将“，”去掉了。
+     * 前缀也是一个道理这里就不说了。
+     */
     private class TrimHandler implements NodeHandler {
 
         public TrimHandler() {
@@ -154,6 +200,13 @@ public class XMLScriptBuilder extends BaseBuilder {
         }
     }
 
+    /**
+     * <where>
+     * ***<if test="true">
+     * *****ORDER_TYPE = #{value}
+     * ***</if>
+     * </where>
+     */
     private class WhereHandler implements NodeHandler {
 
         public WhereHandler() {
@@ -169,6 +222,14 @@ public class XMLScriptBuilder extends BaseBuilder {
         }
     }
 
+    /**
+     * <set>
+     * <if test="username != null">username=#{username},</if>
+     * <if test="password != null">password=#{password},</if>
+     * <if test="email != null">email=#{email},</if>
+     * <if test="bio != null">bio=#{bio}</if>
+     * </set>
+     */
     private class SetHandler implements NodeHandler {
 
         public SetHandler() {
@@ -184,6 +245,11 @@ public class XMLScriptBuilder extends BaseBuilder {
         }
     }
 
+    /**
+     * <foreach item="item" index="index" collection="list" open="(" close=")" separator=",">
+     * <if test="index != 0">,</if> #{item}
+     * </foreach>
+     */
     private class ForEachHandler implements NodeHandler {
 
         public ForEachHandler() {
@@ -221,6 +287,24 @@ public class XMLScriptBuilder extends BaseBuilder {
         }
     }
 
+    /**
+     * <where>
+     * <choose>
+     * <when test="id != null">id = #{id}</when>
+     * <when test="author_id != null">AND author_id = #{author_id}</when>
+     * <otherwise>
+     * <if test="ids != null">
+     * AND id IN
+     * <foreach item="item_id" index="index" open="(" close=")" separator="," collection="ids">#{ids[${index}]}
+     * </foreach>
+     * </if>
+     * <trim prefix="AND">
+     * <include refid="byBlogId"/>
+     * </trim>
+     * </otherwise>
+     * </choose>
+     * </where>
+     */
     private class OtherwiseHandler implements NodeHandler {
 
         public OtherwiseHandler() {
@@ -235,6 +319,24 @@ public class XMLScriptBuilder extends BaseBuilder {
         }
     }
 
+    /**
+     * <where>
+     * <choose>
+     * <when test="id != null">id = #{id}</when>
+     * <when test="author_id != null">AND author_id = #{author_id}</when>
+     * <otherwise>
+     * <if test="ids != null">
+     * AND id IN
+     * <foreach item="item_id" index="index" open="(" close=")" separator="," collection="ids">#{ids[${index}]}
+     * </foreach>
+     * </if>
+     * <trim prefix="AND">
+     * <include refid="byBlogId"/>
+     * </trim>
+     * </otherwise>
+     * </choose>
+     * </where>
+     */
     private class ChooseHandler implements NodeHandler {
 
         public ChooseHandler() {
@@ -274,5 +376,4 @@ public class XMLScriptBuilder extends BaseBuilder {
             return defaultSqlNode;
         }
     }
-
 }
