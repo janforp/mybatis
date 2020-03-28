@@ -1,5 +1,6 @@
 package org.apache.ibatis.cache.impl;
 
+import lombok.Getter;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.CacheException;
 
@@ -9,7 +10,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  * 永久缓存
- * 一旦存入就一直保持
+ * 一旦存入就一直保持在HashMap中,由具体的Executor去clear缓存，具体看配置
  *
  * @author Clinton Begin
  */
@@ -18,19 +19,20 @@ public class PerpetualCache implements Cache {
     /**
      * 每个永久缓存有一个ID来识别 namespace
      */
+    @Getter
     private String id;
 
-    //内部就是一个HashMap,所有方法基本就是直接调用HashMap的方法,不支持多线程？
-    //一级缓存基本上不存在并发的 问题
+    /**
+     * 内部就是一个HashMap,所有方法基本就是直接调用HashMap的方法,不支持多线程？
+     * 一级缓存基本上不存在并发的 问题
+     *
+     * key:一般情况下是 cacheKey 实例
+     * value：该cacheKey对应的值
+     */
     private Map<Object, Object> cache = new HashMap<Object, Object>();
 
     public PerpetualCache(String id) {
         this.id = id;
-    }
-
-    @Override
-    public String getId() {
-        return id;
     }
 
     @Override
@@ -65,7 +67,6 @@ public class PerpetualCache implements Cache {
 
     @Override
     public boolean equals(Object o) {
-        //只要id相等就认为两个cache相同
         if (getId() == null) {
             throw new CacheException("Cache instances require an ID.");
         }
@@ -77,6 +78,7 @@ public class PerpetualCache implements Cache {
         }
 
         Cache otherCache = (Cache) o;
+        //只要id相等就认为两个cache相同
         return getId().equals(otherCache.getId());
     }
 

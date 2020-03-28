@@ -312,7 +312,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
         statementBuilder.databaseId(databaseId);
         statementBuilder.lang(lang);
         statementBuilder.resultOrdered(resultOrdered);
-        statementBuilder.resulSets(resultSets);
+        statementBuilder.resultSets(resultSets);
         setStatementTimeout(timeout, statementBuilder);
 
         //1.参数映射

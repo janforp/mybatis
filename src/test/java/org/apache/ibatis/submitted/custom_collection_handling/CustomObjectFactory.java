@@ -31,6 +31,7 @@ public class CustomObjectFactory implements ObjectFactory {
         return created;
     }
 
+    @Override
     public void setProperties(Properties properties) {
         // no props for default
     }

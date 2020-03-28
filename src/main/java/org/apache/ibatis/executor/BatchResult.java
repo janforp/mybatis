@@ -1,5 +1,7 @@
 package org.apache.ibatis.executor;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.ibatis.mapping.MappedStatement;
 
 import java.util.ArrayList;
@@ -10,12 +12,17 @@ import java.util.List;
  */
 public class BatchResult {
 
+    @Getter
     private final MappedStatement mappedStatement;
 
+    @Getter
     private final String sql;
 
+    @Getter
     private final List<Object> parameterObjects;
 
+    @Setter
+    @Getter
     private int[] updateCounts;
 
     public BatchResult(MappedStatement mappedStatement, String sql) {
@@ -30,29 +37,9 @@ public class BatchResult {
         addParameterObject(parameterObject);
     }
 
-    public MappedStatement getMappedStatement() {
-        return mappedStatement;
-    }
-
-    public String getSql() {
-        return sql;
-    }
-
     @Deprecated
     public Object getParameterObject() {
         return parameterObjects.get(0);
-    }
-
-    public List<Object> getParameterObjects() {
-        return parameterObjects;
-    }
-
-    public int[] getUpdateCounts() {
-        return updateCounts;
-    }
-
-    public void setUpdateCounts(int[] updateCounts) {
-        this.updateCounts = updateCounts;
     }
 
     public void addParameterObject(Object parameterObject) {

@@ -5,7 +5,7 @@ package org.apache.ibatis.executor;
  */
 
 /**
- * 执行占位符
+ * 执行占位符，延长加载的时候有使用
  */
 public enum ExecutionPlaceholder {
 

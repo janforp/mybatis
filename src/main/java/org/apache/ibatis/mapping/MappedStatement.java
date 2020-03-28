@@ -1,21 +1,6 @@
-/*
- *    Copyright 2009-2012 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.mapping;
 
+import lombok.Getter;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.executor.keygen.Jdbc3KeyGenerator;
 import org.apache.ibatis.executor.keygen.KeyGenerator;
@@ -36,57 +21,78 @@ import java.util.List;
  */
 public final class MappedStatement {
 
+    @Getter
     private String resource;
 
+    @Getter
     private Configuration configuration;
 
+    @Getter
     private String id;
 
+    @Getter
     private Integer fetchSize;
 
+    @Getter
     private Integer timeout;
 
+    @Getter
     private StatementType statementType;
 
+    @Getter
     private ResultSetType resultSetType;
 
-    //SQL源码
+    @Getter
     private SqlSource sqlSource;
 
     /**
-     * namespace下的缓存，也就是二级缓存
+     * namespace下的缓存，SqlSession缓存
      */
+    @Getter
     private Cache cache;
 
+    @Getter
     private ParameterMap parameterMap;
 
+    @Getter
     private List<ResultMap> resultMaps;
 
     /**
      * 该条sql执行的时候是否需要清楚缓存
      */
+    @Getter
     private boolean flushCacheRequired;
 
+    @Getter
     private boolean useCache;
 
+    @Getter
     private boolean resultOrdered;
 
+    @Getter
     private SqlCommandType sqlCommandType;
 
+    @Getter
     private KeyGenerator keyGenerator;
 
+    @Getter
     private String[] keyProperties;
 
+    @Getter
     private String[] keyColumns;
 
     private boolean hasNestedResultMaps;
 
+    @Getter
     private String databaseId;
 
+    @Getter
     private Log statementLog;
 
+    @Getter
     private LanguageDriver lang;
 
+    @Getter
     private String[] resultSets;
 
     MappedStatement() {
@@ -101,96 +107,8 @@ public final class MappedStatement {
         }
     }
 
-    public KeyGenerator getKeyGenerator() {
-        return keyGenerator;
-    }
-
-    public SqlCommandType getSqlCommandType() {
-        return sqlCommandType;
-    }
-
-    public String getResource() {
-        return resource;
-    }
-
-    public Configuration getConfiguration() {
-        return configuration;
-    }
-
-    public String getId() {
-        return id;
-    }
-
     public boolean hasNestedResultMaps() {
         return hasNestedResultMaps;
-    }
-
-    public Integer getFetchSize() {
-        return fetchSize;
-    }
-
-    public Integer getTimeout() {
-        return timeout;
-    }
-
-    public StatementType getStatementType() {
-        return statementType;
-    }
-
-    public ResultSetType getResultSetType() {
-        return resultSetType;
-    }
-
-    public SqlSource getSqlSource() {
-        return sqlSource;
-    }
-
-    public ParameterMap getParameterMap() {
-        return parameterMap;
-    }
-
-    public List<ResultMap> getResultMaps() {
-        return resultMaps;
-    }
-
-    public Cache getCache() {
-        return cache;
-    }
-
-    public boolean isFlushCacheRequired() {
-        return flushCacheRequired;
-    }
-
-    public boolean isUseCache() {
-        return useCache;
-    }
-
-    public boolean isResultOrdered() {
-        return resultOrdered;
-    }
-
-    public String getDatabaseId() {
-        return databaseId;
-    }
-
-    public String[] getKeyProperties() {
-        return keyProperties;
-    }
-
-    public String[] getKeyColumns() {
-        return keyColumns;
-    }
-
-    public Log getStatementLog() {
-        return statementLog;
-    }
-
-    public LanguageDriver getLang() {
-        return lang;
-    }
-
-    public String[] getResulSets() {
-        return resultSets;
     }
 
     /**
@@ -330,7 +248,7 @@ public final class MappedStatement {
             return this;
         }
 
-        public Builder resulSets(String resultSet) {
+        public Builder resultSets(String resultSet) {
             mappedStatement.resultSets = delimitedStringtoArray(resultSet);
             return this;
         }
@@ -344,5 +262,4 @@ public final class MappedStatement {
             return mappedStatement;
         }
     }
-
 }

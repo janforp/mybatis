@@ -163,7 +163,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
             resultSetCount++;
         }
 
-        String[] resultSets = mappedStatement.getResulSets();
+        String[] resultSets = mappedStatement.getResultSets();
         if (resultSets != null) {
             while (rsw != null && resultSetCount < resultSets.length) {
                 ResultMapping parentMapping = nextResultMaps.get(resultSets[resultSetCount]);
