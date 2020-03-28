@@ -252,7 +252,8 @@ public class DefaultResultSetHandler implements ResultSetHandler {
                     //调用自己的handleRowValues
                     handleRowValues(resultSetWrapper, resultMap, defaultResultHandler, rowBounds, null);
                     //得到记录的list
-                    multipleResults.add(defaultResultHandler.getResultList());
+                    List<Object> resultList = defaultResultHandler.getResultList();
+                    multipleResults.add(resultList);
                 } else {
                     //如果有resultHandler
                     handleRowValues(resultSetWrapper, resultMap, resultHandler, rowBounds, null);
@@ -267,7 +268,8 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
     @SuppressWarnings("unchecked")
     private List<Object> collapseSingleResultList(List<Object> multipleResults) {
-        return multipleResults.size() == 1 ? (List<Object>) multipleResults.get(0) : multipleResults;
+        boolean single = multipleResults.size() == 1;
+        return single ? (List<Object>) multipleResults.get(0) : multipleResults;
     }
 
     private void handleRowValues(ResultSetWrapper resultSetWrapper, ResultMap resultMap, ResultHandler resultHandler,
@@ -318,9 +320,9 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         }
     }
 
-    private void storeObject(ResultHandler resultHandler, DefaultResultContext resultContext, Object rowValue, ResultMapping parentMapping, ResultSet rs) throws SQLException {
+    private void storeObject(ResultHandler resultHandler, DefaultResultContext resultContext, Object rowValue, ResultMapping parentMapping, ResultSet resultSet) throws SQLException {
         if (parentMapping != null) {
-            linkToParents(rs, parentMapping, rowValue);
+            linkToParents(resultSet, parentMapping, rowValue);
         } else {
             callResultHandler(resultHandler, resultContext, rowValue);
         }
@@ -370,6 +372,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         //实例化ResultLoaderMap(延迟加载器)
         final ResultLoaderMap lazyLoader = new ResultLoaderMap();
         //调用自己的createResultObject,内部就是new一个对象(如果是简单类型，new完也把值赋进去)
+        //查询到的结果
         Object resultObject = createResultObject(resultSetWrapper, resultMap, lazyLoader, null);
         if (resultObject != null && !typeHandlerRegistry.hasTypeHandler(resultMap.getType())) {
             //一般不是简单类型不会有typeHandler,这个if会进来
@@ -404,8 +407,9 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         }
     }
 
-    private boolean applyPropertyMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, ResultLoaderMap lazyLoader, String columnPrefix)
-            throws SQLException {
+    private boolean applyPropertyMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject,
+            ResultLoaderMap lazyLoader, String columnPrefix) throws SQLException {
+
         final List<String> mappedColumnNames = rsw.getMappedColumnNames(resultMap, columnPrefix);
         boolean foundValues = false;
         final List<ResultMapping> propertyMappings = resultMap.getPropertyResultMappings();
@@ -414,6 +418,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
             if (propertyMapping.isCompositeResult()
                     || (column != null && mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH)))
                     || propertyMapping.getResultSet() != null) {
+
                 Object value = getPropertyMappingValue(rsw.getResultSet(), metaObject, propertyMapping, lazyLoader, columnPrefix);
                 // issue #541 make property optional
                 final String property = propertyMapping.getProperty();
@@ -433,12 +438,13 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     // PROPERTY MAPPINGS
     //
 
-    private Object getPropertyMappingValue(ResultSet rs, MetaObject metaResultObject, ResultMapping propertyMapping, ResultLoaderMap lazyLoader, String columnPrefix)
-            throws SQLException {
+    private Object getPropertyMappingValue(ResultSet resultSet, MetaObject metaResultObject, ResultMapping propertyMapping,
+            ResultLoaderMap lazyLoader, String columnPrefix) throws SQLException {
+
         if (propertyMapping.getNestedQueryId() != null) {
-            return getNestedQueryMappingValue(rs, metaResultObject, propertyMapping, lazyLoader, columnPrefix);
+            return getNestedQueryMappingValue(resultSet, metaResultObject, propertyMapping, lazyLoader, columnPrefix);
         } else if (propertyMapping.getResultSet() != null) {
-            addPendingChildRelation(rs, metaResultObject, propertyMapping);
+            addPendingChildRelation(resultSet, metaResultObject, propertyMapping);
             return NO_VALUE;
         } else if (propertyMapping.getNestedResultMapId() != null) {
             // the user added a column attribute to a nested result map, ignore it
@@ -446,13 +452,13 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         } else {
             final TypeHandler<?> typeHandler = propertyMapping.getTypeHandler();
             final String column = prependPrefix(propertyMapping.getColumn(), columnPrefix);
-            return typeHandler.getResult(rs, column);
+            return typeHandler.getResult(resultSet, column);
         }
     }
 
     //自动映射咯
-    private boolean applyAutomaticMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, String columnPrefix) throws SQLException {
-        final List<String> unmappedColumnNames = rsw.getUnmappedColumnNames(resultMap, columnPrefix);
+    private boolean applyAutomaticMappings(ResultSetWrapper resultSetWrapper, ResultMap resultMap, MetaObject metaObject, String columnPrefix) throws SQLException {
+        final List<String> unmappedColumnNames = resultSetWrapper.getUnmappedColumnNames(resultMap, columnPrefix);
         boolean foundValues = false;
         for (String columnName : unmappedColumnNames) {
             String propertyName = columnName;
@@ -469,9 +475,9 @@ public class DefaultResultSetHandler implements ResultSetHandler {
             if (property != null && metaObject.hasSetter(property)) {
                 final Class<?> propertyType = metaObject.getSetterType(property);
                 if (typeHandlerRegistry.hasTypeHandler(propertyType)) {
-                    final TypeHandler<?> typeHandler = rsw.getTypeHandler(propertyType, columnName);
+                    final TypeHandler<?> typeHandler = resultSetWrapper.getTypeHandler(propertyType, columnName);
                     //巧妙的用TypeHandler取得结果
-                    final Object value = typeHandler.getResult(rsw.getResultSet(), columnName);
+                    final Object value = typeHandler.getResult(resultSetWrapper.getResultSet(), columnName);
                     // issue #377, call setter on nulls
                     if (value != null || configuration.isCallSettersOnNulls()) {
                         if (value != null || !propertyType.isPrimitive()) {
