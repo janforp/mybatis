@@ -13,36 +13,40 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.not_null_column;
 
 import java.util.List;
 
 public class Father extends Base {
-  private Integer id;
-  private String name;
-  private List<Child> children;
 
-  public Integer getId() {
-    return id;
-  }
+    private Integer id;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    private String name;
 
-  public String getName() {
-    return name;
-  }
+    private List<Child> children;
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public List<Child> getChildren() {
-    return children;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-  public void setChildren(List<Child> children) {
-    this.children = children;
-  }
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<Child> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<Child> children) {
+        this.children = children;
+    }
 }

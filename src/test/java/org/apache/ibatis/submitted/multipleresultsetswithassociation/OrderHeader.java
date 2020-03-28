@@ -13,27 +13,29 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.multipleresultsetswithassociation;
 
 public class OrderHeader {
 
-  private int orderId;
-  private String custName;
+    private int orderId;
 
-  public int getOrderId() {
-    return orderId;
-  }
+    private String custName;
 
-  public void setOrderId(int orderId) {
-    this.orderId = orderId;
-  }
+    public int getOrderId() {
+        return orderId;
+    }
 
-  public String getCustName() {
-    return custName;
-  }
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
+    }
 
-  public void setCustName(String custName) {
-    this.custName = custName;
-  }
+    public String getCustName() {
+        return custName;
+    }
+
+    public void setCustName(String custName) {
+        this.custName = custName;
+    }
 
 }

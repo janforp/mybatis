@@ -93,128 +93,11 @@ public final class MappedStatement {
         // constructor disabled
     }
 
-    //静态内部类，建造者模式
-    public static class Builder {
-
-        private MappedStatement mappedStatement = new MappedStatement();
-
-        public Builder(Configuration configuration, String id, SqlSource sqlSource, SqlCommandType sqlCommandType) {
-            mappedStatement.configuration = configuration;
-            mappedStatement.id = id;
-            mappedStatement.sqlSource = sqlSource;
-            mappedStatement.statementType = StatementType.PREPARED;
-            mappedStatement.parameterMap = new ParameterMap.Builder(configuration, "defaultParameterMap", null, new ArrayList<ParameterMapping>()).build();
-            mappedStatement.resultMaps = new ArrayList<ResultMap>();
-            mappedStatement.timeout = configuration.getDefaultStatementTimeout();
-            mappedStatement.sqlCommandType = sqlCommandType;
-            mappedStatement.keyGenerator = configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType) ? new Jdbc3KeyGenerator() : new NoKeyGenerator();
-            String logId = id;
-            if (configuration.getLogPrefix() != null) {
-                logId = configuration.getLogPrefix() + id;
-            }
-            mappedStatement.statementLog = LogFactory.getLog(logId);
-            mappedStatement.lang = configuration.getDefaultScriptingLanuageInstance();
-        }
-
-        public Builder resource(String resource) {
-            mappedStatement.resource = resource;
-            return this;
-        }
-
-        public String id() {
-            return mappedStatement.id;
-        }
-
-        public Builder parameterMap(ParameterMap parameterMap) {
-            mappedStatement.parameterMap = parameterMap;
-            return this;
-        }
-
-        public Builder resultMaps(List<ResultMap> resultMaps) {
-            mappedStatement.resultMaps = resultMaps;
-            for (ResultMap resultMap : resultMaps) {
-                mappedStatement.hasNestedResultMaps = mappedStatement.hasNestedResultMaps || resultMap.hasNestedResultMaps();
-            }
-            return this;
-        }
-
-        public Builder fetchSize(Integer fetchSize) {
-            mappedStatement.fetchSize = fetchSize;
-            return this;
-        }
-
-        public Builder timeout(Integer timeout) {
-            mappedStatement.timeout = timeout;
-            return this;
-        }
-
-        public Builder statementType(StatementType statementType) {
-            mappedStatement.statementType = statementType;
-            return this;
-        }
-
-        public Builder resultSetType(ResultSetType resultSetType) {
-            mappedStatement.resultSetType = resultSetType;
-            return this;
-        }
-
-        public Builder cache(Cache cache) {
-            mappedStatement.cache = cache;
-            return this;
-        }
-
-        public Builder flushCacheRequired(boolean flushCacheRequired) {
-            mappedStatement.flushCacheRequired = flushCacheRequired;
-            return this;
-        }
-
-        public Builder useCache(boolean useCache) {
-            mappedStatement.useCache = useCache;
-            return this;
-        }
-
-        public Builder resultOrdered(boolean resultOrdered) {
-            mappedStatement.resultOrdered = resultOrdered;
-            return this;
-        }
-
-        public Builder keyGenerator(KeyGenerator keyGenerator) {
-            mappedStatement.keyGenerator = keyGenerator;
-            return this;
-        }
-
-        public Builder keyProperty(String keyProperty) {
-            mappedStatement.keyProperties = delimitedStringtoArray(keyProperty);
-            return this;
-        }
-
-        public Builder keyColumn(String keyColumn) {
-            mappedStatement.keyColumns = delimitedStringtoArray(keyColumn);
-            return this;
-        }
-
-        public Builder databaseId(String databaseId) {
-            mappedStatement.databaseId = databaseId;
-            return this;
-        }
-
-        public Builder lang(LanguageDriver driver) {
-            mappedStatement.lang = driver;
-            return this;
-        }
-
-        public Builder resulSets(String resultSet) {
-            mappedStatement.resultSets = delimitedStringtoArray(resultSet);
-            return this;
-        }
-
-        public MappedStatement build() {
-            assert mappedStatement.configuration != null;
-            assert mappedStatement.id != null;
-            assert mappedStatement.sqlSource != null;
-            assert mappedStatement.lang != null;
-            mappedStatement.resultMaps = Collections.unmodifiableList(mappedStatement.resultMaps);
-            return mappedStatement;
+    private static String[] delimitedStringtoArray(String in) {
+        if (in == null || in.trim().length() == 0) {
+            return null;
+        } else {
+            return in.split(",");
         }
     }
 
@@ -337,11 +220,128 @@ public final class MappedStatement {
         return boundSql;
     }
 
-    private static String[] delimitedStringtoArray(String in) {
-        if (in == null || in.trim().length() == 0) {
-            return null;
-        } else {
-            return in.split(",");
+    //静态内部类，建造者模式
+    public static class Builder {
+
+        private MappedStatement mappedStatement = new MappedStatement();
+
+        public Builder(Configuration configuration, String id, SqlSource sqlSource, SqlCommandType sqlCommandType) {
+            mappedStatement.configuration = configuration;
+            mappedStatement.id = id;
+            mappedStatement.sqlSource = sqlSource;
+            mappedStatement.statementType = StatementType.PREPARED;
+            mappedStatement.parameterMap = new ParameterMap.Builder(configuration, "defaultParameterMap", null, new ArrayList<ParameterMapping>()).build();
+            mappedStatement.resultMaps = new ArrayList<ResultMap>();
+            mappedStatement.timeout = configuration.getDefaultStatementTimeout();
+            mappedStatement.sqlCommandType = sqlCommandType;
+            mappedStatement.keyGenerator = configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType) ? new Jdbc3KeyGenerator() : new NoKeyGenerator();
+            String logId = id;
+            if (configuration.getLogPrefix() != null) {
+                logId = configuration.getLogPrefix() + id;
+            }
+            mappedStatement.statementLog = LogFactory.getLog(logId);
+            mappedStatement.lang = configuration.getDefaultScriptingLanuageInstance();
+        }
+
+        public Builder resource(String resource) {
+            mappedStatement.resource = resource;
+            return this;
+        }
+
+        public String id() {
+            return mappedStatement.id;
+        }
+
+        public Builder parameterMap(ParameterMap parameterMap) {
+            mappedStatement.parameterMap = parameterMap;
+            return this;
+        }
+
+        public Builder resultMaps(List<ResultMap> resultMaps) {
+            mappedStatement.resultMaps = resultMaps;
+            for (ResultMap resultMap : resultMaps) {
+                mappedStatement.hasNestedResultMaps = mappedStatement.hasNestedResultMaps || resultMap.hasNestedResultMaps();
+            }
+            return this;
+        }
+
+        public Builder fetchSize(Integer fetchSize) {
+            mappedStatement.fetchSize = fetchSize;
+            return this;
+        }
+
+        public Builder timeout(Integer timeout) {
+            mappedStatement.timeout = timeout;
+            return this;
+        }
+
+        public Builder statementType(StatementType statementType) {
+            mappedStatement.statementType = statementType;
+            return this;
+        }
+
+        public Builder resultSetType(ResultSetType resultSetType) {
+            mappedStatement.resultSetType = resultSetType;
+            return this;
+        }
+
+        public Builder cache(Cache cache) {
+            mappedStatement.cache = cache;
+            return this;
+        }
+
+        public Builder flushCacheRequired(boolean flushCacheRequired) {
+            mappedStatement.flushCacheRequired = flushCacheRequired;
+            return this;
+        }
+
+        public Builder useCache(boolean useCache) {
+            mappedStatement.useCache = useCache;
+            return this;
+        }
+
+        public Builder resultOrdered(boolean resultOrdered) {
+            mappedStatement.resultOrdered = resultOrdered;
+            return this;
+        }
+
+        public Builder keyGenerator(KeyGenerator keyGenerator) {
+            mappedStatement.keyGenerator = keyGenerator;
+            return this;
+        }
+
+        public Builder keyProperty(String keyProperty) {
+            mappedStatement.keyProperties = delimitedStringtoArray(keyProperty);
+            return this;
+        }
+
+        public Builder keyColumn(String keyColumn) {
+            mappedStatement.keyColumns = delimitedStringtoArray(keyColumn);
+            return this;
+        }
+
+        public Builder databaseId(String databaseId) {
+            mappedStatement.databaseId = databaseId;
+            return this;
+        }
+
+        public Builder lang(LanguageDriver driver) {
+            mappedStatement.lang = driver;
+            return this;
+        }
+
+        public Builder resulSets(String resultSet) {
+            mappedStatement.resultSets = delimitedStringtoArray(resultSet);
+            return this;
+        }
+
+        public MappedStatement build() {
+            assert mappedStatement.configuration != null;
+            assert mappedStatement.id != null;
+            assert mappedStatement.sqlSource != null;
+            assert mappedStatement.lang != null;
+            mappedStatement.resultMaps = Collections.unmodifiableList(mappedStatement.resultMaps);
+            return mappedStatement;
         }
     }
 

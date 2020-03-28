@@ -13,36 +13,40 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.extends_with_constructor;
 
 import java.util.List;
 
 public class Teacher {
-  private int id;
-  private String name;
-  private List<StudentConstructor> students;
 
-  public int getId() {
-    return id;
-  }
+    private int id;
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    private String name;
 
-  public String getName() {
-    return name;
-  }
+    private List<StudentConstructor> students;
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public List<StudentConstructor> getStudents() {
-    return students;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public void setStudents(List<StudentConstructor> students) {
-    this.students = students;
-  }
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<StudentConstructor> getStudents() {
+        return students;
+    }
+
+    public void setStudents(List<StudentConstructor> students) {
+        this.students = students;
+    }
 }

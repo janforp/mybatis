@@ -1,19 +1,3 @@
-/*
- *    Copyright 2009-2012 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.datasource.unpooled;
 
 import org.apache.ibatis.io.Resources;
@@ -42,6 +26,19 @@ import java.util.logging.Logger;
 public class UnpooledDataSource implements DataSource {
 
     /**
+     * 已经注册的驱动
+     */
+    private static Map<String, Driver> registeredDrivers = new ConcurrentHashMap<String, Driver>();
+
+    static {
+        Enumeration<Driver> drivers = DriverManager.getDrivers();
+        while (drivers.hasMoreElements()) {
+            Driver driver = drivers.nextElement();
+            registeredDrivers.put(driver.getClass().getName(), driver);
+        }
+    }
+
+    /**
      * 驱动类加载器
      */
     private ClassLoader driverClassLoader;
@@ -49,11 +46,6 @@ public class UnpooledDataSource implements DataSource {
     //作为可选项,你可以传递数据库驱动的属性。要这样做,属性的前缀是以“driver.”开 头的,例如
     //driver.encoding=UTF8
     private Properties driverProperties;
-
-    /**
-     * 已经注册的驱动
-     */
-    private static Map<String, Driver> registeredDrivers = new ConcurrentHashMap<String, Driver>();
 
     private String driver;
 
@@ -69,14 +61,6 @@ public class UnpooledDataSource implements DataSource {
      * 事务级别
      */
     private Integer defaultTransactionIsolationLevel;
-
-    static {
-        Enumeration<Driver> drivers = DriverManager.getDrivers();
-        while (drivers.hasMoreElements()) {
-            Driver driver = drivers.nextElement();
-            registeredDrivers.put(driver.getClass().getName(), driver);
-        }
-    }
 
     public UnpooledDataSource() {
     }
@@ -120,23 +104,23 @@ public class UnpooledDataSource implements DataSource {
     }
 
     @Override
-    public void setLoginTimeout(int loginTimeout) throws SQLException {
-        DriverManager.setLoginTimeout(loginTimeout);
-    }
-
-    @Override
     public int getLoginTimeout() throws SQLException {
         return DriverManager.getLoginTimeout();
     }
 
     @Override
-    public void setLogWriter(PrintWriter logWriter) throws SQLException {
-        DriverManager.setLogWriter(logWriter);
+    public void setLoginTimeout(int loginTimeout) throws SQLException {
+        DriverManager.setLoginTimeout(loginTimeout);
     }
 
     @Override
     public PrintWriter getLogWriter() throws SQLException {
         return DriverManager.getLogWriter();
+    }
+
+    @Override
+    public void setLogWriter(PrintWriter logWriter) throws SQLException {
+        DriverManager.setLogWriter(logWriter);
     }
 
     public ClassLoader getDriverClassLoader() {
@@ -257,6 +241,22 @@ public class UnpooledDataSource implements DataSource {
         }
     }
 
+    @Override
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        throw new SQLException(getClass().getName() + " is not a wrapper.");
+    }
+
+    @Override
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return false;
+    }
+
+    // @Override only valid jdk7+
+    public Logger getParentLogger() {
+        // requires JDK version 1.6
+        return Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    }
+
     /**
      * 驱动代理
      * 不是很懂
@@ -304,21 +304,5 @@ public class UnpooledDataSource implements DataSource {
         public Logger getParentLogger() {
             return Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
         }
-    }
-
-    @Override
-    public <T> T unwrap(Class<T> iface) throws SQLException {
-        throw new SQLException(getClass().getName() + " is not a wrapper.");
-    }
-
-    @Override
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return false;
-    }
-
-    // @Override only valid jdk7+
-    public Logger getParentLogger() {
-        // requires JDK version 1.6
-        return Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     }
 }

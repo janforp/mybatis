@@ -13,19 +13,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.automapping;
 
 import java.util.List;
 
 public interface Mapper {
 
-  User getUser(Integer id);
+    User getUser(Integer id);
 
-  User getUserWithPets_Inline(Integer id);
+    User getUserWithPets_Inline(Integer id);
 
-  User getUserWithPets_External(Integer id);
+    User getUserWithPets_External(Integer id);
 
-  List<Book> getBooks();
+    List<Book> getBooks();
 
-  Article getArticle();
+    Article getArticle();
 }

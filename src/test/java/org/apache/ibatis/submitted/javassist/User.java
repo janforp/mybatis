@@ -13,37 +13,40 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.javassist;
 
 import java.util.List;
 
 public class User {
 
-  private Integer id;
-  private String name;
-  private List<Group> groups;
+    private Integer id;
 
-  public Integer getId() {
-    return id;
-  }
+    private String name;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    private List<Group> groups;
 
-  public String getName() {
-    return name;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-public List<Group> getGroups() {
-  return groups;
-}
+    public String getName() {
+        return name;
+    }
 
-public void setGroups(List<Group> groups) {
-  this.groups = groups;
-}
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
+    }
 }

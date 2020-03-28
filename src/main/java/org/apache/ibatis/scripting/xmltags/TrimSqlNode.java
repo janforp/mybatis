@@ -64,14 +64,6 @@ public class TrimSqlNode implements SqlNode {
         this.configuration = configuration;
     }
 
-    @Override
-    public boolean apply(DynamicContext context) {
-        FilteredDynamicContext filteredDynamicContext = new FilteredDynamicContext(context);
-        boolean result = contents.apply(filteredDynamicContext);
-        filteredDynamicContext.applyAll();
-        return result;
-    }
-
     public static void main(String[] args) {
         final StringTokenizer parser = new StringTokenizer("a|b|c", "|", false);
         Assert.assertEquals(3, (int) parser.countTokens());
@@ -96,6 +88,14 @@ public class TrimSqlNode implements SqlNode {
             return list;
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public boolean apply(DynamicContext context) {
+        FilteredDynamicContext filteredDynamicContext = new FilteredDynamicContext(context);
+        boolean result = contents.apply(filteredDynamicContext);
+        filteredDynamicContext.applyAll();
+        return result;
     }
 
     private class FilteredDynamicContext extends DynamicContext {

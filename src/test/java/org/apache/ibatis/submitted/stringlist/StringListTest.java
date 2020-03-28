@@ -13,11 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.submitted.stringlist;
 
-import java.io.Reader;
-import java.sql.Connection;
-import java.util.List;
+package org.apache.ibatis.submitted.stringlist;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -28,40 +25,44 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.Reader;
+import java.sql.Connection;
+import java.util.List;
+
 public class StringListTest {
 
-  private static SqlSessionFactory sqlSessionFactory;
+    private static SqlSessionFactory sqlSessionFactory;
 
-  @BeforeClass
-  public static void setUp() throws Exception {
-    // create a SqlSessionFactory
-    Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/stringlist/mybatis-config.xml");
-    sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
-    reader.close();
+    @BeforeClass
+    public static void setUp() throws Exception {
+        // create a SqlSessionFactory
+        Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/stringlist/mybatis-config.xml");
+        sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+        reader.close();
 
-    // populate in-memory database
-    SqlSession session = sqlSessionFactory.openSession();
-    Connection conn = session.getConnection();
-    reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/stringlist/CreateDB.sql");
-    ScriptRunner runner = new ScriptRunner(conn);
-    runner.setLogWriter(null);
-    runner.runScript(reader);
-    reader.close();
-    session.close();
-  }
-
-  @Test
-  public void shouldGetAUser() {
-    SqlSession sqlSession = sqlSessionFactory.openSession();
-    try {
-      Mapper mapper = sqlSession.getMapper(Mapper.class);
-      List<User> users = mapper.getUsersAndGroups(1);
-      Assert.assertEquals(1, users.size());
-      Assert.assertEquals(2, users.get(0).getGroups().size());
-      Assert.assertEquals(2, users.get(0).getRoles().size());
-    } finally {
-      sqlSession.close();
+        // populate in-memory database
+        SqlSession session = sqlSessionFactory.openSession();
+        Connection conn = session.getConnection();
+        reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/stringlist/CreateDB.sql");
+        ScriptRunner runner = new ScriptRunner(conn);
+        runner.setLogWriter(null);
+        runner.runScript(reader);
+        reader.close();
+        session.close();
     }
-  }
+
+    @Test
+    public void shouldGetAUser() {
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            Mapper mapper = sqlSession.getMapper(Mapper.class);
+            List<User> users = mapper.getUsersAndGroups(1);
+            Assert.assertEquals(1, users.size());
+            Assert.assertEquals(2, users.get(0).getGroups().size());
+            Assert.assertEquals(2, users.get(0).getRoles().size());
+        } finally {
+            sqlSession.close();
+        }
+    }
 
 }

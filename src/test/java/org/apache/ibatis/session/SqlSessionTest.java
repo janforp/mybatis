@@ -777,16 +777,6 @@ public class SqlSessionTest extends BaseDataTest {
         }
     }
 
-    private static class TestResultHandler implements ResultHandler {
-
-        int count = 0;
-
-        @Override
-        public void handleResult(ResultContext context) {
-            count++;
-        }
-    }
-
     @Test
     public void shouldHandleZeroParameters() throws Exception {
         SqlSession session = sqlMapper.openSession();
@@ -797,19 +787,6 @@ public class SqlSessionTest extends BaseDataTest {
             assertEquals(5, resultHandler.count);
         } finally {
             session.close();
-        }
-    }
-
-    private static class TestResultStopHandler implements ResultHandler {
-
-        int count = 0;
-
-        @Override
-        public void handleResult(ResultContext context) {
-            count++;
-            if (count == 2) {
-                context.stop();
-            }
         }
     }
 
@@ -988,6 +965,29 @@ public class SqlSessionTest extends BaseDataTest {
             assertEquals(3, posts.get(1).getId());
         } finally {
             session.close();
+        }
+    }
+
+    private static class TestResultHandler implements ResultHandler {
+
+        int count = 0;
+
+        @Override
+        public void handleResult(ResultContext context) {
+            count++;
+        }
+    }
+
+    private static class TestResultStopHandler implements ResultHandler {
+
+        int count = 0;
+
+        @Override
+        public void handleResult(ResultContext context) {
+            count++;
+            if (count == 2) {
+                context.stop();
+            }
         }
     }
 

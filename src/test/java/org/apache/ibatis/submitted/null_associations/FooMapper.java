@@ -13,14 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.null_associations;
 
 public interface FooMapper {
 
-  void insertFoo(Foo foo);
+    void insertFoo(Foo foo);
 
-  Foo selectFoo();
+    Foo selectFoo();
 
-  int deleteAllFoo();
+    int deleteAllFoo();
 
 }

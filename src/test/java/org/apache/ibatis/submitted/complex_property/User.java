@@ -13,58 +13,60 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.complex_property;
 
 public class User {
-  private Long id;
 
-  /*
-   * user specified user ID
-   */
-  private String username;
+    boolean administrator;
 
-  /*
-   * encrypted password
-   */
-  private EncryptedString password;
+    private Long id;
 
-  boolean administrator;
+    /*
+     * user specified user ID
+     */
+    private String username;
 
-  public User() {
-    setUsername(new String());
-    setPassword(new EncryptedString());
-    setAdministrator(false);
-  }
+    /*
+     * encrypted password
+     */
+    private EncryptedString password;
 
-  public String getUsername() {
-    return username;
-  }
+    public User() {
+        setUsername(new String());
+        setPassword(new EncryptedString());
+        setAdministrator(false);
+    }
 
-  public void setUsername(String arg) {
-    this.username = arg;
-  }
+    public String getUsername() {
+        return username;
+    }
 
-  public EncryptedString getPassword() {
-    return password;
-  }
+    public void setUsername(String arg) {
+        this.username = arg;
+    }
 
-  public void setPassword(EncryptedString arg) {
-    this.password = arg;
-  }
+    public EncryptedString getPassword() {
+        return password;
+    }
 
-  public Long getId() {
-    return id;
-  }
+    public void setPassword(EncryptedString arg) {
+        this.password = arg;
+    }
 
-  public void setId(Long oid) {
-    this.id = oid;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public boolean isAdministrator() {
-    return administrator;
-  }
+    public void setId(Long oid) {
+        this.id = oid;
+    }
 
-  public void setAdministrator(boolean arg) {
-    this.administrator = arg;
-  }
+    public boolean isAdministrator() {
+        return administrator;
+    }
+
+    public void setAdministrator(boolean arg) {
+        this.administrator = arg;
+    }
 }

@@ -13,44 +13,48 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.multiple_resultsets;
 
 public class OrderDetail {
 
-  private int orderId;
-  private int lineNumber;
-  private int quantity;
-  private String itemDescription;
+    private int orderId;
 
-  public int getOrderId() {
-    return orderId;
-  }
+    private int lineNumber;
 
-  public void setOrderId(int orderId) {
-    this.orderId = orderId;
-  }
+    private int quantity;
 
-  public int getLineNumber() {
-    return lineNumber;
-  }
+    private String itemDescription;
 
-  public void setLineNumber(int lineNumber) {
-    this.lineNumber = lineNumber;
-  }
+    public int getOrderId() {
+        return orderId;
+    }
 
-  public int getQuantity() {
-    return quantity;
-  }
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
+    }
 
-  public void setQuantity(int quantity) {
-    this.quantity = quantity;
-  }
+    public int getLineNumber() {
+        return lineNumber;
+    }
 
-  public String getItemDescription() {
-    return itemDescription;
-  }
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
+    }
 
-  public void setItemDescription(String itemDescription) {
-    this.itemDescription = itemDescription;
-  }
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getItemDescription() {
+        return itemDescription;
+    }
+
+    public void setItemDescription(String itemDescription) {
+        this.itemDescription = itemDescription;
+    }
 }

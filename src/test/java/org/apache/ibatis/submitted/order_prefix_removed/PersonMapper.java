@@ -13,8 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.order_prefix_removed;
 
 public interface PersonMapper {
+
     public Person select(String orderType);
 }

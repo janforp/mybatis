@@ -13,25 +13,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.criterion;
 
 public class Criterion {
-  private String test;
-  private Object value;
 
-  public String getTest() {
-    return test;
-  }
+    private String test;
 
-  public void setTest(String test) {
-    this.test = test;
-  }
+    private Object value;
 
-  public Object getValue() {
-    return value;
-  }
+    public String getTest() {
+        return test;
+    }
 
-  public void setValue(Object value) {
-    this.value = value;
-  }
+    public void setTest(String test) {
+        this.test = test;
+    }
+
+    public Object getValue() {
+        return value;
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
+    }
 }

@@ -13,24 +13,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.dml_return_types;
 
 public interface Mapper {
 
-  User getUser(int id);
+    User getUser(int id);
 
-  void updateReturnsVoid(User user);
+    void updateReturnsVoid(User user);
 
-  int updateReturnsPrimitiveInteger(User user);
+    int updateReturnsPrimitiveInteger(User user);
 
-  Integer updateReturnsInteger(User user);
+    Integer updateReturnsInteger(User user);
 
-  long updateReturnsPrimitiveLong(User user);
+    long updateReturnsPrimitiveLong(User user);
 
-  Long updateReturnsLong(User user);
+    Long updateReturnsLong(User user);
 
-  boolean updateReturnsPrimitiveBoolean(User user);
+    boolean updateReturnsPrimitiveBoolean(User user);
 
-  Boolean updateReturnsBoolean(User user);
+    Boolean updateReturnsBoolean(User user);
 
 }

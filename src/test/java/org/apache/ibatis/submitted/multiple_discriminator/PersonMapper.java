@@ -13,11 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.multiple_discriminator;
 
 public interface PersonMapper {
-    
+
     public Person get(Long id);
+
     public Person get2(Long id);
+
     public Person getLoop();
 }

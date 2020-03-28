@@ -13,11 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.serializecircular;
 
 import java.util.List;
 
 public interface PersonMapper {
-  public Person getById(Integer anId);
-  public List<Person> getByDepartment(Integer anDepartmentId);
+
+    public Person getById(Integer anId);
+
+    public List<Person> getByDepartment(Integer anDepartmentId);
 }

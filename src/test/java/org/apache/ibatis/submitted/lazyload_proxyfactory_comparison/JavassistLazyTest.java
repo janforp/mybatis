@@ -13,15 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.lazyload_proxyfactory_comparison;
 
 import org.junit.Ignore;
 
 @Ignore("See Issue 664: Javassist ProxyFactory does not handle interfaces with generics correctly.")
-public class JavassistLazyTest 
-extends AbstractLazyTest {
-  @Override
-  protected String getConfiguration() {
-    return "javassist";
-  }
+public class JavassistLazyTest
+        extends AbstractLazyTest {
+
+    @Override
+    protected String getConfiguration() {
+        return "javassist";
+    }
 }

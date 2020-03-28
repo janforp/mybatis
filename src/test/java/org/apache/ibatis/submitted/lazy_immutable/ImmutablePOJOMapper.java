@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.lazy_immutable;
 
 import org.apache.ibatis.annotations.Param;

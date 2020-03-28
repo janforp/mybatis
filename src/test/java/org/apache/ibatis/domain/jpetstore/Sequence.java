@@ -13,39 +13,41 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.domain.jpetstore;
 
 import java.io.Serializable;
 
 public class Sequence implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private String name;
-  private int nextId;
+    private String name;
 
-  public Sequence() {
-  }
+    private int nextId;
 
-  public Sequence(String name, int nextId) {
-    this.name = name;
-    this.nextId = nextId;
-  }
+    public Sequence() {
+    }
 
-  public String getName() {
-    return name;
-  }
+    public Sequence(String name, int nextId) {
+        this.name = name;
+        this.nextId = nextId;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public int getNextId() {
-    return nextId;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public void setNextId(int nextId) {
-    this.nextId = nextId;
-  }
+    public int getNextId() {
+        return nextId;
+    }
+
+    public void setNextId(int nextId) {
+        this.nextId = nextId;
+    }
 
 }

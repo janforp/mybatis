@@ -67,23 +67,6 @@ public class Plugin implements InvocationHandler {
         return target;
     }
 
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        try {
-            //看看如何拦截
-            Set<Method> methods = signatureMap.get(method.getDeclaringClass());
-            //看哪些方法需要拦截
-            if (methods != null && methods.contains(method)) {
-                //调用Interceptor.intercept，也即插入了我们自己的逻辑
-                return interceptor.intercept(new Invocation(target, method, args));
-            }
-            //最后还是执行原来逻辑
-            return method.invoke(target, args);
-        } catch (Exception e) {
-            throw ExceptionUtil.unwrapThrowable(e);
-        }
-    }
-
     /**
      * 把该interceptor的所有拦截的方法按class归类
      *
@@ -145,6 +128,23 @@ public class Plugin implements InvocationHandler {
             targetClass = targetClass.getSuperclass();
         }
         return interfaces.toArray(new Class<?>[0]);
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        try {
+            //看看如何拦截
+            Set<Method> methods = signatureMap.get(method.getDeclaringClass());
+            //看哪些方法需要拦截
+            if (methods != null && methods.contains(method)) {
+                //调用Interceptor.intercept，也即插入了我们自己的逻辑
+                return interceptor.intercept(new Invocation(target, method, args));
+            }
+            //最后还是执行原来逻辑
+            return method.invoke(target, args);
+        } catch (Exception e) {
+            throw ExceptionUtil.unwrapThrowable(e);
+        }
     }
 
 }

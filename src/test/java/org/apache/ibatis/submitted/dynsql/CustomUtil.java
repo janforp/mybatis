@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.ibatis.submitted.dynsql;
 
 public class CustomUtil {
+
     public static String esc(final String s) {
         return s.replace("'", "''");
-    }    
+    }
 }

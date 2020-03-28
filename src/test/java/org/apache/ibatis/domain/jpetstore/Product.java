@@ -13,54 +13,57 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.domain.jpetstore;
 
 import java.io.Serializable;
 
-
 public class Product implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private String productId;
-  private String categoryId;
-  private String name;
-  private String description;
+    private String productId;
 
-  public String getProductId() {
-    return productId;
-  }
+    private String categoryId;
 
-  public void setProductId(String productId) {
-    this.productId = productId.trim();
-  }
+    private String name;
 
-  public String getCategoryId() {
-    return categoryId;
-  }
+    private String description;
 
-  public void setCategoryId(String categoryId) {
-    this.categoryId = categoryId;
-  }
+    public String getProductId() {
+        return productId;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public void setProductId(String productId) {
+        this.productId = productId.trim();
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getCategoryId() {
+        return categoryId;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String toString() {
-    return getName();
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String toString() {
+        return getName();
+    }
 
 }

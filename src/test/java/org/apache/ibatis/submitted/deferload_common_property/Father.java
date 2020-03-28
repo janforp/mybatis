@@ -13,10 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.deferload_common_property;
 
 public class Father {
+
     private Integer id;
+
     private String name;
 
     public Integer getId() {

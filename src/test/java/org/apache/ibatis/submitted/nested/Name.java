@@ -13,32 +13,35 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.nested;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Name {
-  private String lastName;
-  private List<String> firstNames;
 
-  public Name() {
-    firstNames = new ArrayList<String>();
-  }
+    private String lastName;
 
-  public String getLastName() {
-    return lastName;
-  }
+    private List<String> firstNames;
 
-  public void setLastName(String lastName) {
-    this.lastName = lastName;
-  }
+    public Name() {
+        firstNames = new ArrayList<String>();
+    }
 
-  public List<String> getFirstNames() {
-    return firstNames;
-  }
+    public String getLastName() {
+        return lastName;
+    }
 
-  public void addFirstName(String firstName) {
-    firstNames.add(firstName);
-  }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public List<String> getFirstNames() {
+        return firstNames;
+    }
+
+    public void addFirstName(String firstName) {
+        firstNames.add(firstName);
+    }
 }

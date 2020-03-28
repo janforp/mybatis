@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.primitive_result_type;
 
 import org.apache.ibatis.session.SqlSession;
@@ -22,52 +23,52 @@ import java.util.List;
 
 public class ProductDAO {
 
-  public static List<Integer> selectProductCodes() {
-    SqlSession session = IbatisConfig.getSession();
-    try {
-      ProductMapper productMapper = session.getMapper(ProductMapper.class);
-      return productMapper.selectProductCodes();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    } finally {
-      session.close();
+    public static List<Integer> selectProductCodes() {
+        SqlSession session = IbatisConfig.getSession();
+        try {
+            ProductMapper productMapper = session.getMapper(ProductMapper.class);
+            return productMapper.selectProductCodes();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            session.close();
+        }
     }
-  }
 
-  public static List<Long> selectProductCodesL() {
-    SqlSession session = IbatisConfig.getSession();
-    try {
-      ProductMapper productMapper = session.getMapper(ProductMapper.class);
-      return productMapper.selectProductCodesL();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    } finally {
-      session.close();
+    public static List<Long> selectProductCodesL() {
+        SqlSession session = IbatisConfig.getSession();
+        try {
+            ProductMapper productMapper = session.getMapper(ProductMapper.class);
+            return productMapper.selectProductCodesL();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            session.close();
+        }
     }
-  }
 
-  public static List<BigDecimal> selectProductCodesB() {
-    SqlSession session = IbatisConfig.getSession();
-    try {
-      ProductMapper productMapper = session.getMapper(ProductMapper.class);
-      return productMapper.selectProductCodesB();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    } finally {
-      session.close();
+    public static List<BigDecimal> selectProductCodesB() {
+        SqlSession session = IbatisConfig.getSession();
+        try {
+            ProductMapper productMapper = session.getMapper(ProductMapper.class);
+            return productMapper.selectProductCodesB();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            session.close();
+        }
     }
-  }
 
-  public static List<Product> selectAllProducts() {
-    SqlSession session = IbatisConfig.getSession();
-    try {
-      ProductMapper productMapper = session.getMapper(ProductMapper.class);
-      return productMapper.selectAllProducts();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    } finally {
-      session.close();
+    public static List<Product> selectAllProducts() {
+        SqlSession session = IbatisConfig.getSession();
+        try {
+            ProductMapper productMapper = session.getMapper(ProductMapper.class);
+            return productMapper.selectAllProducts();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            session.close();
+        }
     }
-  }
 
 }

@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.ibatis.submitted.primitive_result_type;
 
 public class Product {
+
     int productCod;
+
     Integer productType;
 
     public int getProductCod() {
@@ -34,5 +37,5 @@ public class Product {
     public void setProductType(Integer productType) {
         this.productType = productType;
     }
-    
+
 }

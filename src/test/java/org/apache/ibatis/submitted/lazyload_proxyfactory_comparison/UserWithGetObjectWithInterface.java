@@ -13,40 +13,43 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.lazyload_proxyfactory_comparison;
 
-public class UserWithGetObjectWithInterface 
-implements Owned<Group> {
+public class UserWithGetObjectWithInterface
+        implements Owned<Group> {
 
-  private Integer id;
-  private String name;
-  private Group owner;
+    private Integer id;
 
-  public Integer getId() {
-    return id;
-  }
+    private String name;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    private Group owner;
 
-  public String getName() {
-    return name;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
-  
-  public Group getOwner() {
-     return owner;
-  }
-  
-  public void setOwner(Group owner) {
-    this.owner = owner;
-  }
-  
-  public Object getObject() {
-    return null;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Group getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Group owner) {
+        this.owner = owner;
+    }
+
+    public Object getObject() {
+        return null;
+    }
 }

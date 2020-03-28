@@ -36,8 +36,6 @@ import java.util.List;
  */
 public abstract class VFS {
 
-    private static final Log log = LogFactory.getLog(ResolverUtil.class);
-
     /**
      * The built-in implementations.
      */
@@ -49,6 +47,8 @@ public abstract class VFS {
      */
     //这里是提供一个用户扩展点，可以让用户自定义VFS实现
     public static final List<Class<? extends VFS>> USER_IMPLEMENTATIONS = new ArrayList<Class<? extends VFS>>();
+
+    private static final Log log = LogFactory.getLog(ResolverUtil.class);
 
     /**
      * Singleton instance.
@@ -189,10 +189,10 @@ public abstract class VFS {
         return Collections.list(Thread.currentThread().getContextClassLoader().getResources(path));
     }
 
-  public static void main(String[] args) throws IOException {
-    List<URL> urlList = getResources("org/apache/ibatis/datasource");
-    System.out.println(urlList);
-  }
+    public static void main(String[] args) throws IOException {
+        List<URL> urlList = getResources("org/apache/ibatis/datasource");
+        System.out.println(urlList);
+    }
 
     /**
      * Return true if the {@link VFS} implementation is valid for the current environment.

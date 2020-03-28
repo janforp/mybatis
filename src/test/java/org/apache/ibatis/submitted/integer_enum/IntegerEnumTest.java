@@ -13,23 +13,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.submitted.integer_enum;
 
-import java.io.Reader;
+package org.apache.ibatis.submitted.integer_enum;
 
 import org.apache.ibatis.BaseDataTest;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.Test;
 
+import java.io.Reader;
+
 public class IntegerEnumTest extends BaseDataTest {
 
-  @Test
-  public void shouldParseMapWithIntegerJdbcType() throws Exception {
-    String resource = "org/apache/ibatis/submitted/integer_enum/MapperConfig.xml";
-    Reader reader = Resources.getResourceAsReader(resource);
-    SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
-    builder.build(reader);
-  }
+    @Test
+    public void shouldParseMapWithIntegerJdbcType() throws Exception {
+        String resource = "org/apache/ibatis/submitted/integer_enum/MapperConfig.xml";
+        Reader reader = Resources.getResourceAsReader(resource);
+        SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+        builder.build(reader);
+    }
 
 }

@@ -1,19 +1,3 @@
-/*
- *    Copyright 2009-2013 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.binding;
 
 import org.apache.ibatis.builder.annotation.MapperAnnotationBuilder;
@@ -37,8 +21,6 @@ import java.util.Set;
  */
 public class MapperRegistry {
 
-    private Configuration config;
-
     /**
      * 将已经添加的映射都放入HashMap
      * 注册的 mapperClass
@@ -50,6 +32,8 @@ public class MapperRegistry {
      * ，所以我们可以这么来看，MapperProxyFactory会存在多个实例，针对每个映射器有一个实例，这个实例就作为值保存在注册器中
      */
     private final Map<Class<?>, MapperProxyFactory<?>> knownMappers = new HashMap<Class<?>, MapperProxyFactory<?>>();
+
+    private Configuration config;
 
     public MapperRegistry(Configuration config) {
         this.config = config;
@@ -148,5 +132,4 @@ public class MapperRegistry {
         //表示所有的java类都可以被注册
         addMappers(packageName, Object.class);
     }
-
 }

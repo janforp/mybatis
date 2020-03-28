@@ -13,40 +13,42 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.type;
+
+import org.junit.Test;
+
+import java.sql.Timestamp;
+import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.sql.Timestamp;
-import java.util.Date;
-
-import org.junit.Test;
-
 public class SqlTimetampTypeHandlerTest extends BaseTypeHandlerTest {
 
-  private static final TypeHandler<Timestamp> TYPE_HANDLER = new SqlTimestampTypeHandler();
-  private static final java.sql.Timestamp SQL_TIME = new java.sql.Timestamp(new Date().getTime());
+    private static final TypeHandler<Timestamp> TYPE_HANDLER = new SqlTimestampTypeHandler();
 
-  @Test
-  public void shouldSetParameter() throws Exception {
-    TYPE_HANDLER.setParameter(ps, 1, SQL_TIME, null);
-    verify(ps).setTimestamp(1, SQL_TIME);
-  }
+    private static final java.sql.Timestamp SQL_TIME = new java.sql.Timestamp(new Date().getTime());
 
-  @Test
-  public void shouldGetResultFromResultSet() throws Exception {
-    when(rs.getTimestamp("column")).thenReturn(SQL_TIME);
-    when(rs.wasNull()).thenReturn(false);
-    assertEquals(SQL_TIME, TYPE_HANDLER.getResult(rs, "column"));
-  }
+    @Test
+    public void shouldSetParameter() throws Exception {
+        TYPE_HANDLER.setParameter(ps, 1, SQL_TIME, null);
+        verify(ps).setTimestamp(1, SQL_TIME);
+    }
 
-  @Test
-  public void shouldGetResultFromCallableStatement() throws Exception {
-    when(cs.getTimestamp(1)).thenReturn(SQL_TIME);
-    when(cs.wasNull()).thenReturn(false);
-    assertEquals(SQL_TIME, TYPE_HANDLER.getResult(cs, 1));
-  }
+    @Test
+    public void shouldGetResultFromResultSet() throws Exception {
+        when(rs.getTimestamp("column")).thenReturn(SQL_TIME);
+        when(rs.wasNull()).thenReturn(false);
+        assertEquals(SQL_TIME, TYPE_HANDLER.getResult(rs, "column"));
+    }
+
+    @Test
+    public void shouldGetResultFromCallableStatement() throws Exception {
+        when(cs.getTimestamp(1)).thenReturn(SQL_TIME);
+        when(cs.wasNull()).thenReturn(false);
+        assertEquals(SQL_TIME, TYPE_HANDLER.getResult(cs, 1));
+    }
 
 }

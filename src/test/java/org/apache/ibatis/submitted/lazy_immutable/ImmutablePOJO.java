@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.lazy_immutable;
 
 import java.io.Serializable;
@@ -20,7 +21,9 @@ import java.io.Serializable;
 public class ImmutablePOJO implements Serializable {
 
     private static final long serialVersionUID = -7086198701202598455L;
+
     private final Integer id;
+
     private final String description;
 
     public ImmutablePOJO(Integer id, String description) {

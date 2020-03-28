@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.domain.blog.mappers;
 
 import org.apache.ibatis.session.RowBounds;
@@ -22,10 +23,10 @@ import java.util.Map;
 
 public interface BlogMapper {
 
-  List<Map> selectAllPosts();
+    List<Map> selectAllPosts();
 
-  List<Map> selectAllPosts(RowBounds rowBounds);
+    List<Map> selectAllPosts(RowBounds rowBounds);
 
-  List<Map> selectAllPosts(RowBounds rowBounds, Object param);
+    List<Map> selectAllPosts(RowBounds rowBounds, Object param);
 
 }

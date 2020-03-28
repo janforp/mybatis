@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.dynsql2;
 
 import java.util.List;
@@ -21,13 +22,14 @@ import java.util.List;
  * @author Jeff Butler
  */
 public class Parameter {
-  private List<Name> names;
 
-  public List<Name> getNames() {
-    return names;
-  }
+    private List<Name> names;
 
-  public void setNames(List<Name> names) {
-    this.names = names;
-  }
+    public List<Name> getNames() {
+        return names;
+    }
+
+    public void setNames(List<Name> names) {
+        this.names = names;
+    }
 }

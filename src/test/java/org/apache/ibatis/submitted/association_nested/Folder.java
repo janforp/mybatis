@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.association_nested;
 
 /**
@@ -20,13 +21,13 @@ package org.apache.ibatis.submitted.association_nested;
  */
 public class Folder {
 
-   public Long id;
-   public String name;
+    public Long id;
 
-   @Override
-   public String toString() {
-     return name;
-   }
+    public String name;
 
+    @Override
+    public String toString() {
+        return name;
+    }
 
 }

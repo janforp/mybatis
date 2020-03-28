@@ -1,13 +1,13 @@
 package org.apache.ibatis.annotations;
 
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.TypeHandler;
+import org.apache.ibatis.type.UnknownTypeHandler;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import org.apache.ibatis.type.JdbcType;
-import org.apache.ibatis.type.TypeHandler;
-import org.apache.ibatis.type.UnknownTypeHandler;
 
 /**
  * @author Clinton Begin
@@ -15,17 +15,18 @@ import org.apache.ibatis.type.UnknownTypeHandler;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Arg {
-  boolean id() default false;
 
-  String column() default "";
+    boolean id() default false;
 
-  Class<?> javaType() default void.class;
+    String column() default "";
 
-  JdbcType jdbcType() default JdbcType.UNDEFINED;
+    Class<?> javaType() default void.class;
 
-  Class<? extends TypeHandler<?>> typeHandler() default UnknownTypeHandler.class;
+    JdbcType jdbcType() default JdbcType.UNDEFINED;
 
-  String select() default "";
+    Class<? extends TypeHandler<?>> typeHandler() default UnknownTypeHandler.class;
 
-  String resultMap() default "";
+    String select() default "";
+
+    String resultMap() default "";
 }

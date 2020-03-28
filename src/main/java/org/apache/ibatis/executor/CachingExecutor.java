@@ -114,7 +114,7 @@ public class CachingExecutor implements Executor {
                 ensureNoOutParams(mappedStatement, parameterObject, boundSql);
                 @SuppressWarnings("unchecked")
                 //先拿缓存
-                List<E> list = (List<E>) transactionalCacheManager.getObject(cache, key);
+                        List<E> list = (List<E>) transactionalCacheManager.getObject(cache, key);
                 if (list == null) {
                     //没缓存，去数据库
                     list = delegate.<E>query(mappedStatement, parameterObject, rowBounds, resultHandler, key, boundSql);

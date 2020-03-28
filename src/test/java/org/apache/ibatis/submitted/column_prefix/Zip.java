@@ -17,33 +17,34 @@
 package org.apache.ibatis.submitted.column_prefix;
 
 public class Zip {
-  private String state;
 
-  private String city;
+    private String state;
 
-  private int zipCode;
+    private String city;
 
-  public String getState() {
-    return state;
-  }
+    private int zipCode;
 
-  public void setState(String state) {
-    this.state = state;
-  }
+    public String getState() {
+        return state;
+    }
 
-  public String getCity() {
-    return city;
-  }
+    public void setState(String state) {
+        this.state = state;
+    }
 
-  public void setCity(String city) {
-    this.city = city;
-  }
+    public String getCity() {
+        return city;
+    }
 
-  public int getZipCode() {
-    return zipCode;
-  }
+    public void setCity(String city) {
+        this.city = city;
+    }
 
-  public void setZipCode(int zipCode) {
-    this.zipCode = zipCode;
-  }
+    public int getZipCode() {
+        return zipCode;
+    }
+
+    public void setZipCode(int zipCode) {
+        this.zipCode = zipCode;
+    }
 }

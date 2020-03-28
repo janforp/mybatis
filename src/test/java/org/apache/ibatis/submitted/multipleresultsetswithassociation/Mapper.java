@@ -13,12 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.multipleresultsetswithassociation;
 
 import java.util.List;
 
 public interface Mapper {
 
-  List<OrderDetail> getOrderDetailsWithHeaders();
+    List<OrderDetail> getOrderDetailsWithHeaders();
 
 }

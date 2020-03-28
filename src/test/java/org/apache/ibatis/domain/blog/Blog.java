@@ -13,61 +13,65 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.domain.blog;
 
 import java.util.List;
 
 public class Blog {
 
-  private int id;
-  private String title;
-  private Author author;
-  private List<Post> posts;
+    private int id;
 
-  public Blog() {
-  }
+    private String title;
 
-  public Blog(int id, String title, Author author, List<Post> posts) {
-    this();
-    this.id = id;
-    this.title = title;
-    this.author = author;
-    this.posts = posts;
-  }
+    private Author author;
 
-  public int getId() {
-    return id;
-  }
+    private List<Post> posts;
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    public Blog() {
+    }
 
-  public String getTitle() {
-    return title;
-  }
+    public Blog(int id, String title, Author author, List<Post> posts) {
+        this();
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.posts = posts;
+    }
 
-  public void setTitle(String title) {
-    this.title = title;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public Author getAuthor() {
-    return author;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public void setAuthor(Author author) {
-    this.author = author;
-  }
+    public String getTitle() {
+        return title;
+    }
 
-  public List<Post> getPosts() {
-    return posts;
-  }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-  public void setPosts(List<Post> posts) {
-    this.posts = posts;
-  }
+    public Author getAuthor() {
+        return author;
+    }
 
-  public String toString() {
-    return "Blog: " + id + " : " + title + " (" + author + ")";
-  }
+    public void setAuthor(Author author) {
+        this.author = author;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+
+    public String toString() {
+        return "Blog: " + id + " : " + title + " (" + author + ")";
+    }
 }

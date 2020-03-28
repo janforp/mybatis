@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.ibatis.submitted.lazy_deserialize;
 
 import java.io.Serializable;
@@ -24,6 +25,7 @@ import java.io.Serializable;
 public class LazyObjectFoo implements Serializable {
 
     private Integer id;
+
     private LazyObjectBar lazyObjectBar;
 
     public Integer getId() {

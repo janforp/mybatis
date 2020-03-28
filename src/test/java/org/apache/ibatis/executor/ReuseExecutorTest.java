@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.executor;
 
 import org.apache.ibatis.transaction.Transaction;
@@ -20,16 +21,16 @@ import org.junit.Test;
 
 public class ReuseExecutorTest extends BaseExecutorTest {
 
-  @Test
-  public void dummy() {
-  }
+    @Test
+    public void dummy() {
+    }
 
-  @Test
-  public void shouldFetchPostWithBlogWithCompositeKey() throws Exception {
-    super.shouldFetchPostWithBlogWithCompositeKey();
-  }
+    @Test
+    public void shouldFetchPostWithBlogWithCompositeKey() throws Exception {
+        super.shouldFetchPostWithBlogWithCompositeKey();
+    }
 
-  protected Executor createExecutor(Transaction transaction) {
-    return new ReuseExecutor(config,transaction);
-  }
+    protected Executor createExecutor(Transaction transaction) {
+        return new ReuseExecutor(config, transaction);
+    }
 }

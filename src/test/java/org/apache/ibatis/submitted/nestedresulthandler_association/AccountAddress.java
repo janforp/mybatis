@@ -17,33 +17,34 @@
 package org.apache.ibatis.submitted.nestedresulthandler_association;
 
 public class AccountAddress {
-  private String accountUuid;
 
-  private String zipCode;
+    private String accountUuid;
 
-  private String address;
+    private String zipCode;
 
-  public String getAccountUuid() {
-    return accountUuid;
-  }
+    private String address;
 
-  public void setAccountUuid(String accountUuid) {
-    this.accountUuid = accountUuid;
-  }
+    public String getAccountUuid() {
+        return accountUuid;
+    }
 
-  public String getZipCode() {
-    return zipCode;
-  }
+    public void setAccountUuid(String accountUuid) {
+        this.accountUuid = accountUuid;
+    }
 
-  public void setZipCode(String zipCode) {
-    this.zipCode = zipCode;
-  }
+    public String getZipCode() {
+        return zipCode;
+    }
 
-  public String getAddress() {
-    return address;
-  }
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
+    }
 
-  public void setAddress(String address) {
-    this.address = address;
-  }
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }

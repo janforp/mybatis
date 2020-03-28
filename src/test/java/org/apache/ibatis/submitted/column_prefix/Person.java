@@ -19,63 +19,64 @@ package org.apache.ibatis.submitted.column_prefix;
 import java.util.List;
 
 public class Person {
-  private Integer id;
 
-  private String name;
+    private Integer id;
 
-  private Address billingAddress;
+    private String name;
 
-  private Address shippingAddress;
+    private Address billingAddress;
 
-  private Room room;
+    private Address shippingAddress;
 
-  private List<Pet> pets;
+    private Room room;
 
-  public Integer getId() {
-    return id;
-  }
+    private List<Pet> pets;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public Address getBillingAddress() {
-    return billingAddress;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public void setBillingAddress(Address billingAddress) {
-    this.billingAddress = billingAddress;
-  }
+    public Address getBillingAddress() {
+        return billingAddress;
+    }
 
-  public Address getShippingAddress() {
-    return shippingAddress;
-  }
+    public void setBillingAddress(Address billingAddress) {
+        this.billingAddress = billingAddress;
+    }
 
-  public void setShippingAddress(Address shippingAddress) {
-    this.shippingAddress = shippingAddress;
-  }
+    public Address getShippingAddress() {
+        return shippingAddress;
+    }
 
-  public Room getRoom() {
-    return room;
-  }
+    public void setShippingAddress(Address shippingAddress) {
+        this.shippingAddress = shippingAddress;
+    }
 
-  public void setRoom(Room room) {
-    this.room = room;
-  }
+    public Room getRoom() {
+        return room;
+    }
 
-  public List<Pet> getPets() {
-    return pets;
-  }
+    public void setRoom(Room room) {
+        this.room = room;
+    }
 
-  public void setPets(List<Pet> pets) {
-    this.pets = pets;
-  }
+    public List<Pet> getPets() {
+        return pets;
+    }
+
+    public void setPets(List<Pet> pets) {
+        this.pets = pets;
+    }
 }

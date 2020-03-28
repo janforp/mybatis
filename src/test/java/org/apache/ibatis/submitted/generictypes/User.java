@@ -17,30 +17,32 @@
 package org.apache.ibatis.submitted.generictypes;
 
 public class User<T> {
-  private Integer id;
-  private String name;
 
-  public User() {
-  }
+    private Integer id;
 
-  public User(Integer id, String name) {
-    this.id = id;
-    this.name = name;
-  }
+    private String name;
 
-  public Integer getId() {
-    return id;
-  }
+    public User() {
+    }
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    public User(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

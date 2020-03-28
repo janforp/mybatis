@@ -13,25 +13,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.sptests;
 
 public class Item {
-  private Integer id;
-  private String item;
 
-  public Integer getId() {
-    return id;
-  }
+    private Integer id;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    private String item;
 
-  public String getItem() {
-    return item;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public void setItem(String item) {
-    this.item = item;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getItem() {
+        return item;
+    }
+
+    public void setItem(String item) {
+        this.item = item;
+    }
 }

@@ -1,19 +1,3 @@
-/*
- *    Copyright 2009-2014 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.binding;
 
 import org.apache.ibatis.reflection.ExceptionUtil;
@@ -27,7 +11,8 @@ import java.util.Map;
 /**
  * 映射器代理，代理模式
  *
- * 在每个映射器代理中都存在以上三个参数，也就是说我们一旦我们使用过某个操作，那么这个操作过程中产生的代理实例将会一直存在，且具体操作方法会保存在这个代理实例的方法缓存中备用
+ * 在每个映射器代理中都存在以上三个参数，也就是说我们一旦我们使用过某个操作，
+ * 那么这个操作过程中产生的代理实例将会一直存在，且具体操作方法会保存在这个代理实例的方法缓存中备用
  *
  * @author Clinton Begin
  * @author Eduardo Macarron
@@ -88,5 +73,4 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
         }
         return mapperMethod;
     }
-
 }

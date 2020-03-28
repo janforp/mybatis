@@ -13,25 +13,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.language;
 
 public class Parameter {
 
-  private final boolean includeLastName;
+    private final boolean includeLastName;
 
-  private final String name;
+    private final String name;
 
-  public Parameter(boolean includeLastName, String name) {
-    this.includeLastName = includeLastName;
-    this.name = name;
-  }
+    public Parameter(boolean includeLastName, String name) {
+        this.includeLastName = includeLastName;
+        this.name = name;
+    }
 
-  public boolean isIncludeLastName() {
-    return includeLastName;
-  }
+    public boolean isIncludeLastName() {
+        return includeLastName;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
 }

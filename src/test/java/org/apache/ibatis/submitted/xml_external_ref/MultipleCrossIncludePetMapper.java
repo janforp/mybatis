@@ -13,8 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.xml_external_ref;
 
 public interface MultipleCrossIncludePetMapper {
-  Pet select(Integer id);
+
+    Pet select(Integer id);
 }

@@ -13,62 +13,69 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.foreach_map;
 
 public class StringStringMapEntry {
-  public StringStringMapEntry() {
-  }
 
-  public StringStringMapEntry(String key, String value) {
-    this.key = key;
-    this.value = value;
-  }
+    private String key;
 
-  public Object getKey() {
-    return key;
-  }
+    private String value;
 
-  public void setKey(String key) {
-    this.key = key;
-  }
+    public StringStringMapEntry() {
+    }
 
-  public String getValue() {
-    return value;
-  }
+    public StringStringMapEntry(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
 
-  public void setValue(String value) {
-    this.value = value;
-  }
+    public Object getKey() {
+        return key;
+    }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-    StringStringMapEntry mapEntry = (StringStringMapEntry) o;
+    public String getValue() {
+        return value;
+    }
 
-    if (key != null ? !key.equals(mapEntry.key) : mapEntry.key != null)
-      return false;
-    if (value != null ? !value.equals(mapEntry.value) : mapEntry.value != null)
-      return false;
+    public void setValue(String value) {
+        this.value = value;
+    }
 
-    return true;
-  }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-  @Override
-  public int hashCode() {
-    int result = key != null ? key.hashCode() : 0;
-    result = 31 * result + (value != null ? value.hashCode() : 0);
-    return result;
-  }
+        StringStringMapEntry mapEntry = (StringStringMapEntry) o;
 
-  @Override
-  public String toString() {
-    return '{' + key.toString() + '=' + value + '}';
-  }
+        if (key != null ? !key.equals(mapEntry.key) : mapEntry.key != null) {
+            return false;
+        }
+        if (value != null ? !value.equals(mapEntry.value) : mapEntry.value != null) {
+            return false;
+        }
 
-  private String key;
-  private String value;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = key != null ? key.hashCode() : 0;
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return '{' + key.toString() + '=' + value + '}';
+    }
 }

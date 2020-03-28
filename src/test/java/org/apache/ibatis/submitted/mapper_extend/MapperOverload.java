@@ -13,17 +13,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.mapper_extend;
 
 import org.apache.ibatis.annotations.Select;
 
 public interface MapperOverload extends ParentMapper {
 
-  @Override
-  User getUserXML();
-  
-  @Override
-  @Select("select * from users where id = 2")
-  User getUserAnnotated();
-  
+    @Override
+    User getUserXML();
+
+    @Override
+    @Select("select * from users where id = 2")
+    User getUserAnnotated();
+
 }

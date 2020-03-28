@@ -66,8 +66,6 @@ public enum JdbcType {
     NCLOB(Types.NCLOB), // JDK6
     STRUCT(Types.STRUCT);
 
-    public final int TYPE_CODE;
-
     private static Map<Integer, JdbcType> codeLookup = new HashMap<Integer, JdbcType>();
 
     //一开始就将数字对应的枚举型放入hashmap
@@ -76,6 +74,8 @@ public enum JdbcType {
             codeLookup.put(type.TYPE_CODE, type);
         }
     }
+
+    public final int TYPE_CODE;
 
     JdbcType(int code) {
         this.TYPE_CODE = code;

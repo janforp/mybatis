@@ -13,54 +13,59 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.extends_with_constructor;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class StudentConstructor {
-  public enum Constructor {
-    ID,
-    ID_NAME
-  }
 
-  private List<Constructor> constructors = new LinkedList<Constructor>();
-  private final int id;
-  private String name;
-  private Teacher teacher;
+    private final int id;
 
-  public StudentConstructor(Integer id) {
-    constructors.add(Constructor.ID);
-    this.id = id;
-  }
+    private List<Constructor> constructors = new LinkedList<Constructor>();
 
-  public StudentConstructor(Integer id, String name) {
-    constructors.add(Constructor.ID_NAME);
-    this.id = id;
-    this.name = name;
-  }
+    private String name;
 
-  public int getId() {
-    return id;
-  }
+    private Teacher teacher;
 
-  public String getName() {
-    return name;
-  }
+    public StudentConstructor(Integer id) {
+        constructors.add(Constructor.ID);
+        this.id = id;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public StudentConstructor(Integer id, String name) {
+        constructors.add(Constructor.ID_NAME);
+        this.id = id;
+        this.name = name;
+    }
 
-  public Teacher getTeacher() {
-    return teacher;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public void setTeacher(Teacher teacher) {
-    this.teacher = teacher;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public List<Constructor> getConstructors() {
-    return constructors;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
+    }
+
+    public List<Constructor> getConstructors() {
+        return constructors;
+    }
+
+    public enum Constructor {
+        ID,
+        ID_NAME
+    }
 }

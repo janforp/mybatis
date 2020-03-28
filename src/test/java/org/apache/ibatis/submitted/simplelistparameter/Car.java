@@ -13,27 +13,30 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.simplelistparameter;
 
 import java.util.List;
 
 public class Car {
-  private String name;
-  private List<String> doors;
 
-  public String getName() {
-    return name;
-  }
+    private String name;
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    private List<String> doors;
 
-  public List<String> getDoors() {
-    return doors;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setDoors(List<String> doors) {
-    this.doors = doors;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<String> getDoors() {
+        return doors;
+    }
+
+    public void setDoors(List<String> doors) {
+        this.doors = doors;
+    }
 }

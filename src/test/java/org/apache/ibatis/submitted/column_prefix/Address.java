@@ -17,89 +17,90 @@
 package org.apache.ibatis.submitted.column_prefix;
 
 public class Address {
-  private Integer id;
 
-  private String state;
+    private Integer id;
 
-  private String city;
+    private String state;
 
-  private Phone phone1;
+    private String city;
 
-  private Phone phone2;
+    private Phone phone1;
 
-  private boolean hasPhone;
+    private Phone phone2;
 
-  private String stateBird;
+    private boolean hasPhone;
 
-  private Zip zip;
+    private String stateBird;
 
-  public Address(Integer id, String state) {
-    super();
-    this.id = id;
-    this.state = state;
-  }
+    private Zip zip;
 
-  public Integer getId() {
-    return id;
-  }
+    public Address(Integer id, String state) {
+        super();
+        this.id = id;
+        this.state = state;
+    }
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public String getState() {
-    return state;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-  public void setState(String state) {
-    this.state = state;
-  }
+    public String getState() {
+        return state;
+    }
 
-  public String getCity() {
-    return city;
-  }
+    public void setState(String state) {
+        this.state = state;
+    }
 
-  public void setCity(String city) {
-    this.city = city;
-  }
+    public String getCity() {
+        return city;
+    }
 
-  public Phone getPhone1() {
-    return phone1;
-  }
+    public void setCity(String city) {
+        this.city = city;
+    }
 
-  public void setPhone1(Phone phone1) {
-    this.phone1 = phone1;
-  }
+    public Phone getPhone1() {
+        return phone1;
+    }
 
-  public Phone getPhone2() {
-    return phone2;
-  }
+    public void setPhone1(Phone phone1) {
+        this.phone1 = phone1;
+    }
 
-  public void setPhone2(Phone phone2) {
-    this.phone2 = phone2;
-  }
+    public Phone getPhone2() {
+        return phone2;
+    }
 
-  public boolean isHasPhone() {
-    return hasPhone;
-  }
+    public void setPhone2(Phone phone2) {
+        this.phone2 = phone2;
+    }
 
-  public void setHasPhone(boolean hasPhone) {
-    this.hasPhone = hasPhone;
-  }
+    public boolean isHasPhone() {
+        return hasPhone;
+    }
 
-  public String getStateBird() {
-    return stateBird;
-  }
+    public void setHasPhone(boolean hasPhone) {
+        this.hasPhone = hasPhone;
+    }
 
-  public void setStateBird(String stateBird) {
-    this.stateBird = stateBird;
-  }
+    public String getStateBird() {
+        return stateBird;
+    }
 
-  public Zip getZip() {
-    return zip;
-  }
+    public void setStateBird(String stateBird) {
+        this.stateBird = stateBird;
+    }
 
-  public void setZip(Zip zip) {
-    this.zip = zip;
-  }
+    public Zip getZip() {
+        return zip;
+    }
+
+    public void setZip(Zip zip) {
+        this.zip = zip;
+    }
 }

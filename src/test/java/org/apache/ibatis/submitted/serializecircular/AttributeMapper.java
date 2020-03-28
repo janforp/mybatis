@@ -13,9 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.serializecircular;
 
 public interface AttributeMapper {
-  public Attribute getById(Integer anId);
+
+    public Attribute getById(Integer anId);
 }
 

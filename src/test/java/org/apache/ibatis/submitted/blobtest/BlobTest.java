@@ -13,15 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.blobtest;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.Reader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.List;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -31,7 +24,16 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.Reader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class BlobTest {
+
     private static SqlSessionFactory sqlSessionFactory;
 
     @BeforeClass
@@ -62,60 +64,6 @@ public class BlobTest {
         }
     }
 
-    @Test
-    /*
-     * This test demonstrates the use of type aliases for primitive types
-     * in constructor based result maps
-     */
-    public void testInsertBlobThenSelectAll() {
-        SqlSession sqlSession = sqlSessionFactory.openSession();
-        try {
-            BlobMapper blobMapper = sqlSession.getMapper(BlobMapper.class);
-            
-            byte[] myblob = new byte[] {1, 2, 3, 4, 5};
-            BlobRecord blobRecord = new BlobRecord(1, myblob);
-            int rows = blobMapper.insert(blobRecord);
-            assertEquals(1, rows);
-
-            // NPE here due to unresolved type handler
-            List<BlobRecord> results = blobMapper.selectAll();
-
-            assertEquals(1, results.size());
-            BlobRecord result = results.get(0);
-            assertEquals (blobRecord.getId(), result.getId());
-            assertTrue (blobsAreEqual(blobRecord.getBlob(), result.getBlob()));
-        } finally {
-            sqlSession.close();
-        }
-    }
-
-    @Test
-    /*
-     * This test demonstrates the use of type aliases for primitive types
-     * in constructor based result maps
-     */
-    public void testInsertBlobObjectsThenSelectAll() {
-        SqlSession sqlSession = sqlSessionFactory.openSession();
-        try {
-            BlobMapper blobMapper = sqlSession.getMapper(BlobMapper.class);
-
-            Byte[] myblob = new Byte[] {1, 2, 3, 4, 5};
-            BlobRecord blobRecord = new BlobRecord(1, myblob);
-            int rows = blobMapper.insert(blobRecord);
-            assertEquals(1, rows);
-
-            // NPE here due to unresolved type handler
-            List<BlobRecord> results = blobMapper.selectAllWithBlobObjects();
-
-            assertEquals(1, results.size());
-            BlobRecord result = results.get(0);
-            assertEquals (blobRecord.getId(), result.getId());
-            assertTrue (blobsAreEqual(blobRecord.getBlob(), result.getBlob()));
-        } finally {
-            sqlSession.close();
-        }
-    }
-
     public static boolean blobsAreEqual(byte[] blob1, byte[] blob2) {
         if (blob1 == null) {
             return blob2 == null;
@@ -137,5 +85,59 @@ public class BlobTest {
         }
 
         return rc;
+    }
+
+    @Test
+    /*
+     * This test demonstrates the use of type aliases for primitive types
+     * in constructor based result maps
+     */
+    public void testInsertBlobThenSelectAll() {
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            BlobMapper blobMapper = sqlSession.getMapper(BlobMapper.class);
+
+            byte[] myblob = new byte[] { 1, 2, 3, 4, 5 };
+            BlobRecord blobRecord = new BlobRecord(1, myblob);
+            int rows = blobMapper.insert(blobRecord);
+            assertEquals(1, rows);
+
+            // NPE here due to unresolved type handler
+            List<BlobRecord> results = blobMapper.selectAll();
+
+            assertEquals(1, results.size());
+            BlobRecord result = results.get(0);
+            assertEquals(blobRecord.getId(), result.getId());
+            assertTrue(blobsAreEqual(blobRecord.getBlob(), result.getBlob()));
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    /*
+     * This test demonstrates the use of type aliases for primitive types
+     * in constructor based result maps
+     */
+    public void testInsertBlobObjectsThenSelectAll() {
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            BlobMapper blobMapper = sqlSession.getMapper(BlobMapper.class);
+
+            Byte[] myblob = new Byte[] { 1, 2, 3, 4, 5 };
+            BlobRecord blobRecord = new BlobRecord(1, myblob);
+            int rows = blobMapper.insert(blobRecord);
+            assertEquals(1, rows);
+
+            // NPE here due to unresolved type handler
+            List<BlobRecord> results = blobMapper.selectAllWithBlobObjects();
+
+            assertEquals(1, results.size());
+            BlobRecord result = results.get(0);
+            assertEquals(blobRecord.getId(), result.getId());
+            assertTrue(blobsAreEqual(blobRecord.getBlob(), result.getBlob()));
+        } finally {
+            sqlSession.close();
+        }
     }
 }

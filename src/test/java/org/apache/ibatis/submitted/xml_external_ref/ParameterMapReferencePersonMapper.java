@@ -13,8 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.xml_external_ref;
 
 public interface ParameterMapReferencePersonMapper {
-  Person select(Person person);
+
+    Person select(Person person);
 }

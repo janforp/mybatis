@@ -13,35 +13,38 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.automapping;
 
 public class Pet {
 
-  private Integer petId;
-  private String petName;
-  private Breeder breeder;
+    private Integer petId;
 
-  public Integer getPetId() {
-    return petId;
-  }
+    private String petName;
 
-  public void setPetId(Integer petId) {
-    this.petId = petId;
-  }
+    private Breeder breeder;
 
-  public String getPetName() {
-    return petName;
-  }
+    public Integer getPetId() {
+        return petId;
+    }
 
-  public void setPetName(String petName) {
-    this.petName = petName;
-  }
+    public void setPetId(Integer petId) {
+        this.petId = petId;
+    }
 
-  public Breeder getBreeder() {
-    return breeder;
-  }
+    public String getPetName() {
+        return petName;
+    }
 
-  public void setBreeder(Breeder breeder) {
-    this.breeder = breeder;
-  }
+    public void setPetName(String petName) {
+        this.petName = petName;
+    }
+
+    public Breeder getBreeder() {
+        return breeder;
+    }
+
+    public void setBreeder(Breeder breeder) {
+        this.breeder = breeder;
+    }
 }

@@ -13,13 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.domain.misc;
 
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.wrapper.BeanWrapper;
 
 public class CustomBeanWrapper extends BeanWrapper {
-  public CustomBeanWrapper(MetaObject metaObject, Object object) {
-    super(metaObject, object);
-  }
+
+    public CustomBeanWrapper(MetaObject metaObject, Object object) {
+        super(metaObject, object);
+    }
 }

@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.duplicate_resource_loaded;
 
 import java.util.List;
@@ -20,6 +21,6 @@ import java.util.Map;
 
 public interface Mapper {
 
-  List<Map<String, Object>> selectAllBlogs();
+    List<Map<String, Object>> selectAllBlogs();
 
 }

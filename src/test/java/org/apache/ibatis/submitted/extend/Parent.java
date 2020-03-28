@@ -13,17 +13,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.extend;
 
 public class Parent {
 
-  private String myProperty;
+    private String myProperty;
 
-  public String getMyProperty() {
-    return myProperty;
-  }
+    public String getMyProperty() {
+        return myProperty;
+    }
 
-  public void setMyProperty(String myProperty) {
-    this.myProperty = myProperty;
-  }
+    public void setMyProperty(String myProperty) {
+        this.myProperty = myProperty;
+    }
 }

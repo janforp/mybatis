@@ -13,13 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.immutable_constructor;
 
 import org.apache.ibatis.annotations.Param;
 
 public interface ImmutablePOJOMapper {
 
-  public ImmutablePOJO getImmutablePOJO(@Param("pojoID") Integer pojoID);
-  public ImmutablePOJO getImmutablePOJONoMatchingConstructor(@Param("pojoID") Integer pojoID);
+    public ImmutablePOJO getImmutablePOJO(@Param("pojoID") Integer pojoID);
+
+    public ImmutablePOJO getImmutablePOJONoMatchingConstructor(@Param("pojoID") Integer pojoID);
 
 }

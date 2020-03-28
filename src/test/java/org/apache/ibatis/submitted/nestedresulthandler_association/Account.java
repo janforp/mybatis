@@ -19,43 +19,44 @@ package org.apache.ibatis.submitted.nestedresulthandler_association;
 import java.util.Date;
 
 public class Account {
-  private String accountUuid;
 
-  private String accountName;
+    private String accountUuid;
 
-  private Date birthDate;
+    private String accountName;
 
-  private AccountAddress address;
+    private Date birthDate;
 
-  public String getAccountUuid() {
-    return accountUuid;
-  }
+    private AccountAddress address;
 
-  public void setAccountUuid(String accountUuid) {
-    this.accountUuid = accountUuid;
-  }
+    public String getAccountUuid() {
+        return accountUuid;
+    }
 
-  public String getAccountName() {
-    return accountName;
-  }
+    public void setAccountUuid(String accountUuid) {
+        this.accountUuid = accountUuid;
+    }
 
-  public void setAccountName(String accountName) {
-    this.accountName = accountName;
-  }
+    public String getAccountName() {
+        return accountName;
+    }
 
-  public Date getBirthDate() {
-    return birthDate;
-  }
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
+    }
 
-  public void setBirthDate(Date birthDate) {
-    this.birthDate = birthDate;
-  }
+    public Date getBirthDate() {
+        return birthDate;
+    }
 
-  public AccountAddress getAddress() {
-    return address;
-  }
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
 
-  public void setAddress(AccountAddress address) {
-    this.address = address;
-  }
+    public AccountAddress getAddress() {
+        return address;
+    }
+
+    public void setAddress(AccountAddress address) {
+        this.address = address;
+    }
 }

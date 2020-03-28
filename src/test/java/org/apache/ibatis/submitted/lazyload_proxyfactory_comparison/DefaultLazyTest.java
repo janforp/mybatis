@@ -13,13 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.lazyload_proxyfactory_comparison;
 
+public class DefaultLazyTest
+        extends AbstractLazyTest {
 
-public class DefaultLazyTest 
-extends AbstractLazyTest {
-  @Override
-  protected String getConfiguration() {
-    return "default";
-  }
+    @Override
+    protected String getConfiguration() {
+        return "default";
+    }
 }

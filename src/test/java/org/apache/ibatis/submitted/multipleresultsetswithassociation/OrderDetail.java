@@ -13,54 +13,58 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.multipleresultsetswithassociation;
 
 public class OrderDetail {
 
-  private int orderId;
-  private int lineNumber;
-  private int quantity;
-  private String itemDescription;
-  
-  private OrderHeader orderHeader;
+    private int orderId;
 
-  public int getOrderId() {
-    return orderId;
-  }
+    private int lineNumber;
 
-  public void setOrderId(int orderId) {
-    this.orderId = orderId;
-  }
+    private int quantity;
 
-  public int getLineNumber() {
-    return lineNumber;
-  }
+    private String itemDescription;
 
-  public void setLineNumber(int lineNumber) {
-    this.lineNumber = lineNumber;
-  }
+    private OrderHeader orderHeader;
 
-  public int getQuantity() {
-    return quantity;
-  }
+    public int getOrderId() {
+        return orderId;
+    }
 
-  public void setQuantity(int quantity) {
-    this.quantity = quantity;
-  }
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
+    }
 
-  public String getItemDescription() {
-    return itemDescription;
-  }
+    public int getLineNumber() {
+        return lineNumber;
+    }
 
-  public void setItemDescription(String itemDescription) {
-    this.itemDescription = itemDescription;
-  }
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
+    }
 
-  public OrderHeader getOrderHeader() {
-      return orderHeader;
-  }
+    public int getQuantity() {
+        return quantity;
+    }
 
-  public void setOrderHeader(OrderHeader orderHeader) {
-      this.orderHeader = orderHeader;
-  }
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getItemDescription() {
+        return itemDescription;
+    }
+
+    public void setItemDescription(String itemDescription) {
+        this.itemDescription = itemDescription;
+    }
+
+    public OrderHeader getOrderHeader() {
+        return orderHeader;
+    }
+
+    public void setOrderHeader(OrderHeader orderHeader) {
+        this.orderHeader = orderHeader;
+    }
 }

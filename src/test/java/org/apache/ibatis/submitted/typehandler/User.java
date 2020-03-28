@@ -13,44 +13,48 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.typehandler;
 
 public class User {
 
-  private Integer id;
-  private String name;
-  private String city;
-  private String state;
+    private Integer id;
 
-  public Integer getId() {
-    return id;
-  }
+    private String name;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    private String city;
 
-  public String getName() {
-    return name;
-  }
+    private String state;
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public String getCity() {
-    return city;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-  public void setCity(String city) {
-    this.city = city;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getState() {
-    return state;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public void setState(String state) {
-    this.state = state;
-  }
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
 }

@@ -13,16 +13,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.missing_id_property;
 
 public class Part {
 
-  private String name;
-  
-  public Part(String name) {
-    this.name = name;
-  }
-  public String getName() {
-    return name;
-  }
+    private String name;
+
+    public Part(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

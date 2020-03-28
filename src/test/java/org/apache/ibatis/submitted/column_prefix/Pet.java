@@ -17,33 +17,34 @@
 package org.apache.ibatis.submitted.column_prefix;
 
 public class Pet {
-  private Integer id;
 
-  private String name;
+    private Integer id;
 
-  private Room room;
+    private String name;
 
-  public Integer getId() {
-    return id;
-  }
+    private Room room;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public Room getRoom() {
-    return room;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public void setRoom(Room room) {
-    this.room = room;
-  }
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
 }

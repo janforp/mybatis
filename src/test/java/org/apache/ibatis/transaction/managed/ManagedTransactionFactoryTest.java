@@ -13,14 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.transaction.managed;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-
-import java.sql.Connection;
-import java.util.Properties;
 
 import org.apache.ibatis.BaseDataTest;
 import org.apache.ibatis.transaction.Transaction;
@@ -30,36 +24,43 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.sql.Connection;
+import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+
 @RunWith(MockitoJUnitRunner.class)
 public class ManagedTransactionFactoryTest extends BaseDataTest {
 
-  @Mock
-  private Connection conn;
+    @Mock
+    private Connection conn;
 
-  @Test
-  public void shouldEnsureThatCallsToManagedTransactionAPIDoNotForwardToManagedConnections() throws Exception {
-    TransactionFactory tf = new ManagedTransactionFactory();
-    tf.setProperties(new Properties());
-    Transaction tx = tf.newTransaction(conn);
-    assertEquals(conn, tx.getConnection());
-    tx.commit();
-    tx.rollback();
-    tx.close();
-    verify(conn).close();
-  }
+    @Test
+    public void shouldEnsureThatCallsToManagedTransactionAPIDoNotForwardToManagedConnections() throws Exception {
+        TransactionFactory tf = new ManagedTransactionFactory();
+        tf.setProperties(new Properties());
+        Transaction tx = tf.newTransaction(conn);
+        assertEquals(conn, tx.getConnection());
+        tx.commit();
+        tx.rollback();
+        tx.close();
+        verify(conn).close();
+    }
 
-  @Test
-  public void shouldEnsureThatCallsToManagedTransactionAPIDoNotForwardToManagedConnectionsAndDoesNotCloseConnection() throws Exception {
-    TransactionFactory tf = new ManagedTransactionFactory();
-    Properties props = new Properties();
-    props.setProperty("closeConnection", "false");
-    tf.setProperties(props);
-    Transaction tx = tf.newTransaction(conn);
-    assertEquals(conn, tx.getConnection());
-    tx.commit();
-    tx.rollback();
-    tx.close();
-    verifyNoMoreInteractions(conn);
-  }
+    @Test
+    public void shouldEnsureThatCallsToManagedTransactionAPIDoNotForwardToManagedConnectionsAndDoesNotCloseConnection() throws Exception {
+        TransactionFactory tf = new ManagedTransactionFactory();
+        Properties props = new Properties();
+        props.setProperty("closeConnection", "false");
+        tf.setProperties(props);
+        Transaction tx = tf.newTransaction(conn);
+        assertEquals(conn, tx.getConnection());
+        tx.commit();
+        tx.rollback();
+        tx.close();
+        verifyNoMoreInteractions(conn);
+    }
 
 }

@@ -13,13 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.nested;
+
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.annotations.Param;
-
 public interface Mapper {
-  List<Map<String, Object>> simpleSelectWithMapperAndPrimitives(@Param("ids") int... values);
+
+    List<Map<String, Object>> simpleSelectWithMapperAndPrimitives(@Param("ids") int... values);
 }

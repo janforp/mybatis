@@ -13,16 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.foreach;
 
 import java.util.List;
 
 public interface Mapper {
 
-  User getUser(User user);
+    User getUser(User user);
 
-  int countByUserList(List<User> users);
+    int countByUserList(List<User> users);
 
-  int countByBestFriend(List<User> users);
+    int countByBestFriend(List<User> users);
 
 }

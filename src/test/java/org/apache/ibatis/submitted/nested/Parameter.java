@@ -13,23 +13,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.nested;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Parameter {
-  private List<Name> names;
 
-  public Parameter() {
-    names = new ArrayList<Name>();
-  }
+    private List<Name> names;
 
-  public List<Name> getNames() {
-    return names;
-  }
+    public Parameter() {
+        names = new ArrayList<Name>();
+    }
 
-  public void addName(Name name) {
-    names.add(name);
-  }
+    public List<Name> getNames() {
+        return names;
+    }
+
+    public void addName(Name name) {
+        names.add(name);
+    }
 }

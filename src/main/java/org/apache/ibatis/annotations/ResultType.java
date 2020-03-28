@@ -1,4 +1,3 @@
-
 package org.apache.ibatis.annotations;
 
 import java.lang.annotation.ElementType;
@@ -11,12 +10,13 @@ import java.lang.annotation.Target;
  * ResultHandler.  Those methods must have void return type, so
  * this annotation can be used to tell MyBatis what kind of object
  * it should build for each row.
- * 
- * @since 3.2.0
+ *
  * @author Jeff Butler
+ * @since 3.2.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface ResultType {
-  Class<?> value();
+
+    Class<?> value();
 }

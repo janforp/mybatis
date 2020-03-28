@@ -13,62 +13,65 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.domain.jpetstore;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-
 public class CartItem implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private Item item;
-  private int quantity;
-  private boolean inStock;
-  private BigDecimal total;
+    private Item item;
 
-  public boolean isInStock() {
-    return inStock;
-  }
+    private int quantity;
 
-  public void setInStock(boolean inStock) {
-    this.inStock = inStock;
-  }
+    private boolean inStock;
 
-  public BigDecimal getTotal() {
-    return total;
-  }
+    private BigDecimal total;
 
-  public Item getItem() {
-    return item;
-  }
-
-  public void setItem(Item item) {
-    this.item = item;
-    calculateTotal();
-  }
-
-  public int getQuantity() {
-    return quantity;
-  }
-
-  public void setQuantity(int quantity) {
-    this.quantity = quantity;
-    calculateTotal();
-  }
-
-  public void incrementQuantity() {
-    quantity++;
-    calculateTotal();
-  }
-
-  private void calculateTotal() {
-    if (item != null && item.getListPrice() != null) {
-      total = item.getListPrice().multiply(new BigDecimal(quantity));
-    } else {
-      total = null;
+    public boolean isInStock() {
+        return inStock;
     }
-  }
+
+    public void setInStock(boolean inStock) {
+        this.inStock = inStock;
+    }
+
+    public BigDecimal getTotal() {
+        return total;
+    }
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
+        calculateTotal();
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+        calculateTotal();
+    }
+
+    public void incrementQuantity() {
+        quantity++;
+        calculateTotal();
+    }
+
+    private void calculateTotal() {
+        if (item != null && item.getListPrice() != null) {
+            total = item.getListPrice().multiply(new BigDecimal(quantity));
+        } else {
+            total = null;
+        }
+    }
 
 }

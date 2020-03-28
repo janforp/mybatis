@@ -13,16 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.submitted.blocking_cache;
 
-import java.util.List;
+package org.apache.ibatis.submitted.blocking_cache;
 
 import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.Select;
 
-@CacheNamespace(blocking=true)
+import java.util.List;
+
+@CacheNamespace(blocking = true)
 public interface PersonMapper {
 
-  @Select("select id, firstname, lastname from person")
-  public List<Person> findAll();
+    @Select("select id, firstname, lastname from person")
+    public List<Person> findAll();
 }

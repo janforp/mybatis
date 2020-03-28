@@ -13,13 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.domain.blog.mappers;
 
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.session.ResultHandler;
 
 public interface AuthorMapperWithMultipleHandlers {
-  @Select("select id, username, password, email, bio, favourite_section from author where id = #{id}")
-  void selectAuthor(int id, ResultHandler handler1, ResultHandler handler2);
+
+    @Select("select id, username, password, email, bio, favourite_section from author where id = #{id}")
+    void selectAuthor(int id, ResultHandler handler1, ResultHandler handler2);
 
 }

@@ -13,13 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.rounding;
 
 public interface Mapper {
 
-  User getUser(Integer id);
-  void insert(User user);
-  User getUser2(Integer id);
-  void insert2(User user);
+    User getUser(Integer id);
+
+    void insert(User user);
+
+    User getUser2(Integer id);
+
+    void insert2(User user);
 
 }

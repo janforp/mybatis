@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.ibatis.submitted.custom_collection_handling;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 public class CustomCollection<T> {
-    
+
     private List<T> data = new ArrayList<T>();
 
     public <K> K[] toArray(K[] a) {
@@ -92,8 +97,10 @@ public class CustomCollection<T> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof CustomCollection)) return false;
-        return data.equals(((CustomCollection)o).data);
+        if (!(o instanceof CustomCollection)) {
+            return false;
+        }
+        return data.equals(((CustomCollection) o).data);
     }
 
     public boolean containsAll(Collection<?> c) {
@@ -123,5 +130,5 @@ public class CustomCollection<T> {
     public boolean add(T e) {
         return data.add(e);
     }
-    
+
 }

@@ -13,15 +13,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.global_variables;
 
 import org.apache.ibatis.annotations.Select;
 
 public interface Mapper {
 
-  User getUser(Integer id);
-  
-  @Select("select * from ${table} where id = #{id}")
-  User getUserFromAnnotation(Integer id);
+    User getUser(Integer id);
+
+    @Select("select * from ${table} where id = #{id}")
+    User getUserFromAnnotation(Integer id);
 
 }

@@ -30,7 +30,7 @@ public final class PropertyNamer {
         //如果大于1个字母，第二个字母非大写-->转为小写
         //String uRL -->String getuRL() {
         if (methodName.length() == 1 || (methodName.length() > 1 && !Character.isUpperCase(methodName.charAt(1)))) {
-            methodName = methodName.substring(0, 1).toLowerCase(Locale.ENGLISH) + methodName.substring(1);
+            methodName = methodName.substring(0, 1).toLowerCase(Locale.ENGLISH) + methodName.substring(1);//RichMap -> richMap
         }
         return methodName;
     }

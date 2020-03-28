@@ -13,46 +13,49 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.parent_reference_3level;
 
 import java.util.List;
 
 public class Blog {
 
-  private int id;
-  private String title;
-  private List<Post> posts;
+    private int id;
 
-  public Blog() {
-  }
+    private String title;
 
-  public int getId() {
-    return id;
-  }
+    private List<Post> posts;
 
-  public void setId(int id) {    
-    this.id = id;
-  }
-
-  public String getTitle() {
-    return title;
-  }
-
-  public void setTitle(String title) {
-    if (this.title != null) {
-      throw new RuntimeException("Setter called twice");
+    public Blog() {
     }
-    this.title = title;
-  }
 
-  public List<Post> getPosts() {
-    return posts;
-  }
-
-  public void setPosts(List<Post> posts) {
-    if (this.posts != null) {
-      throw new RuntimeException("Setter called twice");
+    public int getId() {
+        return id;
     }
-    this.posts = posts;
-  }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        if (this.title != null) {
+            throw new RuntimeException("Setter called twice");
+        }
+        this.title = title;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        if (this.posts != null) {
+            throw new RuntimeException("Setter called twice");
+        }
+        this.posts = posts;
+    }
 }

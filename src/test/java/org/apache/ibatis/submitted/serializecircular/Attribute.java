@@ -13,21 +13,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.serializecircular;
 
 import java.io.Serializable;
 
 public class Attribute implements Serializable {
-  private static final long serialVersionUID = 1L;
-  
-  private Integer id;
 
-  public Integer getId() {
-    return id;
-  }
+    private static final long serialVersionUID = 1L;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    private Integer id;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
 }

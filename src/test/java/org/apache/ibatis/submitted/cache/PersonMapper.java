@@ -13,24 +13,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.submitted.cache;
 
-import java.util.List;
+package org.apache.ibatis.submitted.cache;
 
 import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @CacheNamespace
 public interface PersonMapper {
 
-  @Insert("insert into person (id, firstname, lastname) values (#{id}, #{firstname}, #{lastname})")
-  public void create(Person person);
+    @Insert("insert into person (id, firstname, lastname) values (#{id}, #{firstname}, #{lastname})")
+    public void create(Person person);
 
-  @Delete("delete from person where id = #{id}")
-  public void delete(int id);
+    @Delete("delete from person where id = #{id}")
+    public void delete(int id);
 
-  @Select("select id, firstname, lastname from person")
-  public List<Person> findAll();
+    @Select("select id, firstname, lastname from person")
+    public List<Person> findAll();
 }

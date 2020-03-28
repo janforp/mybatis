@@ -1,5 +1,3 @@
-
-
 package org.apache.ibatis.builder.xml;
 
 import org.apache.ibatis.builder.IncompleteElementException;

@@ -13,35 +13,37 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.initialized_collection_property;
 
 public class Post {
 
-  private int id;
-  private String content;
+    private int id;
 
-  public Post() {
-  }
+    private String content;
 
-  public Post(int id, String content) {
-    this.id = id;
-    this.content = content;
-  }
+    public Post() {
+    }
 
-  public int getId() {
-    return id;
-  }
+    public Post(int id, String content) {
+        this.id = id;
+        this.content = content;
+    }
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public String getContent() {
-    return content;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public void setContent(String content) {
-    this.content = content;
-  }
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 
 }

@@ -33,15 +33,15 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Reflector {
 
-    /**
-     * 是否开启 class 缓存
-     */
-    private static boolean classCacheEnabled = true;
-
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     //这里用ConcurrentHashMap，多线程支持，作为一个缓存
     private static final Map<Class<?>, Reflector> REFLECTOR_MAP = new ConcurrentHashMap<Class<?>, Reflector>();
+
+    /**
+     * 是否开启 class 缓存
+     */
+    private static boolean classCacheEnabled = true;
 
     /**
      * 每一个class都有一个Reflector
@@ -92,6 +92,50 @@ public class Reflector {
         }
     }
 
+    private static boolean canAccessPrivateMethods() {
+        try {
+            SecurityManager securityManager = System.getSecurityManager();
+            if (null != securityManager) {
+                securityManager.checkPermission(new ReflectPermission("suppressAccessChecks"));
+            }
+        } catch (SecurityException e) {
+            return false;
+        }
+        return true;
+    }
+
+    /*
+     * Gets an instance of ClassInfo for the specified class.
+     * 得到某个类的反射器，是静态方法，而且要缓存，又要多线程，所以REFLECTOR_MAP是一个ConcurrentHashMap
+     *
+     * @param clazz The class for which to lookup the method cache.
+     * @return The method cache for the class
+     */
+    public static Reflector forClass(Class<?> clazz) {
+        //如果开启来缓存，则先走缓存逻辑
+        if (classCacheEnabled) {
+            // synchronized (clazz) removed see issue #461
+            //对于每个类来说，我们假设它是不会变的，这样可以考虑将这个类的信息(构造函数，getter,setter,字段)加入缓存，以提高速度
+            Reflector cached = REFLECTOR_MAP.get(clazz);
+            if (cached == null) {
+                cached = new Reflector(clazz);
+                REFLECTOR_MAP.put(clazz, cached);
+            }
+            return cached;
+        } else {
+            //如果关闭来缓存，则每次都创建一个新实例
+            return new Reflector(clazz);
+        }
+    }
+
+    public static boolean isClassCacheEnabled() {
+        return classCacheEnabled;
+    }
+
+    public static void setClassCacheEnabled(boolean classCacheEnabled) {
+        Reflector.classCacheEnabled = classCacheEnabled;
+    }
+
     private void addDefaultConstructor(Class<?> clazz) {
         Constructor<?>[] constructors = clazz.getDeclaredConstructors();
         for (Constructor<?> constructor : constructors) {
@@ -136,6 +180,7 @@ public class Reflector {
 
     /**
      * 解决冲突
+     *
      * @param conflictingGetters key:属性名称,value:该属性对应的所有get方法集合
      */
     private void resolveGetterConflicts(Map<String, List<Method>> conflictingGetters) {
@@ -386,18 +431,6 @@ public class Reflector {
         return stringBuilder.toString();
     }
 
-    private static boolean canAccessPrivateMethods() {
-        try {
-            SecurityManager securityManager = System.getSecurityManager();
-            if (null != securityManager) {
-                securityManager.checkPermission(new ReflectPermission("suppressAccessChecks"));
-            }
-        } catch (SecurityException e) {
-            return false;
-        }
-        return true;
-    }
-
     /*
      * Gets the name of the class the instance provides information for
      *
@@ -503,37 +536,5 @@ public class Reflector {
 
     public String findPropertyName(String name) {
         return caseInsensitivePropertyMap.get(name.toUpperCase(Locale.ENGLISH));
-    }
-
-    /*
-     * Gets an instance of ClassInfo for the specified class.
-     * 得到某个类的反射器，是静态方法，而且要缓存，又要多线程，所以REFLECTOR_MAP是一个ConcurrentHashMap
-     *
-     * @param clazz The class for which to lookup the method cache.
-     * @return The method cache for the class
-     */
-    public static Reflector forClass(Class<?> clazz) {
-        //如果开启来缓存，则先走缓存逻辑
-        if (classCacheEnabled) {
-            // synchronized (clazz) removed see issue #461
-            //对于每个类来说，我们假设它是不会变的，这样可以考虑将这个类的信息(构造函数，getter,setter,字段)加入缓存，以提高速度
-            Reflector cached = REFLECTOR_MAP.get(clazz);
-            if (cached == null) {
-                cached = new Reflector(clazz);
-                REFLECTOR_MAP.put(clazz, cached);
-            }
-            return cached;
-        } else {
-            //如果关闭来缓存，则每次都创建一个新实例
-            return new Reflector(clazz);
-        }
-    }
-
-    public static void setClassCacheEnabled(boolean classCacheEnabled) {
-        Reflector.classCacheEnabled = classCacheEnabled;
-    }
-
-    public static boolean isClassCacheEnabled() {
-        return classCacheEnabled;
     }
 }

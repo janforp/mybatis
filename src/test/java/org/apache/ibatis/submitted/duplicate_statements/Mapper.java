@@ -13,14 +13,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.submitted.duplicate_statements;
 
-import java.util.List;
+package org.apache.ibatis.submitted.duplicate_statements;
 
 import org.apache.ibatis.session.RowBounds;
 
+import java.util.List;
+
 public interface Mapper {
 
-  List<User> getAllUsers();
-  List<User> getAllUsers(RowBounds rowBounds);
+    List<User> getAllUsers();
+
+    List<User> getAllUsers(RowBounds rowBounds);
 }

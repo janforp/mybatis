@@ -13,50 +13,52 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.xml_external_ref;
 
 import java.io.Serializable;
 
 public class Pet implements Serializable {
-  private static final long serialVersionUID = 1L;
 
-  private Integer id;
+    private static final long serialVersionUID = 1L;
 
-  private Integer ownerId;
+    private Integer id;
 
-  private String name;
+    private Integer ownerId;
 
-  private Person owner;
+    private String name;
 
-  public Integer getId() {
-    return id;
-  }
+    private Person owner;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public Integer getOwnerId() {
-    return ownerId;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-  public void setOwnerId(Integer ownerId) {
-    this.ownerId = ownerId;
-  }
+    public Integer getOwnerId() {
+        return ownerId;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public void setOwnerId(Integer ownerId) {
+        this.ownerId = ownerId;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public Person getOwner() {
-    return owner;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public void setOwner(Person owner) {
-    this.owner = owner;
-  }
+    public Person getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Person owner) {
+        this.owner = owner;
+    }
 }

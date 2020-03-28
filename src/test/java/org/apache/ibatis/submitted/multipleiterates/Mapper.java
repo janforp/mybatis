@@ -13,12 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.multipleiterates;
 
 public interface Mapper {
 
-  User getUser(Integer id);
+    User getUser(Integer id);
 
-  void insertUser(User user);
+    void insertUser(User user);
 
 }

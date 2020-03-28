@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.ibatis.submitted.custom_collection_handling;
 
 public class Contact {
-    
+
     private Integer id;
+
     private String address;
+
     private String phone;
 
     public String getAddress() {
@@ -43,6 +46,6 @@ public class Contact {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }    
-    
+    }
+
 }

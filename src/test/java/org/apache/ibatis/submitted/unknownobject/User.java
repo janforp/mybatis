@@ -13,35 +13,38 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.unknownobject;
 
 public class User {
 
-  private Integer id;
-  private String name;
-  private UnknownObject unknownObject;
+    private Integer id;
 
-  public UnknownObject getUnknownObject() {
-    return unknownObject;
-  }
+    private String name;
 
-  public void setUnknownObject(UnknownObject unknownObject) {
-    this.unknownObject = unknownObject;
-  }
+    private UnknownObject unknownObject;
 
-  public Integer getId() {
-    return id;
-  }
+    public UnknownObject getUnknownObject() {
+        return unknownObject;
+    }
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    public void setUnknownObject(UnknownObject unknownObject) {
+        this.unknownObject = unknownObject;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

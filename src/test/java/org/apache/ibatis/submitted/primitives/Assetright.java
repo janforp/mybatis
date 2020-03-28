@@ -13,38 +13,41 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.primitives;
 
 import java.util.List;
 
 public class Assetright {
 
-  private Integer id;
-  private String name;
-  private List<Long> values;
+    private Integer id;
 
-  public Integer getId() {
-    return id;
-  }
+    private String name;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    private List<Long> values;
 
-  public String getName() {
-    return name;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-  public List<Long> getValues() {
-    return values;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setValues(List<Long> values) {
-    this.values = values;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<Long> getValues() {
+        return values;
+    }
+
+    public void setValues(List<Long> values) {
+        this.values = values;
+    }
 
 }

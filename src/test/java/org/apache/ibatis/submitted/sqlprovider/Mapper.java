@@ -13,16 +13,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.submitted.sqlprovider;
 
-import java.util.List;
+package org.apache.ibatis.submitted.sqlprovider;
 
 import org.apache.ibatis.annotations.SelectProvider;
 
-public interface Mapper {
-  @SelectProvider(type = OurSqlBuilder.class, method = "buildGetUsersQuery")
-  List<User> getUsers(List<Integer> allFilterIds);
+import java.util.List;
 
-  @SelectProvider(type = OurSqlBuilder.class, method = "buildGetUserQuery")
-  User getUser(Integer userId);
+public interface Mapper {
+
+    @SelectProvider(type = OurSqlBuilder.class, method = "buildGetUsersQuery")
+    List<User> getUsers(List<Integer> allFilterIds);
+
+    @SelectProvider(type = OurSqlBuilder.class, method = "buildGetUserQuery")
+    User getUser(Integer userId);
 }

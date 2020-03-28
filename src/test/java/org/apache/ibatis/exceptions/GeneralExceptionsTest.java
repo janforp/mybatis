@@ -13,12 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.exceptions;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.lang.reflect.InvocationTargetException;
 
 import org.apache.ibatis.binding.BindingException;
 import org.apache.ibatis.builder.BuilderException;
@@ -35,60 +31,66 @@ import org.apache.ibatis.transaction.TransactionException;
 import org.apache.ibatis.type.TypeException;
 import org.junit.Test;
 
+import java.lang.reflect.InvocationTargetException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class GeneralExceptionsTest {
 
-  private static final String EXPECTED_MESSAGE = "Test Message";
-  private static final Exception EXPECTED_CAUSE = new Exception("Nested Exception");
+    private static final String EXPECTED_MESSAGE = "Test Message";
 
-  @Test
-  public void should() {
-    RuntimeException thrown = ExceptionFactory.wrapException(EXPECTED_MESSAGE, EXPECTED_CAUSE);
-    assertTrue("Exception should be wrapped in RuntimeSqlException.", thrown instanceof PersistenceException);
-    testThrowException(thrown);
-  }
+    private static final Exception EXPECTED_CAUSE = new Exception("Nested Exception");
 
-  @Test
-  public void shouldInstantiateAndThrowAllCustomExceptions() throws Exception {
-    Class<?>[] exceptionTypes = {
-        BindingException.class,
-        CacheException.class,
-        DataSourceException.class,
-        ExecutorException.class,
-        LogException.class,
-        ParsingException.class,
-        BuilderException.class,
-        PluginException.class,
-        ReflectionException.class,
-        PersistenceException.class,
-        SqlSessionException.class,
-        TransactionException.class,
-        TypeException.class, 
-        ScriptingException.class
-    };
-    for (Class<?> exceptionType : exceptionTypes) {
-      testExceptionConstructors(exceptionType);
+    @Test
+    public void should() {
+        RuntimeException thrown = ExceptionFactory.wrapException(EXPECTED_MESSAGE, EXPECTED_CAUSE);
+        assertTrue("Exception should be wrapped in RuntimeSqlException.", thrown instanceof PersistenceException);
+        testThrowException(thrown);
     }
 
-  }
+    @Test
+    public void shouldInstantiateAndThrowAllCustomExceptions() throws Exception {
+        Class<?>[] exceptionTypes = {
+                BindingException.class,
+                CacheException.class,
+                DataSourceException.class,
+                ExecutorException.class,
+                LogException.class,
+                ParsingException.class,
+                BuilderException.class,
+                PluginException.class,
+                ReflectionException.class,
+                PersistenceException.class,
+                SqlSessionException.class,
+                TransactionException.class,
+                TypeException.class,
+                ScriptingException.class
+        };
+        for (Class<?> exceptionType : exceptionTypes) {
+            testExceptionConstructors(exceptionType);
+        }
 
-  private void testExceptionConstructors(Class<?> exceptionType) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    Exception e = (Exception) exceptionType.newInstance();
-    testThrowException(e);
-    e = (Exception) exceptionType.getConstructor(String.class).newInstance(EXPECTED_MESSAGE);
-    testThrowException(e);
-    e = (Exception) exceptionType.getConstructor(String.class, Throwable.class).newInstance(EXPECTED_MESSAGE, EXPECTED_CAUSE);
-    testThrowException(e);
-    e = (Exception) exceptionType.getConstructor(Throwable.class).newInstance(EXPECTED_CAUSE);
-    testThrowException(e);
-  }
-
-  private void testThrowException(Exception thrown) {
-    try {
-      throw thrown;
-    } catch (Exception caught) {
-      assertEquals(thrown.getMessage(), caught.getMessage());
-      assertEquals(thrown.getCause(), caught.getCause());
     }
-  }
+
+    private void testExceptionConstructors(Class<?> exceptionType) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        Exception e = (Exception) exceptionType.newInstance();
+        testThrowException(e);
+        e = (Exception) exceptionType.getConstructor(String.class).newInstance(EXPECTED_MESSAGE);
+        testThrowException(e);
+        e = (Exception) exceptionType.getConstructor(String.class, Throwable.class).newInstance(EXPECTED_MESSAGE, EXPECTED_CAUSE);
+        testThrowException(e);
+        e = (Exception) exceptionType.getConstructor(Throwable.class).newInstance(EXPECTED_CAUSE);
+        testThrowException(e);
+    }
+
+    private void testThrowException(Exception thrown) {
+        try {
+            throw thrown;
+        } catch (Exception caught) {
+            assertEquals(thrown.getMessage(), caught.getMessage());
+            assertEquals(thrown.getCause(), caught.getCause());
+        }
+    }
 
 }

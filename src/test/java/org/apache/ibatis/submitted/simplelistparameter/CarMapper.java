@@ -13,14 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.submitted.simplelistparameter;
 
-import java.util.List;
+package org.apache.ibatis.submitted.simplelistparameter;
 
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 public interface CarMapper {
 
-  @Select({ "select name from car where doors = #{doors[1]}" })
-  List<Car> getCar(Car car);
+    @Select({ "select name from car where doors = #{doors[1]}" })
+    List<Car> getCar(Car car);
 }

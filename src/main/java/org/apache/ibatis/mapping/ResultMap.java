@@ -35,9 +35,9 @@ import java.util.Set;
  * MyBatis 中最重要最强大的元素
  *
  * <resultMap id="BaseResultMap" type="cn.com.janita.employeecore.dao.account.dataobj.AccountLastChooseDO">
- *     <result column="account_id" property="accountId" jdbcType="VARCHAR"/>
- *     <result column="customer_id" property="customerId" jdbcType="BIGINT"/>
- *     <result column="dept_id" property="deptId" jdbcType="INTEGER"/>
+ * <result column="account_id" property="accountId" jdbcType="VARCHAR"/>
+ * <result column="customer_id" property="customerId" jdbcType="BIGINT"/>
+ * <result column="dept_id" property="deptId" jdbcType="INTEGER"/>
  * </resultMap>
  *
  * @author Clinton Begin
@@ -67,6 +67,54 @@ public class ResultMap {
     private Boolean autoMapping;
 
     private ResultMap() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public boolean hasNestedResultMaps() {
+        return hasNestedResultMaps;
+    }
+
+    public boolean hasNestedQueries() {
+        return hasNestedQueries;
+    }
+
+    public Class<?> getType() {
+        return type;
+    }
+
+    public List<ResultMapping> getResultMappings() {
+        return resultMappings;
+    }
+
+    public List<ResultMapping> getConstructorResultMappings() {
+        return constructorResultMappings;
+    }
+
+    public List<ResultMapping> getPropertyResultMappings() {
+        return propertyResultMappings;
+    }
+
+    public List<ResultMapping> getIdResultMappings() {
+        return idResultMappings;
+    }
+
+    public Set<String> getMappedColumns() {
+        return mappedColumns;
+    }
+
+    public Discriminator getDiscriminator() {
+        return discriminator;
+    }
+
+    public void forceNestedResultMaps() {
+        hasNestedResultMaps = true;
+    }
+
+    public Boolean getAutoMapping() {
+        return autoMapping;
     }
 
     //静态内部类，建造者模式
@@ -136,54 +184,6 @@ public class ResultMap {
             resultMap.mappedColumns = Collections.unmodifiableSet(resultMap.mappedColumns);
             return resultMap;
         }
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public boolean hasNestedResultMaps() {
-        return hasNestedResultMaps;
-    }
-
-    public boolean hasNestedQueries() {
-        return hasNestedQueries;
-    }
-
-    public Class<?> getType() {
-        return type;
-    }
-
-    public List<ResultMapping> getResultMappings() {
-        return resultMappings;
-    }
-
-    public List<ResultMapping> getConstructorResultMappings() {
-        return constructorResultMappings;
-    }
-
-    public List<ResultMapping> getPropertyResultMappings() {
-        return propertyResultMappings;
-    }
-
-    public List<ResultMapping> getIdResultMappings() {
-        return idResultMappings;
-    }
-
-    public Set<String> getMappedColumns() {
-        return mappedColumns;
-    }
-
-    public Discriminator getDiscriminator() {
-        return discriminator;
-    }
-
-    public void forceNestedResultMaps() {
-        hasNestedResultMaps = true;
-    }
-
-    public Boolean getAutoMapping() {
-        return autoMapping;
     }
 
 }

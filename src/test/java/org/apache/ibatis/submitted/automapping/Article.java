@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.ibatis.submitted.automapping;
 
 public class Article {
-  public final Integer version=0; 
+
+    public final Integer version = 0;
 }

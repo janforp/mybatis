@@ -13,34 +13,38 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.extends_with_constructor;
 
 public class Student {
-  private int id;
-  private int name;
-  private Teacher teacher;
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    private int id;
 
-  public int getId() {
-    return id;
-  }
+    private int name;
 
-  public int getName() {
-    return name;
-  }
+    private Teacher teacher;
 
-  public void setName(int name) {
-    this.name = name;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public Teacher getTeacher() {
-    return teacher;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public void setTeacher(Teacher teacher) {
-    this.teacher = teacher;
-  }
+    public int getName() {
+        return name;
+    }
+
+    public void setName(int name) {
+        this.name = name;
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
+    }
 }

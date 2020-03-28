@@ -13,10 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.domain.blog;
 
 public class PostLite {
+
     private PostLiteId theId;
+
     private int blogId;
 
     public PostLite() {
@@ -27,20 +30,20 @@ public class PostLite {
         theId = aId;
     }
 
-    public void setId(PostLiteId aId) {
-        theId = aId;
-    }
-
-    public void setBlogId(int aBlogId) {
-        blogId = aBlogId;
-    }
-
     public PostLiteId getId() {
         return theId;
     }
 
+    public void setId(PostLiteId aId) {
+        theId = aId;
+    }
+
     public int getBlogId() {
         return blogId;
+    }
+
+    public void setBlogId(int aBlogId) {
+        blogId = aBlogId;
     }
 
     @Override

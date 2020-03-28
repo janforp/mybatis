@@ -13,45 +13,50 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.sptests;
 
 import java.util.List;
 
 public class Name {
-  private Integer id;
-  private String firstName;
-  private String lastName;
-  private List<Item> items;
 
-  public List<Item> getItems() {
-    return items;
-  }
+    private Integer id;
 
-  public void setItems(List<Item> items) {
-    this.items = items;
-  }
+    private String firstName;
 
-  public Integer getId() {
-    return id;
-  }
+    private String lastName;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    private List<Item> items;
 
-  public String getFirstName() {
-    return firstName;
-  }
+    public List<Item> getItems() {
+        return items;
+    }
 
-  public void setFirstName(String firstName) {
-    this.firstName = firstName;
-  }
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
 
-  public String getLastName() {
-    return lastName;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public void setLastName(String lastName) {
-    this.lastName = lastName;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 }

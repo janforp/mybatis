@@ -13,10 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.blobtest;
 
 public class BlobRecord {
+
     private int id;
+
     private byte[] blob;
 
     public BlobRecord(int id, byte[] blob) {
@@ -30,8 +33,8 @@ public class BlobRecord {
         this.id = id;
         final byte[] newBytes = new byte[blob.length];
         for (int i = 0; i < blob.length; i++) {
-          Byte b = blob[i];
-          newBytes[i] = b;
+            Byte b = blob[i];
+            newBytes[i] = b;
         }
         this.blob = newBytes;
     }

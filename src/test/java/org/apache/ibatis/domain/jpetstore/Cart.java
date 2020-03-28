@@ -13,80 +13,86 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.domain.jpetstore;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class Cart implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private final Map<String, CartItem> itemMap = Collections.synchronizedMap(new HashMap<String, CartItem>());
-  private final List<CartItem> itemList = new ArrayList<CartItem>();
+    private final Map<String, CartItem> itemMap = Collections.synchronizedMap(new HashMap<String, CartItem>());
 
-  public Iterator<CartItem> getCartItems() {
-    return itemList.iterator();
-  }
+    private final List<CartItem> itemList = new ArrayList<CartItem>();
 
-  public List<CartItem> getCartItemList() {
-    return itemList;
-  }
-
-  public int getNumberOfItems() {
-    return itemList.size();
-  }
-
-  public boolean containsItemId(String itemId) {
-    return itemMap.containsKey(itemId);
-  }
-
-  public void addItem(Item item, boolean isInStock) {
-    CartItem cartItem = (CartItem) itemMap.get(item.getItemId());
-    if (cartItem == null) {
-      cartItem = new CartItem();
-      cartItem.setItem(item);
-      cartItem.setQuantity(0);
-      cartItem.setInStock(isInStock);
-      itemMap.put(item.getItemId(), cartItem);
-      itemList.add(cartItem);
+    public Iterator<CartItem> getCartItems() {
+        return itemList.iterator();
     }
-    cartItem.incrementQuantity();
-  }
 
-
-  public Item removeItemById(String itemId) {
-    CartItem cartItem = (CartItem) itemMap.remove(itemId);
-    if (cartItem == null) {
-      return null;
-    } else {
-      itemList.remove(cartItem);
-      return cartItem.getItem();
+    public List<CartItem> getCartItemList() {
+        return itemList;
     }
-  }
 
-  public void incrementQuantityByItemId(String itemId) {
-    CartItem cartItem = (CartItem) itemMap.get(itemId);
-    cartItem.incrementQuantity();
-  }
-
-  public void setQuantityByItemId(String itemId, int quantity) {
-    CartItem cartItem = (CartItem) itemMap.get(itemId);
-    cartItem.setQuantity(quantity);
-  }
-
-  public BigDecimal getSubTotal() {
-    BigDecimal subTotal = new BigDecimal("0");
-    Iterator<CartItem> items = getCartItems();
-    while (items.hasNext()) {
-      CartItem cartItem = (CartItem) items.next();
-      Item item = cartItem.getItem();
-      BigDecimal listPrice = item.getListPrice();
-      BigDecimal quantity = new BigDecimal(String.valueOf(cartItem.getQuantity()));
-      subTotal = subTotal.add(listPrice.multiply(quantity));
+    public int getNumberOfItems() {
+        return itemList.size();
     }
-    return subTotal;
-  }
+
+    public boolean containsItemId(String itemId) {
+        return itemMap.containsKey(itemId);
+    }
+
+    public void addItem(Item item, boolean isInStock) {
+        CartItem cartItem = (CartItem) itemMap.get(item.getItemId());
+        if (cartItem == null) {
+            cartItem = new CartItem();
+            cartItem.setItem(item);
+            cartItem.setQuantity(0);
+            cartItem.setInStock(isInStock);
+            itemMap.put(item.getItemId(), cartItem);
+            itemList.add(cartItem);
+        }
+        cartItem.incrementQuantity();
+    }
+
+    public Item removeItemById(String itemId) {
+        CartItem cartItem = (CartItem) itemMap.remove(itemId);
+        if (cartItem == null) {
+            return null;
+        } else {
+            itemList.remove(cartItem);
+            return cartItem.getItem();
+        }
+    }
+
+    public void incrementQuantityByItemId(String itemId) {
+        CartItem cartItem = (CartItem) itemMap.get(itemId);
+        cartItem.incrementQuantity();
+    }
+
+    public void setQuantityByItemId(String itemId, int quantity) {
+        CartItem cartItem = (CartItem) itemMap.get(itemId);
+        cartItem.setQuantity(quantity);
+    }
+
+    public BigDecimal getSubTotal() {
+        BigDecimal subTotal = new BigDecimal("0");
+        Iterator<CartItem> items = getCartItems();
+        while (items.hasNext()) {
+            CartItem cartItem = (CartItem) items.next();
+            Item item = cartItem.getItem();
+            BigDecimal listPrice = item.getListPrice();
+            BigDecimal quantity = new BigDecimal(String.valueOf(cartItem.getQuantity()));
+            subTotal = subTotal.add(listPrice.multiply(quantity));
+        }
+        return subTotal;
+    }
 
 }

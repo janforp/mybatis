@@ -13,30 +13,32 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.domain.blog;
 
 public class Tag {
 
-  private int id;
-  private String name;
+    private int id;
 
-  public int getId() {
-    return id;
-  }
+    private String name;
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String toString() {
-    return "Tag: " + id + " : " + name;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String toString() {
+        return "Tag: " + id + " : " + name;
+    }
 }

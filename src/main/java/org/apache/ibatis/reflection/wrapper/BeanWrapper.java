@@ -29,7 +29,8 @@ public class BeanWrapper extends BaseWrapper {
     public BeanWrapper(MetaObject metaObject, Object object) {
         super(metaObject);
         this.object = object;
-        this.metaClass = MetaClass.forClass(object.getClass());
+        Class<?> objectClass = object.getClass();
+        this.metaClass = MetaClass.forClass(objectClass);
     }
 
     @Override

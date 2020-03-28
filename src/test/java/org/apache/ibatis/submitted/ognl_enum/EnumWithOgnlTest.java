@@ -13,12 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.submitted.ognl_enum;
 
-import java.io.Reader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.List;
+package org.apache.ibatis.submitted.ognl_enum;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -31,10 +27,15 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.Reader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.List;
+
 public class EnumWithOgnlTest {
-    
+
     private static SqlSessionFactory sqlSessionFactory;
-    
+
     @BeforeClass
     public static void initDatabase() throws Exception {
         Connection conn = null;
@@ -62,23 +63,23 @@ public class EnumWithOgnlTest {
             }
         }
     }
-    
+
     @Test
     public void testEnumWithOgnl() {
         SqlSession sqlSession = sqlSessionFactory.openSession();
         PersonMapper personMapper = sqlSession.getMapper(PersonMapper.class);
         List<Person> persons = personMapper.selectAllByType(null);
         Assert.assertEquals("Persons must contain 3 persons", 3, persons.size());
-      sqlSession.close();
+        sqlSession.close();
     }
 
-  @Test
+    @Test
     public void testEnumWithOgnlDirector() {
         SqlSession sqlSession = sqlSessionFactory.openSession();
         PersonMapper personMapper = sqlSession.getMapper(PersonMapper.class);
         List<Person> persons = personMapper.selectAllByType(Person.Type.DIRECTOR);
         Assert.assertEquals("Persons must contain 1 persons", 1, persons.size());
-    sqlSession.close();
+        sqlSession.close();
     }
 
     @Test
@@ -87,10 +88,10 @@ public class EnumWithOgnlTest {
         PersonMapper personMapper = sqlSession.getMapper(PersonMapper.class);
         List<Person> persons = personMapper.selectAllByTypeNameAttribute(Person.Type.DIRECTOR);
         Assert.assertEquals("Persons must contain 1 persons", 1, persons.size());
-      sqlSession.close();
+        sqlSession.close();
     }
 
-  @Test
+    @Test
     public void testEnumWithOgnlDirectorWithInterface() {
         SqlSession sqlSession = sqlSessionFactory.openSession();
         PersonMapper personMapper = sqlSession.getMapper(PersonMapper.class);
@@ -100,8 +101,9 @@ public class EnumWithOgnlTest {
             }
         });
         Assert.assertEquals("Persons must contain 1 persons", 1, persons.size());
-    sqlSession.close();
+        sqlSession.close();
     }
+
     @Test
     public void testEnumWithOgnlDirectorNameAttributeWithInterface() {
         SqlSession sqlSession = sqlSessionFactory.openSession();
@@ -112,6 +114,6 @@ public class EnumWithOgnlTest {
             }
         });
         Assert.assertEquals("Persons must contain 1 persons", 1, persons.size());
-      sqlSession.close();
+        sqlSession.close();
     }
 }

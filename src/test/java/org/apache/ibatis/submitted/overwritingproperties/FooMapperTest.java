@@ -13,12 +13,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.overwritingproperties;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
-import org.apache.ibatis.session.*;
-import org.junit.*;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.Reader;
 import java.sql.Connection;
@@ -28,64 +35,65 @@ import java.sql.Connection;
  */
 public class FooMapperTest {
 
-  private final static String SQL_MAP_CONFIG = "org/apache/ibatis/submitted/overwritingproperties/sqlmap.xml";
-  private static SqlSession session;
+    private final static String SQL_MAP_CONFIG = "org/apache/ibatis/submitted/overwritingproperties/sqlmap.xml";
 
-  @BeforeClass
-  public static void setUpBeforeClass() {
-    try {
-      final SqlSessionFactory factory = new SqlSessionFactoryBuilder().build(Resources.getResourceAsReader(SQL_MAP_CONFIG));
-      session = factory.openSession();
-      Connection conn = session.getConnection();
-      ScriptRunner runner = new ScriptRunner(conn);
-      runner.setLogWriter(null);
-      runner.setErrorLogWriter(null);
-      Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/overwritingproperties/create-schema-mysql.sql");
-      runner.runScript(reader);
-    } catch (Exception ex) {
-      ex.printStackTrace();
+    private static SqlSession session;
+
+    @BeforeClass
+    public static void setUpBeforeClass() {
+        try {
+            final SqlSessionFactory factory = new SqlSessionFactoryBuilder().build(Resources.getResourceAsReader(SQL_MAP_CONFIG));
+            session = factory.openSession();
+            Connection conn = session.getConnection();
+            ScriptRunner runner = new ScriptRunner(conn);
+            runner.setLogWriter(null);
+            runner.setErrorLogWriter(null);
+            Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/overwritingproperties/create-schema-mysql.sql");
+            runner.runScript(reader);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
-  }
 
-  @Before
-  public void setUp() {
-    final FooMapper mapper = session.getMapper(FooMapper.class);
-    mapper.deleteAllFoo();
-    session.commit();
-  }
+    @AfterClass
+    public static void tearDownAfterClass() {
+        session.close();
+    }
 
-  @Test
-  public void testOverwriteWithDefault() {
-    final FooMapper mapper = session.getMapper(FooMapper.class);
-    final Bar bar = new Bar(2L);
-    final Foo inserted = new Foo(1L, bar, 3, 4);
-    mapper.insertFoo(inserted);
+    @Before
+    public void setUp() {
+        final FooMapper mapper = session.getMapper(FooMapper.class);
+        mapper.deleteAllFoo();
+        session.commit();
+    }
 
-    final Foo selected = mapper.selectFoo();
-    
-    // field1 is explicitly mapped properly
-    // <result property="field1" column="field1" jdbcType="INTEGER"/>
-    Assert.assertEquals(inserted.getField1(), selected.getField1());
+    @Test
+    public void testOverwriteWithDefault() {
+        final FooMapper mapper = session.getMapper(FooMapper.class);
+        final Bar bar = new Bar(2L);
+        final Foo inserted = new Foo(1L, bar, 3, 4);
+        mapper.insertFoo(inserted);
 
-    // field4 is not mapped in the result map
-    // <result property="field4" column="field3" jdbcType="INTEGER"/>
-    Assert.assertEquals(inserted.getField3(), selected.getField4() );
+        final Foo selected = mapper.selectFoo();
 
-    // field4 is explicitly remapped to field3 in the resultmap
-    // <result property="field3" column="field4" jdbcType="INTEGER"/>
-    Assert.assertEquals(inserted.getField4(), selected.getField3());
+        // field1 is explicitly mapped properly
+        // <result property="field1" column="field1" jdbcType="INTEGER"/>
+        Assert.assertEquals(inserted.getField1(), selected.getField1());
 
-    // is automapped from the only column that matches... which is Field1
-    // probably not the intention, but it's working correctly given the code
-    // <association property="field2" javaType="Bar">
-    //  <result property="field1" column="bar_field1" jdbcType="INTEGER"/>
-    // </association>
-    Assert.assertEquals(inserted.getField2().getField1(), selected.getField2().getField1());
-  }
+        // field4 is not mapped in the result map
+        // <result property="field4" column="field3" jdbcType="INTEGER"/>
+        Assert.assertEquals(inserted.getField3(), selected.getField4());
 
-  @AfterClass
-  public static void tearDownAfterClass() {
-    session.close();
-  }
+        // field4 is explicitly remapped to field3 in the resultmap
+        // <result property="field3" column="field4" jdbcType="INTEGER"/>
+        Assert.assertEquals(inserted.getField4(), selected.getField3());
+
+        // is automapped from the only column that matches... which is Field1
+        // probably not the intention, but it's working correctly given the code
+        // <association property="field2" javaType="Bar">
+        //  <result property="field1" column="bar_field1" jdbcType="INTEGER"/>
+        // </association>
+        Assert.assertEquals(inserted.getField2().getField1(), selected.getField2().getField1());
+    }
 
 }

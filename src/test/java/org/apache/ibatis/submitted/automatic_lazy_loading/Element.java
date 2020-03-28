@@ -13,28 +13,30 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.automatic_lazy_loading;
 
 import java.io.Serializable;
 
 public class Element implements Serializable {
-  private Element element;
 
-  private String value;
+    private Element element;
 
-  public Element getElement() {
-    return element;
-  }
+    private String value;
 
-  public void setElement(Element anElement) {
-    element = anElement;
-  }
+    public Element getElement() {
+        return element;
+    }
 
-  public String getValue() {
-    return value;
-  }
+    public void setElement(Element anElement) {
+        element = anElement;
+    }
 
-  public void setValue(String aValue) {
-    value = aValue;
-  }
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String aValue) {
+        value = aValue;
+    }
 }

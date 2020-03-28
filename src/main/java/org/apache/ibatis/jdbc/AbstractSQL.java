@@ -200,14 +200,6 @@ public abstract class AbstractSQL<T> {
     //SQL语句
     private static class SQLStatement {
 
-        //4种语句类型
-        public enum StatementType {
-            DELETE,
-            INSERT,
-            SELECT,
-            UPDATE
-        }
-
         StatementType statementType;
 
         List<String> sets = new ArrayList<String>();
@@ -351,6 +343,14 @@ public abstract class AbstractSQL<T> {
             }
 
             return answer;
+        }
+
+        //4种语句类型
+        public enum StatementType {
+            DELETE,
+            INSERT,
+            SELECT,
+            UPDATE
         }
     }
 }

@@ -79,6 +79,103 @@ public class ResultMapping {
     ResultMapping() {
     }
 
+    public String getProperty() {
+        return property;
+    }
+
+    public String getColumn() {
+        return column;
+    }
+
+    public Class<?> getJavaType() {
+        return javaType;
+    }
+
+    public JdbcType getJdbcType() {
+        return jdbcType;
+    }
+
+    public TypeHandler<?> getTypeHandler() {
+        return typeHandler;
+    }
+
+    public String getNestedResultMapId() {
+        return nestedResultMapId;
+    }
+
+    public String getNestedQueryId() {
+        return nestedQueryId;
+    }
+
+    public Set<String> getNotNullColumns() {
+        return notNullColumns;
+    }
+
+    public String getColumnPrefix() {
+        return columnPrefix;
+    }
+
+    public List<ResultFlag> getFlags() {
+        return flags;
+    }
+
+    public List<ResultMapping> getComposites() {
+        return composites;
+    }
+
+    public boolean isCompositeResult() {
+        return this.composites != null && !this.composites.isEmpty();
+    }
+
+    public String getResultSet() {
+        return this.resultSet;
+    }
+
+    public String getForeignColumn() {
+        return foreignColumn;
+    }
+
+    public void setForeignColumn(String foreignColumn) {
+        this.foreignColumn = foreignColumn;
+    }
+
+    public boolean isLazy() {
+        return lazy;
+    }
+
+    public void setLazy(boolean lazy) {
+        this.lazy = lazy;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ResultMapping that = (ResultMapping) o;
+
+        if (property == null || !property.equals(that.property)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        if (property != null) {
+            return property.hashCode();
+        } else if (column != null) {
+            return column.hashCode();
+        } else {
+            return 0;
+        }
+    }
+
     //静态内部类，建造者模式
     public static class Builder {
 
@@ -213,103 +310,6 @@ public class ResultMapping {
         public Builder column(String column) {
             resultMapping.column = column;
             return this;
-        }
-    }
-
-    public String getProperty() {
-        return property;
-    }
-
-    public String getColumn() {
-        return column;
-    }
-
-    public Class<?> getJavaType() {
-        return javaType;
-    }
-
-    public JdbcType getJdbcType() {
-        return jdbcType;
-    }
-
-    public TypeHandler<?> getTypeHandler() {
-        return typeHandler;
-    }
-
-    public String getNestedResultMapId() {
-        return nestedResultMapId;
-    }
-
-    public String getNestedQueryId() {
-        return nestedQueryId;
-    }
-
-    public Set<String> getNotNullColumns() {
-        return notNullColumns;
-    }
-
-    public String getColumnPrefix() {
-        return columnPrefix;
-    }
-
-    public List<ResultFlag> getFlags() {
-        return flags;
-    }
-
-    public List<ResultMapping> getComposites() {
-        return composites;
-    }
-
-    public boolean isCompositeResult() {
-        return this.composites != null && !this.composites.isEmpty();
-    }
-
-    public String getResultSet() {
-        return this.resultSet;
-    }
-
-    public String getForeignColumn() {
-        return foreignColumn;
-    }
-
-    public void setForeignColumn(String foreignColumn) {
-        this.foreignColumn = foreignColumn;
-    }
-
-    public boolean isLazy() {
-        return lazy;
-    }
-
-    public void setLazy(boolean lazy) {
-        this.lazy = lazy;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        ResultMapping that = (ResultMapping) o;
-
-        if (property == null || !property.equals(that.property)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        if (property != null) {
-            return property.hashCode();
-        } else if (column != null) {
-            return column.hashCode();
-        } else {
-            return 0;
         }
     }
 

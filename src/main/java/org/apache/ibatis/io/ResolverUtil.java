@@ -69,90 +69,6 @@ public class ResolverUtil<T> {
     private static final Log log = LogFactory.getLog(ResolverUtil.class);
 
     /**
-     * A simple interface that specifies how to test classes to determine if they
-     * are to be included in the results produced by the ResolverUtil.
-     */
-    public static interface Test {
-
-        /**
-         * 如果传入的class的类型是 type，则返回true
-         *
-         * 如：
-         * Test t = new Test(Object.class);
-         * 则:t.match(Car.class) 为 true
-         *
-         * @param type 父类型
-         * @return boolean
-         */
-        boolean matches(Class<?> type);
-    }
-
-    /**
-     * A Test that checks to see if each class is assignable to the provided class. Note
-     * that this test will match the parent type itself if it is presented for matching.
-     */
-    public static class IsA implements Test {
-
-        /**
-         * 如果传入的class的类型是 type，则返回true
-         *
-         * 如：
-         * Test t = new Test(Object.class);
-         * 则:t.match(Car.class) 为 true
-         */
-        private Class<?> superType;
-
-        /**
-         * Constructs an IsA test using the supplied Class as the parent class/interface.
-         */
-        public IsA(Class<?> parentType) {
-            this.superType = parentType;
-        }
-
-        /**
-         * Returns true if type is assignable to the parent type supplied in the constructor.
-         */
-        @Override
-        public boolean matches(Class<?> type) {
-            return type != null && superType.isAssignableFrom(type);
-        }
-
-        @Override
-        public String toString() {
-            return "is assignable to " + superType.getSimpleName();
-        }
-    }
-
-    /**
-     * A Test that checks to see if each class is annotated with a specific annotation. If it
-     * is, then the test returns true, otherwise false.
-     */
-    public static class AnnotatedWith implements Test {
-
-        private Class<? extends Annotation> annotation;
-
-        /**
-         * Constructs an AnnotatedWith test for the specified annotation type.
-         */
-        public AnnotatedWith(Class<? extends Annotation> annotation) {
-            this.annotation = annotation;
-        }
-
-        /**
-         * Returns true if the type is annotated with the class provided to the constructor.
-         */
-        @Override
-        public boolean matches(Class<?> type) {
-            return type != null && type.isAnnotationPresent(annotation);
-        }
-
-        @Override
-        public String toString() {
-            return "annotated with @" + annotation.getSimpleName();
-        }
-    }
-
-    /**
      * The set of matches being accumulated.
      * 满足指定条件的 class 集合
      */
@@ -163,6 +79,11 @@ public class ResolverUtil<T> {
      * by Thread.currentThread().getContextClassLoader() will be used.
      */
     private ClassLoader classloader;
+
+    public static void main(String[] args) {
+        String fullClassName = "com/janita/controller/TestController.class";
+        System.out.println(fullClassName.substring(0, fullClassName.indexOf('.')).replace('/', '.'));
+    }
 
     /**
      * Provides access to the classes discovered so far. If no calls have been made to
@@ -303,8 +224,87 @@ public class ResolverUtil<T> {
         }
     }
 
-    public static void main(String[] args) {
-        String fullClassName = "com/janita/controller/TestController.class";
-        System.out.println(fullClassName.substring(0, fullClassName.indexOf('.')).replace('/', '.'));
+    /**
+     * A simple interface that specifies how to test classes to determine if they
+     * are to be included in the results produced by the ResolverUtil.
+     */
+    public static interface Test {
+
+        /**
+         * 如果传入的class的类型是 type，则返回true
+         *
+         * 如：
+         * Test t = new Test(Object.class);
+         * 则:t.match(Car.class) 为 true
+         *
+         * @param type 父类型
+         * @return boolean
+         */
+        boolean matches(Class<?> type);
+    }
+
+    /**
+     * A Test that checks to see if each class is assignable to the provided class. Note
+     * that this test will match the parent type itself if it is presented for matching.
+     */
+    public static class IsA implements Test {
+
+        /**
+         * 如果传入的class的类型是 type，则返回true
+         *
+         * 如：
+         * Test t = new Test(Object.class);
+         * 则:t.match(Car.class) 为 true
+         */
+        private Class<?> superType;
+
+        /**
+         * Constructs an IsA test using the supplied Class as the parent class/interface.
+         */
+        public IsA(Class<?> parentType) {
+            this.superType = parentType;
+        }
+
+        /**
+         * Returns true if type is assignable to the parent type supplied in the constructor.
+         */
+        @Override
+        public boolean matches(Class<?> type) {
+            return type != null && superType.isAssignableFrom(type);
+        }
+
+        @Override
+        public String toString() {
+            return "is assignable to " + superType.getSimpleName();
+        }
+    }
+
+    /**
+     * A Test that checks to see if each class is annotated with a specific annotation. If it
+     * is, then the test returns true, otherwise false.
+     */
+    public static class AnnotatedWith implements Test {
+
+        private Class<? extends Annotation> annotation;
+
+        /**
+         * Constructs an AnnotatedWith test for the specified annotation type.
+         */
+        public AnnotatedWith(Class<? extends Annotation> annotation) {
+            this.annotation = annotation;
+        }
+
+        /**
+         * Returns true if the type is annotated with the class provided to the constructor.
+         */
+        @Override
+        public boolean matches(Class<?> type) {
+            return type != null && type.isAnnotationPresent(annotation);
+        }
+
+        @Override
+        public String toString() {
+            return "annotated with @" + annotation.getSimpleName();
+        }
     }
 }

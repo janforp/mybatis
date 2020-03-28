@@ -13,32 +13,34 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.complex_property;
 
 public class EncryptedString {
-  private String encrypted;
 
-  public EncryptedString() {
-    setEncrypted(null);
-  }
+    private String encrypted;
 
-  public EncryptedString(String message) {
-    this();
+    public EncryptedString() {
+        setEncrypted(null);
+    }
 
-    //encrypt the message.
-    setEncrypted(message);
-  }
+    public EncryptedString(String message) {
+        this();
 
-  public String decrypt() {
-    return encrypted;
-  }
+        //encrypt the message.
+        setEncrypted(message);
+    }
 
-  public String getEncrypted() {
-    return encrypted;
-  }
+    public String decrypt() {
+        return encrypted;
+    }
 
-  public void setEncrypted(String arg) {
-    this.encrypted = arg;
-  }
+    public String getEncrypted() {
+        return encrypted;
+    }
+
+    public void setEncrypted(String arg) {
+        this.encrypted = arg;
+    }
 
 }

@@ -13,12 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.submitted.enumtypehandler_on_map;
 
-import java.io.Reader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.List;
+package org.apache.ibatis.submitted.enumtypehandler_on_map;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -31,10 +27,15 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.Reader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.List;
+
 public class EnumTypeHandlerTest {
-    
+
     private static SqlSessionFactory sqlSessionFactory;
-    
+
     @BeforeClass
     public static void initDatabase() throws Exception {
         Connection conn = null;
@@ -62,7 +63,7 @@ public class EnumTypeHandlerTest {
             }
         }
     }
-    
+
     @Test
     public void testEnumWithParam() {
         SqlSession sqlSession = sqlSessionFactory.openSession();
@@ -70,8 +71,9 @@ public class EnumTypeHandlerTest {
         List<Person> persons = personMapper.getByType(Person.Type.PERSON, "");
         Assert.assertNotNull("Persons must not be null", persons);
         Assert.assertEquals("Persons must contain exactly 1 person", 1, persons.size());
-      sqlSession.close();
+        sqlSession.close();
     }
+
     @Test
     public void testEnumWithoutParam() {
         SqlSession sqlSession = sqlSessionFactory.openSession();
@@ -80,12 +82,13 @@ public class EnumTypeHandlerTest {
             public String getName() {
                 return "";
             }
+
             public Type getType() {
                 return Person.Type.PERSON;
             }
         });
         Assert.assertNotNull("Persons must not be null", persons);
         Assert.assertEquals("Persons must contain exactly 1 person", 1, persons.size());
-      sqlSession.close();
+        sqlSession.close();
     }
 }

@@ -59,6 +59,18 @@ public final class Environment {
         this.dataSource = dataSource;
     }
 
+    public String getId() {
+        return this.id;
+    }
+
+    public TransactionFactory getTransactionFactory() {
+        return this.transactionFactory;
+    }
+
+    public DataSource getDataSource() {
+        return this.dataSource;
+    }
+
     //一个静态内部类Builder
     //建造模式
     //用法应该是new Environment.Builder(id).transactionFactory(xx).dataSource(xx).build();
@@ -92,18 +104,6 @@ public final class Environment {
             return new Environment(this.id, this.transactionFactory, this.dataSource);
         }
 
-    }
-
-    public String getId() {
-        return this.id;
-    }
-
-    public TransactionFactory getTransactionFactory() {
-        return this.transactionFactory;
-    }
-
-    public DataSource getDataSource() {
-        return this.dataSource;
     }
 
 }

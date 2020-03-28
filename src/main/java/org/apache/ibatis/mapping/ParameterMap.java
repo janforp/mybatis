@@ -38,6 +38,18 @@ public class ParameterMap {
     private ParameterMap() {
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public Class<?> getType() {
+        return type;
+    }
+
+    public List<ParameterMapping> getParameterMappings() {
+        return parameterMappings;
+    }
+
     /**
      * 用于构建 ParameterMap
      */
@@ -60,18 +72,6 @@ public class ParameterMap {
             parameterMap.parameterMappings = Collections.unmodifiableList(parameterMap.parameterMappings);
             return parameterMap;
         }
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public Class<?> getType() {
-        return type;
-    }
-
-    public List<ParameterMapping> getParameterMappings() {
-        return parameterMappings;
     }
 
 }

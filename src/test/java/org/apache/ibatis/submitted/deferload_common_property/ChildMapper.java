@@ -13,10 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.deferload_common_property;
 
 import java.util.List;
 
 public interface ChildMapper {
-  public List<Child> selectAll();
+
+    public List<Child> selectAll();
 }

@@ -1,5 +1,3 @@
-
-
 package org.apache.ibatis.reflection;
 
 import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
@@ -24,12 +22,18 @@ public final class SystemMetaObject {
         // Prevent Instantiation of Static Class
     }
 
+    /**
+     * 默认可以使用该方法来实例化所有对象的 metaObject
+     *
+     * @param object
+     * @return
+     */
+    public static MetaObject forObject(Object object) {
+        return MetaObject.forObject(object, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY);
+    }
+
     //空对象
     private static class NullObject {
 
-    }
-
-    public static MetaObject forObject(Object object) {
-        return MetaObject.forObject(object, DEFAULT_OBJECT_FACTORY, DEFAULT_OBJECT_WRAPPER_FACTORY);
     }
 }

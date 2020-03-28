@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.builder;
 
 import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
@@ -22,16 +23,16 @@ import java.util.Properties;
 
 public class ExampleObjectFactory extends DefaultObjectFactory {
 
-  public <T> T create(Class<T> type) {
-    return super.<T>create(type);
-  }
+    public <T> T create(Class<T> type) {
+        return super.<T>create(type);
+    }
 
-  public <T> T create(Class<T> type, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
-    return super.<T>create(type, constructorArgTypes, constructorArgs);
-  }
+    public <T> T create(Class<T> type, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
+        return super.<T>create(type, constructorArgTypes, constructorArgs);
+    }
 
-  public void setProperties(Properties properties) {
-    super.setProperties(properties);
-  }
+    public void setProperties(Properties properties) {
+        super.setProperties(properties);
+    }
 
 }

@@ -64,6 +64,82 @@ public class ParameterMapping {
     private ParameterMapping() {
     }
 
+    public String getProperty() {
+        return property;
+    }
+
+    /**
+     * Used for handling output of callable statements
+     *
+     * @return
+     */
+    public ParameterMode getMode() {
+        return mode;
+    }
+
+    /**
+     * Used for handling output of callable statements
+     *
+     * @return
+     */
+    public Class<?> getJavaType() {
+        return javaType;
+    }
+
+    /**
+     * Used in the UnknownTypeHandler in case there is no handler for the property type
+     *
+     * @return
+     */
+    public JdbcType getJdbcType() {
+        return jdbcType;
+    }
+
+    /**
+     * Used for handling output of callable statements
+     *
+     * @return
+     */
+    public Integer getNumericScale() {
+        return numericScale;
+    }
+
+    /**
+     * Used when setting parameters to the PreparedStatement
+     *
+     * @return
+     */
+    public TypeHandler<?> getTypeHandler() {
+        return typeHandler;
+    }
+
+    /**
+     * Used for handling output of callable statements
+     *
+     * @return
+     */
+    public String getResultMapId() {
+        return resultMapId;
+    }
+
+    /**
+     * Used for handling output of callable statements
+     *
+     * @return
+     */
+    public String getJdbcTypeName() {
+        return jdbcTypeName;
+    }
+
+    /**
+     * Not used
+     *
+     * @return
+     */
+    public String getExpression() {
+        return expression;
+    }
+
     //静态内部类，建造者模式
     public static class Builder {
 
@@ -163,82 +239,6 @@ public class ParameterMapping {
             }
         }
 
-    }
-
-    public String getProperty() {
-        return property;
-    }
-
-    /**
-     * Used for handling output of callable statements
-     *
-     * @return
-     */
-    public ParameterMode getMode() {
-        return mode;
-    }
-
-    /**
-     * Used for handling output of callable statements
-     *
-     * @return
-     */
-    public Class<?> getJavaType() {
-        return javaType;
-    }
-
-    /**
-     * Used in the UnknownTypeHandler in case there is no handler for the property type
-     *
-     * @return
-     */
-    public JdbcType getJdbcType() {
-        return jdbcType;
-    }
-
-    /**
-     * Used for handling output of callable statements
-     *
-     * @return
-     */
-    public Integer getNumericScale() {
-        return numericScale;
-    }
-
-    /**
-     * Used when setting parameters to the PreparedStatement
-     *
-     * @return
-     */
-    public TypeHandler<?> getTypeHandler() {
-        return typeHandler;
-    }
-
-    /**
-     * Used for handling output of callable statements
-     *
-     * @return
-     */
-    public String getResultMapId() {
-        return resultMapId;
-    }
-
-    /**
-     * Used for handling output of callable statements
-     *
-     * @return
-     */
-    public String getJdbcTypeName() {
-        return jdbcTypeName;
-    }
-
-    /**
-     * Not used
-     *
-     * @return
-     */
-    public String getExpression() {
-        return expression;
     }
 
 }

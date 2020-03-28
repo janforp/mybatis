@@ -13,10 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.domain.misc.generics;
 
 public abstract class GenericSubclass extends GenericAbstract<Long> {
-  public abstract Long getId();
+
+    public abstract Long getId();
 }
 
 

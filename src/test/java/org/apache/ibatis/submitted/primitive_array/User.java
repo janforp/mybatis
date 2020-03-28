@@ -13,35 +13,38 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.primitive_array;
 
 public class User {
 
-  private Integer id;
-  private String name;
-  private int[] num;
+    private Integer id;
 
-  public Integer getId() {
-    return id;
-  }
+    private String name;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    private int[] num;
 
-  public String getName() {
-    return name;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-  public int[] getNum() {
-    return num;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setNum(int[] num) {
-    this.num = num;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int[] getNum() {
+        return num;
+    }
+
+    public void setNum(int[] num) {
+        this.num = num;
+    }
 }

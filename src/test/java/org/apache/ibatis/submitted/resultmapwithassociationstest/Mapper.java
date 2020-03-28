@@ -13,10 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.resultmapwithassociationstest;
 
 import java.util.List;
 
 public interface Mapper {
+
     List<Person> findAll();
 }

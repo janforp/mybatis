@@ -13,10 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.submitted.xml_references;
 
-import java.io.Reader;
-import java.util.Properties;
+package org.apache.ibatis.submitted.xml_references;
 
 import org.apache.ibatis.datasource.unpooled.UnpooledDataSourceFactory;
 import org.apache.ibatis.io.Resources;
@@ -28,8 +26,11 @@ import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.junit.Test;
 
+import java.io.Reader;
+import java.util.Properties;
+
 public class EnumWithOgnlTest {
-    
+
     @Test
     public void testConfiguration() {
         UnpooledDataSourceFactory dataSourceFactory = new UnpooledDataSourceFactory();
@@ -46,10 +47,11 @@ public class EnumWithOgnlTest {
         configuration.addMapper(PersonMapper2.class);
         new DefaultSqlSessionFactory(configuration);
     }
+
     @Test
     public void testMixedConfiguration() throws Exception {
-      Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/xml_references/ibatisConfig.xml");
-      SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
-      sqlSessionFactory.getConfiguration().addMapper(PersonMapper2.class);
+        Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/xml_references/ibatisConfig.xml");
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+        sqlSessionFactory.getConfiguration().addMapper(PersonMapper2.class);
     }
 }

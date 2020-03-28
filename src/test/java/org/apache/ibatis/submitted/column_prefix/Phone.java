@@ -17,33 +17,34 @@
 package org.apache.ibatis.submitted.column_prefix;
 
 public class Phone {
-  private Integer id;
 
-  private String phone;
+    private Integer id;
 
-  private String areaCode;
+    private String phone;
 
-  public Integer getId() {
-    return id;
-  }
+    private String areaCode;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public String getPhone() {
-    return phone;
-  }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-  public void setPhone(String phone) {
-    this.phone = phone;
-  }
+    public String getPhone() {
+        return phone;
+    }
 
-  public String getAreaCode() {
-    return areaCode;
-  }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
-  public void setAreaCode(String areaCode) {
-    this.areaCode = areaCode;
-  }
+    public String getAreaCode() {
+        return areaCode;
+    }
+
+    public void setAreaCode(String areaCode) {
+        this.areaCode = areaCode;
+    }
 }

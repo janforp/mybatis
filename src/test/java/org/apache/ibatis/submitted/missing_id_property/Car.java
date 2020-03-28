@@ -13,28 +13,31 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.missing_id_property;
 
 import java.util.List;
 
 public class Car {
-  // the result class doesn't need id for further processing
-  private String name ;
-  private List<Part> carParts ;
 
-  public String getName() {
-    return name;
-  }
+    // the result class doesn't need id for further processing
+    private String name;
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    private List<Part> carParts;
 
-  public List<Part> getCarParts() {
-    return carParts;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setCarParts(List<Part> carParts) {
-    this.carParts = carParts;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<Part> getCarParts() {
+        return carParts;
+    }
+
+    public void setCarParts(List<Part> carParts) {
+        this.carParts = carParts;
+    }
 }

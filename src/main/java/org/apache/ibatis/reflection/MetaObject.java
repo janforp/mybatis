@@ -132,7 +132,8 @@ public class MetaObject {
     public void setValue(String name, Object value) {
         PropertyTokenizer prop = new PropertyTokenizer(name);//分词器
         if (prop.hasNext()) {
-            MetaObject metaValue = metaObjectForProperty(prop.getIndexedName());
+            String indexedName = prop.getIndexedName();
+            MetaObject metaValue = metaObjectForProperty(indexedName);
             if (metaValue == SystemMetaObject.NULL_META_OBJECT) {
                 if (value == null && prop.getChildren() != null) {
                     // don't instantiate child path if value is null

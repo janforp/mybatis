@@ -13,8 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.extends_with_constructor;
 
 public interface TeacherMapper {
-  public Teacher selectById(Integer id);
+
+    public Teacher selectById(Integer id);
 }

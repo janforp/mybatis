@@ -13,8 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.lazyload_common_property;
 
 public interface FatherMapper {
-  public Father selectById(Integer id); 
+
+    public Father selectById(Integer id);
 }

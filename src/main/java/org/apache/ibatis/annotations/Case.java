@@ -1,4 +1,3 @@
-
 package org.apache.ibatis.annotations;
 
 import java.lang.annotation.ElementType;
@@ -12,11 +11,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Case {
-  String value();
 
-  Class<?> type();
+    String value();
 
-  Result[] results() default {};
+    Class<?> type();
 
-  Arg[] constructArgs() default {};
+    Result[] results() default {};
+
+    Arg[] constructArgs() default {};
 }

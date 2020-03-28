@@ -13,26 +13,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.column_forwarding;
 
 public class Group {
 
-  private Integer id;
-  private String state;
+    private Integer id;
 
-  public Integer getId() {
-    return id;
-  }
+    private String state;
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
-  
-  public String getState() {
-    return state;
-  }
-  
-  public void setState(String state) {
-    this.state = state;
-  }
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
 }

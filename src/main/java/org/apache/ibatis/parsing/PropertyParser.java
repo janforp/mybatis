@@ -35,6 +35,14 @@ public class PropertyParser {
         return parser.parse(string);
     }
 
+    public static void main(String[] args) {
+        Properties variables = new Properties();
+        variables.setProperty("name", "张三");
+        variables.setProperty("gender", "2");
+        String name = PropertyParser.parse("name", variables);
+        System.out.println(name);
+    }
+
     //就是一个map，用相应的value替换key
     private static class VariableTokenHandler implements TokenHandler {
 
@@ -55,12 +63,4 @@ public class PropertyParser {
             return "${" + content + "}";
         }
     }
-
-  public static void main(String[] args) {
-    Properties variables = new Properties();
-    variables.setProperty("name", "张三");
-    variables.setProperty("gender", "2");
-    String name = PropertyParser.parse("name", variables);
-    System.out.println(name);
-  }
 }

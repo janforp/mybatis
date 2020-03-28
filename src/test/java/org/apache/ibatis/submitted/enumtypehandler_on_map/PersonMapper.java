@@ -13,20 +13,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.submitted.enumtypehandler_on_map;
 
-import java.util.List;
+package org.apache.ibatis.submitted.enumtypehandler_on_map;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface PersonMapper {
-    
+
+    public List<Person> getByType(@Param("type") Person.Type type, @Param("name") String name);
+
+    public List<Person> getByTypeNoParam(TypeName typeName);
+
     public static interface TypeName {
+
         public Person.Type getType();
+
         public String getName();
     }
-    
-    public List<Person> getByType(@Param("type") Person.Type type, @Param("name") String name);
-    public List<Person> getByTypeNoParam(TypeName typeName);
-    
+
 }

@@ -13,48 +13,52 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.domain.blog;
 
 public class Comment {
 
-  private int id;
-  private Post post;
-  private String name;
-  private String comment;
+    private int id;
 
-  public int getId() {
-    return id;
-  }
+    private Post post;
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    private String name;
 
-  public Post getPost() {
-    return post;
-  }
+    private String comment;
 
-  public void setPost(Post post) {
-    this.post = post;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public Post getPost() {
+        return post;
+    }
 
-  public String getComment() {
-    return comment;
-  }
+    public void setPost(Post post) {
+        this.post = post;
+    }
 
-  public void setComment(String comment) {
-    this.comment = comment;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String toString() {
-    return "Comment: " + id + " : " + name + " : " + comment;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String toString() {
+        return "Comment: " + id + " : " + name + " : " + comment;
+    }
 }

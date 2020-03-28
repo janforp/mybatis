@@ -51,6 +51,11 @@ public class ForEachSqlNode implements SqlNode {
         this.configuration = configuration;
     }
 
+    private static String itemizeItem(String item, int i) {
+        //__frch_ + item + "_" + i
+        return ITEM_PREFIX + item + "_" + i;
+    }
+
     @Override
     public boolean apply(DynamicContext context) {
         Map<String, Object> bindings = context.getBindings();
@@ -126,11 +131,6 @@ public class ForEachSqlNode implements SqlNode {
         if (close != null) {
             context.appendSql(close);
         }
-    }
-
-    private static String itemizeItem(String item, int i) {
-        //__frch_ + item + "_" + i
-        return ITEM_PREFIX + item + "_" + i;
     }
 
     //被过滤的动态上下文

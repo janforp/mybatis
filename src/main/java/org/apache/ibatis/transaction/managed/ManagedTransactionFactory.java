@@ -29,6 +29,8 @@ import java.util.Properties;
  *
  * @author Clinton Begin
  * @author Clinton Begin
+ * @author Clinton Begin
+ * @author Clinton Begin
  * @see ManagedTransaction
  */
 /**

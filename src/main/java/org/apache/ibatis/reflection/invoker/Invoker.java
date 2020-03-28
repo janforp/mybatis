@@ -22,6 +22,7 @@ public interface Invoker {
 
     /**
      * 取得类型,根据不同的实现返回的类型不一样
+     *
      * @return 取得类型
      */
     Class<?> getType();

@@ -13,17 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.domain.blog;
 
 public class PostLiteId {
-    private int id;
-    
-    public PostLiteId() {
-      
-    }
 
-    public void setId(int id) {
-      this.id = id;
+    private int id;
+
+    public PostLiteId() {
+
     }
 
     public PostLiteId(int aId) {
@@ -32,6 +30,10 @@ public class PostLiteId {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override

@@ -13,11 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.heavy_initial_load;
 
 import org.apache.ibatis.annotations.Param;
 
 public interface ThingMapper {
 
-  public Thing selectByCode(@Param("code") Code aCode);
+    public Thing selectByCode(@Param("code") Code aCode);
 }

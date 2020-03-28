@@ -13,47 +13,50 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.manyanno;
 
 import java.util.List;
 
 public class AnnoPost {
 
-  private int id;
-  private String subject;
-  private String body;
+    private int id;
 
-  private List<AnnoPostTag> tags;
+    private String subject;
 
-  public String getBody() {
-    return body;
-  }
+    private String body;
 
-  public void setBody(String body) {
-    this.body = body;
-  }
+    private List<AnnoPostTag> tags;
 
-  public int getId() {
-    return id;
-  }
+    public String getBody() {
+        return body;
+    }
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    public void setBody(String body) {
+        this.body = body;
+    }
 
-  public String getSubject() {
-    return subject;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public void setSubject(String subject) {
-    this.subject = subject;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public List<AnnoPostTag> getTags() {
-    return tags;
-  }
+    public String getSubject() {
+        return subject;
+    }
 
-  public void setTags(List<AnnoPostTag> tags) {
-    this.tags = tags;
-  }
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public List<AnnoPostTag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<AnnoPostTag> tags) {
+        this.tags = tags;
+    }
 }

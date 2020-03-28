@@ -13,27 +13,30 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.immutable_constructor;
 
 import java.io.Serializable;
 
 public class ImmutablePOJO implements Serializable {
 
-  private static final long serialVersionUID = -7086198701202598455L;
-  private final Integer id;
-  private final String description;
+    private static final long serialVersionUID = -7086198701202598455L;
 
-  public ImmutablePOJO(Integer id, String description) {
-    this.id = id;
-    this.description = description;
-  }
+    private final Integer id;
 
-  public String getDescription() {
-    return description;
-  }
+    private final String description;
 
-  public Integer getId() {
-    return id;
-  }
+    public ImmutablePOJO(Integer id, String description) {
+        this.id = id;
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Integer getId() {
+        return id;
+    }
 
 }

@@ -94,15 +94,76 @@ import java.util.Set;
  */
 public class Configuration {
 
-    //环境
-    protected Environment environment;
+    protected final InterceptorChain interceptorChain = new InterceptorChain();
 
     //---------以下都是<settings>节点-------
+
+    //类型处理器注册机
+    protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry();
+
+    //类型别名注册机
+    protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
+
+    protected final LanguageDriverRegistry languageRegistry = new LanguageDriverRegistry();
+
+    /**
+     * 映射的语句,存在Map里
+     * key : mapperInterface.getName() + "." + method.getName()
+     * value: 映射的语句
+     */
+    protected final Map<String, MappedStatement> mappedStatements = new StrictMap<MappedStatement>("Mapped Statements collection");
+
+    /**
+     * key:namespace
+     * value:缓存实例
+     */
+    protected final Map<String, Cache> caches = new StrictMap<Cache>("Caches collection");
+
+    //结果映射,存在Map里
+    protected final Map<String, ResultMap> resultMaps = new StrictMap<ResultMap>("Result Maps collection");
+
+    protected final Map<String, ParameterMap> parameterMaps = new StrictMap<ParameterMap>("Parameter Maps collection");
+
+    //默认启用缓存
+
+    protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<KeyGenerator>("Key Generators collection");
+
+    //加载过的资源，避免重复加载
+    protected final Set<String> loadedResources = new HashSet<String>();
+
+    protected final Map<String, XNode> sqlFragments = new StrictMap<XNode>("XML fragments parsed from previous mappers");
+
+    //不完整的SQL语句
+    protected final Collection<XMLStatementBuilder> incompleteStatements = new LinkedList<XMLStatementBuilder>();
+
+    protected final Collection<CacheRefResolver> incompleteCacheRefs = new LinkedList<CacheRefResolver>();
+
+    //未完成的映射
+    protected final Collection<ResultMapResolver> incompleteResultMaps = new LinkedList<ResultMapResolver>();
+
+    protected final Collection<MethodResolver> incompleteMethods = new LinkedList<MethodResolver>();
+
+    /**
+     * A map holds cache-ref relationship. The key is the namespace that
+     * references a cache bound to another namespace and the value is the
+     * namespace which the actual cache is bound to.
+     *
+     * cache=ref 缓存
+     * key:当前mapper文件的 namespace
+     * value:当前mapper文件的 cache-ref的namespace
+     */
+    protected final Map<String, String> cacheRefMap = new HashMap<String, String>();
+
+    //默认为简单执行器
+
+    //环境
+    protected Environment environment;
 
     /**
      * 是否允许在嵌套语句中使用分页（RowBounds）。如果允许使用则设置为 false。
      */
     protected boolean safeRowBoundsEnabled = false;
+    //---------以上都是<settings>节点-------
 
     /**
      * 是否允许在嵌套语句中使用结果处理器（ResultHandler）。如果允许使用则设置为 false
@@ -134,8 +195,6 @@ public class Configuration {
      * 使用列标签代替列名。实际表现依赖于数据库驱动，具体可参考数据库驱动的相关文档，或通过对比测试来观察。
      */
     protected boolean useColumnLabel = true;
-
-    //默认启用缓存
 
     /**
      * 全局性地开启或关闭所有映射器配置文件中已配置的任何缓存。
@@ -187,8 +246,6 @@ public class Configuration {
      */
     protected Integer defaultStatementTimeout;
 
-    //默认为简单执行器
-
     /**
      * 配置默认的执行器。SIMPLE 就是普通的执行器；
      * REUSE 执行器会重用预处理语句（PreparedStatement）；
@@ -197,7 +254,6 @@ public class Configuration {
     protected ExecutorType defaultExecutorType = ExecutorType.SIMPLE;
 
     protected AutoMappingBehavior autoMappingBehavior = AutoMappingBehavior.PARTIAL;
-    //---------以上都是<settings>节点-------
 
     /**
      * 配置的变量
@@ -226,62 +282,6 @@ public class Configuration {
      * @see <a href='https://code.google.com/p/mybatis/issues/detail?id=300'>Issue 300</a> (google code)
      */
     protected Class<?> configurationFactory;
-
-    protected final InterceptorChain interceptorChain = new InterceptorChain();
-
-    //类型处理器注册机
-    protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry();
-
-    //类型别名注册机
-    protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
-
-    protected final LanguageDriverRegistry languageRegistry = new LanguageDriverRegistry();
-
-    /**
-     * 映射的语句,存在Map里
-     * key : mapperInterface.getName() + "." + method.getName()
-     * value: 映射的语句
-     */
-    protected final Map<String, MappedStatement> mappedStatements = new StrictMap<MappedStatement>("Mapped Statements collection");
-
-    /**
-     * key:namespace
-     * value:缓存实例
-     */
-    protected final Map<String, Cache> caches = new StrictMap<Cache>("Caches collection");
-
-    //结果映射,存在Map里
-    protected final Map<String, ResultMap> resultMaps = new StrictMap<ResultMap>("Result Maps collection");
-
-    protected final Map<String, ParameterMap> parameterMaps = new StrictMap<ParameterMap>("Parameter Maps collection");
-
-    protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<KeyGenerator>("Key Generators collection");
-
-    //加载过的资源，避免重复加载
-    protected final Set<String> loadedResources = new HashSet<String>();
-
-    protected final Map<String, XNode> sqlFragments = new StrictMap<XNode>("XML fragments parsed from previous mappers");
-
-    //不完整的SQL语句
-    protected final Collection<XMLStatementBuilder> incompleteStatements = new LinkedList<XMLStatementBuilder>();
-
-    protected final Collection<CacheRefResolver> incompleteCacheRefs = new LinkedList<CacheRefResolver>();
-
-    //未完成的映射
-    protected final Collection<ResultMapResolver> incompleteResultMaps = new LinkedList<ResultMapResolver>();
-
-    protected final Collection<MethodResolver> incompleteMethods = new LinkedList<MethodResolver>();
-
-    /**
-     * A map holds cache-ref relationship. The key is the namespace that
-     * references a cache bound to another namespace and the value is the
-     * namespace which the actual cache is bound to.
-     *
-     * cache=ref 缓存
-     * key:当前mapper文件的 namespace
-     * value:当前mapper文件的 cache-ref的namespace
-     */
-    protected final Map<String, String> cacheRefMap = new HashMap<String, String>();
 
     public Configuration(Environment environment) {
         this();

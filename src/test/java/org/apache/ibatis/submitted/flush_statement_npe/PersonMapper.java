@@ -13,9 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.submitted.flush_statement_npe;
 
 public interface PersonMapper {
+
     public Person selectById(int id);
+
     public void update(Person person);
 }

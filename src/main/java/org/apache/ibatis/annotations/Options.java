@@ -1,13 +1,12 @@
-
 package org.apache.ibatis.annotations;
+
+import org.apache.ibatis.mapping.ResultSetType;
+import org.apache.ibatis.mapping.StatementType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import org.apache.ibatis.mapping.ResultSetType;
-import org.apache.ibatis.mapping.StatementType;
 
 /**
  * @author Clinton Begin
@@ -15,21 +14,22 @@ import org.apache.ibatis.mapping.StatementType;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Options {
-  boolean useCache() default true;
 
-  boolean flushCache() default false;
+    boolean useCache() default true;
 
-  ResultSetType resultSetType() default ResultSetType.FORWARD_ONLY;
+    boolean flushCache() default false;
 
-  StatementType statementType() default StatementType.PREPARED;
+    ResultSetType resultSetType() default ResultSetType.FORWARD_ONLY;
 
-  int fetchSize() default -1;
+    StatementType statementType() default StatementType.PREPARED;
 
-  int timeout() default -1;
+    int fetchSize() default -1;
 
-  boolean useGeneratedKeys() default false;
+    int timeout() default -1;
 
-  String keyProperty() default "id";
+    boolean useGeneratedKeys() default false;
 
-  String keyColumn() default "";
+    String keyProperty() default "id";
+
+    String keyColumn() default "";
 }

@@ -13,23 +13,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.submitted.empty_namespace;
 
-import java.io.Reader;
+package org.apache.ibatis.submitted.empty_namespace;
 
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.Test;
 
+import java.io.Reader;
+
 public class EmptyNamespaceTest {
-  @Test(expected = PersistenceException.class)
-  public void testEmptyNamespace() throws Exception {
-    Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/empty_namespace/ibatisConfig.xml");
-    try {
-      new SqlSessionFactoryBuilder().build(reader);
-    } finally {
-      reader.close();
+
+    @Test(expected = PersistenceException.class)
+    public void testEmptyNamespace() throws Exception {
+        Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/empty_namespace/ibatisConfig.xml");
+        try {
+            new SqlSessionFactoryBuilder().build(reader);
+        } finally {
+            reader.close();
+        }
     }
-  }
 }

@@ -13,27 +13,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package org.apache.ibatis.session;
 
 /**
  * @author Clinton Begin
  */
+
 /**
  * 结果上下文
- * 
  */
 public interface ResultContext {
 
-  //获取结果
-  Object getResultObject();
+    //获取结果
+    Object getResultObject();
 
-  //获取记录数
-  int getResultCount();
+    //获取记录数
+    int getResultCount();
 
-  boolean isStopped();
+    boolean isStopped();
 
-  /**
-   * 使用该值让mybatis停止加载更多的数据
-   */
-  void stop();
+    /**
+     * 使用该值让mybatis停止加载更多的数据
+     */
+    void stop();
 }

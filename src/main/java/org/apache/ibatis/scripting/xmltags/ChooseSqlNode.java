@@ -8,21 +8,21 @@ import java.util.List;
 
 /**
  * <where>
- *       <choose>
- *         <when test="id != null">id = #{id}</when>
- *         <when test="author_id != null">AND author_id = #{author_id}</when>
- *         <otherwise>
- *           <if test="ids != null">
- *             AND id IN
- *             <foreach item="item_id" index="index" open="(" close=")" separator="," collection="ids">#{ids[${index}]}
- *             </foreach>
- *           </if>
- *           <trim prefix="AND">
- *             <include refid="byBlogId"/>
- *           </trim>
- *         </otherwise>
- *       </choose>
- *     </where>
+ * <choose>
+ * <when test="id != null">id = #{id}</when>
+ * <when test="author_id != null">AND author_id = #{author_id}</when>
+ * <otherwise>
+ * <if test="ids != null">
+ * AND id IN
+ * <foreach item="item_id" index="index" open="(" close=")" separator="," collection="ids">#{ids[${index}]}
+ * </foreach>
+ * </if>
+ * <trim prefix="AND">
+ * <include refid="byBlogId"/>
+ * </trim>
+ * </otherwise>
+ * </choose>
+ * </where>
  * choose SQL节点
  */
 public class ChooseSqlNode implements SqlNode {
