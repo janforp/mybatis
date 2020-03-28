@@ -35,7 +35,9 @@ import java.util.Set;
  */
 public class ResultLoaderMap {
 
-    //加载对的hashmap
+    /**
+     * 加载对的hashMap
+     */
     private final Map<String, LoadPair> loaderMap = new HashMap<String, LoadPair>();
 
     private static String getUppercaseFirstProperty(String property) {
@@ -95,9 +97,9 @@ public class ResultLoaderMap {
     }
 
     /**
+     * 静态内部类，加载对
      * Property which was not loaded yet.
      */
-    //静态内部类，加载对
     public static class LoadPair implements Serializable {
 
         private static final long serialVersionUID = 20130412;
@@ -224,7 +226,7 @@ public class ResultLoaderMap {
                 throw new ExecutorException("Cannot get Configuration as configuration factory was not set.");
             }
 
-            Object configurationObject = null;
+            Object configurationObject;
             try {
                 final Method factoryMethod = this.configurationFactory.getDeclaredMethod(FACTORY_METHOD);
                 if (!Modifier.isStatic(factoryMethod.getModifiers())) {

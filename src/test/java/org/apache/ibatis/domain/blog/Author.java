@@ -1,23 +1,12 @@
-/*
- *    Copyright 2009-2012 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.domain.blog;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
+@Getter
+@Setter
 public class Author implements Serializable {
 
     protected int id;
@@ -49,82 +38,34 @@ public class Author implements Serializable {
         this(id, null, null, null, null, null);
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
-    public void setBio(String bio) {
-        this.bio = bio;
-    }
-
-    public Section getFavouriteSection() {
-        return favouriteSection;
-    }
-
-    public void setFavouriteSection(Section favouriteSection) {
-        this.favouriteSection = favouriteSection;
-    }
-
     public boolean equals(Object o) {
-      if (this == o) {
-        return true;
-      }
-      if (!(o instanceof Author)) {
-        return false;
-      }
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Author)) {
+            return false;
+        }
 
         Author author = (Author) o;
 
-      if (id != author.id) {
-        return false;
-      }
-      if (bio != null ? !bio.equals(author.bio) : author.bio != null) {
-        return false;
-      }
-      if (email != null ? !email.equals(author.email) : author.email != null) {
-        return false;
-      }
-      if (password != null ? !password.equals(author.password) : author.password != null) {
-        return false;
-      }
-      if (username != null ? !username.equals(author.username) : author.username != null) {
-        return false;
-      }
-      if (favouriteSection != null ? !favouriteSection.equals(author.favouriteSection) : author.favouriteSection != null) {
-        return false;
-      }
+        if (id != author.id) {
+            return false;
+        }
+        if (bio != null ? !bio.equals(author.bio) : author.bio != null) {
+            return false;
+        }
+        if (email != null ? !email.equals(author.email) : author.email != null) {
+            return false;
+        }
+        if (password != null ? !password.equals(author.password) : author.password != null) {
+            return false;
+        }
+        if (username != null ? !username.equals(author.username) : author.username != null) {
+            return false;
+        }
+        if (favouriteSection != null ? !favouriteSection.equals(author.favouriteSection) : author.favouriteSection != null) {
+            return false;
+        }
 
         return true;
     }

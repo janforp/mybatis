@@ -16,6 +16,7 @@
 
 package org.apache.ibatis.mapping;
 
+import lombok.Getter;
 import org.apache.ibatis.session.Configuration;
 
 import java.util.Collections;
@@ -32,19 +33,13 @@ import java.util.Map;
  */
 public class Discriminator {
 
+    @Getter
     private ResultMapping resultMapping;
 
+    @Getter
     private Map<String, String> discriminatorMap;
 
     Discriminator() {
-    }
-
-    public ResultMapping getResultMapping() {
-        return resultMapping;
-    }
-
-    public Map<String, String> getDiscriminatorMap() {
-        return discriminatorMap;
     }
 
     public String getMapIdFor(String s) {

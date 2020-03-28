@@ -81,7 +81,7 @@ public class ResultLoader {
         }
         try {
             //又调回Executor.query去了，比较巧妙
-            return localExecutor.<E>query(mappedStatement, parameterObject, RowBounds.DEFAULT, Executor.NO_RESULT_HANDLER, cacheKey, boundSql);
+            return localExecutor.query(mappedStatement, parameterObject, RowBounds.DEFAULT, Executor.NO_RESULT_HANDLER, cacheKey, boundSql);
         } finally {
             if (localExecutor != executor) {
                 localExecutor.close(false);
@@ -94,14 +94,14 @@ public class ResultLoader {
         if (environment == null) {
             throw new ExecutorException("ResultLoader could not load lazily.  Environment was not configured.");
         }
-        final DataSource ds = environment.getDataSource();
-        if (ds == null) {
+        final DataSource dataSource = environment.getDataSource();
+        if (dataSource == null) {
             throw new ExecutorException("ResultLoader could not load lazily.  DataSource was not configured.");
         }
         final TransactionFactory transactionFactory = environment.getTransactionFactory();
-        final Transaction tx = transactionFactory.newTransaction(ds, null, false);
+        final Transaction transaction = transactionFactory.newTransaction(dataSource, null, false);
         //如果executor已经被关闭了，则创建一个新的SimpleExecutor
-        return configuration.newExecutor(tx, ExecutorType.SIMPLE);
+        return configuration.newExecutor(transaction, ExecutorType.SIMPLE);
     }
 
     public boolean wasNull() {

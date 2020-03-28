@@ -48,25 +48,32 @@ public class ResultMap {
     @Getter
     private String id;
 
+    @Getter
     private Class<?> type;
 
+    @Getter
     private List<ResultMapping> resultMappings;
 
+    @Getter
     private List<ResultMapping> idResultMappings;
 
+    @Getter
     private List<ResultMapping> constructorResultMappings;
 
+    @Getter
     private List<ResultMapping> propertyResultMappings;
 
     @Getter
     private Set<String> mappedColumns;
 
+    @Getter
     private Discriminator discriminator;
 
     private boolean hasNestedResultMaps;
 
     private boolean hasNestedQueries;
 
+    @Getter
     private Boolean autoMapping;
 
     private ResultMap() {
@@ -80,36 +87,8 @@ public class ResultMap {
         return hasNestedQueries;
     }
 
-    public Class<?> getType() {
-        return type;
-    }
-
-    public List<ResultMapping> getResultMappings() {
-        return resultMappings;
-    }
-
-    public List<ResultMapping> getConstructorResultMappings() {
-        return constructorResultMappings;
-    }
-
-    public List<ResultMapping> getPropertyResultMappings() {
-        return propertyResultMappings;
-    }
-
-    public List<ResultMapping> getIdResultMappings() {
-        return idResultMappings;
-    }
-
-    public Discriminator getDiscriminator() {
-        return discriminator;
-    }
-
     public void forceNestedResultMaps() {
         hasNestedResultMaps = true;
-    }
-
-    public Boolean getAutoMapping() {
-        return autoMapping;
     }
 
     //静态内部类，建造者模式
@@ -180,5 +159,4 @@ public class ResultMap {
             return resultMap;
         }
     }
-
 }
