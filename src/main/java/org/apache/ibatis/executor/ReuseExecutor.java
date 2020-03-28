@@ -23,10 +23,15 @@ import java.util.Map;
 
 /**
  * 可重用的执行器
+ * 其实就是缓存
  */
 public class ReuseExecutor extends BaseExecutor {
 
-    //可重用的执行器内部用了一个map，用来缓存SQL语句对应的Statement
+    /**
+     * 可重用的执行器内部用了一个map，用来缓存SQL语句对应的Statement
+     * key:Sql
+     * value:statement
+     */
     private final Map<String, Statement> statementMap = new HashMap<String, Statement>();
 
     public ReuseExecutor(Configuration configuration, Transaction transaction) {
@@ -34,13 +39,13 @@ public class ReuseExecutor extends BaseExecutor {
     }
 
     @Override
-    public int doUpdate(MappedStatement ms, Object parameter) throws SQLException {
-        Configuration configuration = ms.getConfiguration();
+    public int doUpdate(MappedStatement mappedStatement, Object parameter) throws SQLException {
+        Configuration configuration = mappedStatement.getConfiguration();
         //和SimpleExecutor一样，新建一个StatementHandler
         //这里看到ResultHandler传入的是null
-        StatementHandler handler = configuration.newStatementHandler(this, ms, parameter, RowBounds.DEFAULT, null, null);
+        StatementHandler handler = configuration.newStatementHandler(this, mappedStatement, parameter, RowBounds.DEFAULT, null, null);
         //准备语句
-        Statement stmt = prepareStatement(handler, ms.getStatementLog());
+        Statement stmt = prepareStatement(handler, mappedStatement.getStatementLog());
         return handler.update(stmt);
     }
 
@@ -49,11 +54,11 @@ public class ReuseExecutor extends BaseExecutor {
         Configuration configuration = ms.getConfiguration();
         StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);
         Statement stmt = prepareStatement(handler, ms.getStatementLog());
-        return handler.<E>query(stmt, resultHandler);
+        return handler.query(stmt, resultHandler);
     }
 
     @Override
-    public List<BatchResult> doFlushStatements(boolean isRollback) throws SQLException {
+    public List<BatchResult> doFlushStatements(boolean isRollback) {
         for (Statement stmt : statementMap.values()) {
             closeStatement(stmt);
         }
@@ -61,37 +66,43 @@ public class ReuseExecutor extends BaseExecutor {
         return Collections.emptyList();
     }
 
-    private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
-        Statement stmt;
+    private Statement prepareStatement(StatementHandler statementHandler, Log statementLog) throws SQLException {
+        Statement statement;
         //得到绑定的SQL语句
-        BoundSql boundSql = handler.getBoundSql();
+        BoundSql boundSql = statementHandler.getBoundSql();
         String sql = boundSql.getSql();
         //如果缓存中已经有了，直接得到Statement
-        if (hasStatementFor(sql)) {
-            stmt = getStatement(sql);
+        //缓存命中
+        boolean hasStatementFor = hasStatementFor(sql);
+        if (hasStatementFor) {
+            statement = getStatement(sql);
         } else {
             //如果缓存没有找到，则和SimpleExecutor处理完全一样，然后加入缓存
             Connection connection = getConnection(statementLog);
-            stmt = handler.prepare(connection);
-            putStatement(sql, stmt);
+            statement = statementHandler.prepare(connection);
+            //丢进缓存
+            putStatement(sql, statement);
         }
-        handler.parameterize(stmt);
-        return stmt;
+        statementHandler.parameterize(statement);
+        return statement;
     }
 
     private boolean hasStatementFor(String sql) {
         try {
-            return statementMap.keySet().contains(sql) && !statementMap.get(sql).getConnection().isClosed();
+            boolean containsSql = statementMap.keySet().contains(sql);
+            boolean notClosed = !statementMap.get(sql).getConnection().isClosed();
+            //statement存在，并且没有关闭，则true
+            return containsSql && notClosed;
         } catch (SQLException e) {
             return false;
         }
     }
 
-    private Statement getStatement(String s) {
-        return statementMap.get(s);
+    private Statement getStatement(String sql) {
+        return statementMap.get(sql);
     }
 
-    private void putStatement(String sql, Statement stmt) {
-        statementMap.put(sql, stmt);
+    private void putStatement(String sql, Statement statement) {
+        statementMap.put(sql, statement);
     }
 }

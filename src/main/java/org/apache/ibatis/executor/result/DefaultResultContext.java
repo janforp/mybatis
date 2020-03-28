@@ -1,5 +1,6 @@
 package org.apache.ibatis.executor.result;
 
+import lombok.Getter;
 import org.apache.ibatis.session.ResultContext;
 
 /**
@@ -11,10 +12,13 @@ import org.apache.ibatis.session.ResultContext;
  */
 public class DefaultResultContext implements ResultContext {
 
+    @Getter
     private Object resultObject;
 
+    @Getter
     private int resultCount;
 
+    @Getter
     private boolean stopped;
 
     public DefaultResultContext() {
@@ -23,22 +27,11 @@ public class DefaultResultContext implements ResultContext {
         stopped = false;
     }
 
-    @Override
-    public Object getResultObject() {
-        return resultObject;
-    }
-
-    @Override
-    public int getResultCount() {
-        return resultCount;
-    }
-
-    @Override
-    public boolean isStopped() {
-        return stopped;
-    }
-
-    //应该是每次调用nextResultObject这个方法，这样内部count就加1
+    /**
+     * 应该是每次调用nextResultObject这个方法，这样内部count就加1
+     *
+     * @param resultObject 结果
+     */
     public void nextResultObject(Object resultObject) {
         resultCount++;
         this.resultObject = resultObject;
@@ -48,5 +41,4 @@ public class DefaultResultContext implements ResultContext {
     public void stop() {
         this.stopped = true;
     }
-
 }

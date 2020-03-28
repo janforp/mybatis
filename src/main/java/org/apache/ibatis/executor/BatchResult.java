@@ -18,9 +18,17 @@ public class BatchResult {
     @Getter
     private final String sql;
 
+    /**
+     * 参数
+     */
     @Getter
     private final List<Object> parameterObjects;
 
+    /**
+     * an array of update counts containing one element for each
+     * command in the batch.  The elements of the array are ordered according
+     * to the order in which commands were added to the batch.
+     */
     @Setter
     @Getter
     private int[] updateCounts;

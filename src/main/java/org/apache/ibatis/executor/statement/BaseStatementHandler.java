@@ -30,12 +30,24 @@ public abstract class BaseStatementHandler implements StatementHandler {
 
     protected final TypeHandlerRegistry typeHandlerRegistry;
 
+    /**
+     * 结果处理器
+     */
     protected final ResultSetHandler resultSetHandler;
 
+    /**
+     * 参数处理器
+     */
     protected final ParameterHandler parameterHandler;
 
+    /**
+     * 执行器
+     */
     protected final Executor executor;
 
+    /**
+     * 映射语句详情
+     */
     protected final MappedStatement mappedStatement;
 
     protected final RowBounds rowBounds;

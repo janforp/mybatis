@@ -28,5 +28,4 @@ public class ExecutorException extends PersistenceException {
     public ExecutorException(Throwable cause) {
         super(cause);
     }
-
 }

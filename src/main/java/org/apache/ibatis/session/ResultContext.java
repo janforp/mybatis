@@ -28,7 +28,11 @@ public interface ResultContext {
     //获取结果
     Object getResultObject();
 
-    //获取记录数
+    /**
+     * 获取记录数，分页的时候有用到
+     *
+     * @return 获取记录数
+     */
     int getResultCount();
 
     boolean isStopped();

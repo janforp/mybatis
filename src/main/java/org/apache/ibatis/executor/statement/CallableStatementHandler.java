@@ -33,31 +33,31 @@ public class CallableStatementHandler extends BaseStatementHandler {
 
     @Override
     public int update(Statement statement) throws SQLException {
-        //这个方法和PreparedStatementHandler代码基本一样,就多了最后的handleOutputParameters
+        //这个方法和PreparedStatementHandler代码基本一样,就多了最后的 handleOutputParameters
         //调用Statement.execute和Statement.getUpdateCount
-        CallableStatement cs = (CallableStatement) statement;
-        cs.execute();
-        int rows = cs.getUpdateCount();
+        CallableStatement callableStatement = (CallableStatement) statement;
+        callableStatement.execute();
+        int rows = callableStatement.getUpdateCount();
         Object parameterObject = boundSql.getParameterObject();
         KeyGenerator keyGenerator = mappedStatement.getKeyGenerator();
-        keyGenerator.processAfter(executor, mappedStatement, cs, parameterObject);
+        keyGenerator.processAfter(executor, mappedStatement, callableStatement, parameterObject);
         //然后交给ResultSetHandler.handleOutputParameters
-        resultSetHandler.handleOutputParameters(cs);
+        resultSetHandler.handleOutputParameters(callableStatement);
         return rows;
     }
 
     @Override
     public void batch(Statement statement) throws SQLException {
-        CallableStatement cs = (CallableStatement) statement;
-        cs.addBatch();
+        CallableStatement callableStatement = (CallableStatement) statement;
+        callableStatement.addBatch();
     }
 
     @Override
     public <E> List<E> query(Statement statement, ResultHandler resultHandler) throws SQLException {
-        CallableStatement cs = (CallableStatement) statement;
-        cs.execute();
-        List<E> resultList = resultSetHandler.<E>handleResultSets(cs);
-        resultSetHandler.handleOutputParameters(cs);
+        CallableStatement callableStatement = (CallableStatement) statement;
+        callableStatement.execute();
+        List<E> resultList = resultSetHandler.<E>handleResultSets(callableStatement);
+        resultSetHandler.handleOutputParameters(callableStatement);
         return resultList;
     }
 
@@ -80,7 +80,7 @@ public class CallableStatementHandler extends BaseStatementHandler {
         parameterHandler.setParameters((CallableStatement) statement);
     }
 
-    private void registerOutputParameters(CallableStatement cs) throws SQLException {
+    private void registerOutputParameters(CallableStatement callableStatement) throws SQLException {
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         for (int i = 0, n = parameterMappings.size(); i < n; i++) {
             ParameterMapping parameterMapping = parameterMappings.get(i);
@@ -90,13 +90,13 @@ public class CallableStatementHandler extends BaseStatementHandler {
                     throw new ExecutorException("The JDBC Type must be specified for output parameter.  Parameter: " + parameterMapping.getProperty());
                 } else {
                     if (parameterMapping.getNumericScale() != null && (parameterMapping.getJdbcType() == JdbcType.NUMERIC || parameterMapping.getJdbcType() == JdbcType.DECIMAL)) {
-                        cs.registerOutParameter(i + 1, parameterMapping.getJdbcType().TYPE_CODE, parameterMapping.getNumericScale());
+                        callableStatement.registerOutParameter(i + 1, parameterMapping.getJdbcType().TYPE_CODE, parameterMapping.getNumericScale());
                     } else {
                         //核心是调用CallableStatement.registerOutParameter
                         if (parameterMapping.getJdbcTypeName() == null) {
-                            cs.registerOutParameter(i + 1, parameterMapping.getJdbcType().TYPE_CODE);
+                            callableStatement.registerOutParameter(i + 1, parameterMapping.getJdbcType().TYPE_CODE);
                         } else {
-                            cs.registerOutParameter(i + 1, parameterMapping.getJdbcType().TYPE_CODE, parameterMapping.getJdbcTypeName());
+                            callableStatement.registerOutParameter(i + 1, parameterMapping.getJdbcType().TYPE_CODE, parameterMapping.getJdbcTypeName());
                         }
                     }
                 }

@@ -20,18 +20,32 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * 进行批量操作，通过批量操作来提高性能
+ *
  * @author Jeff Butler
  */
 public class BatchExecutor extends BaseExecutor {
 
     public static final int BATCH_UPDATE_RETURN_VALUE = Integer.MIN_VALUE + 1002;
 
+    /**
+     * Statement链表
+     **/
     private final List<Statement> statementList = new ArrayList<Statement>();
 
+    /**
+     * batch结果链表
+     **/
     private final List<BatchResult> batchResultList = new ArrayList<BatchResult>();
 
+    /**
+     * 当前sql
+     */
     private String currentSql;
 
+    /**
+     * 当前 MappedStatement
+     */
     private MappedStatement currentStatement;
 
     public BatchExecutor(Configuration configuration, Transaction transaction) {
@@ -39,33 +53,33 @@ public class BatchExecutor extends BaseExecutor {
     }
 
     @Override
-    public int doUpdate(MappedStatement ms, Object parameterObject) throws SQLException {
-        final Configuration configuration = ms.getConfiguration();
-        final StatementHandler handler = configuration.newStatementHandler(this, ms, parameterObject, RowBounds.DEFAULT, null, null);
+    public int doUpdate(MappedStatement mappedStatement, Object parameterObject) throws SQLException {
+        final Configuration configuration = mappedStatement.getConfiguration();
+        final StatementHandler handler = configuration.newStatementHandler(this, mappedStatement, parameterObject, RowBounds.DEFAULT, null, null);
         final BoundSql boundSql = handler.getBoundSql();
         final String sql = boundSql.getSql();
-        final Statement stmt;
-        if (sql.equals(currentSql) && ms.equals(currentStatement)) {
+        final Statement statement;
+        if (sql.equals(currentSql) && mappedStatement.equals(currentStatement)) {
             int last = statementList.size() - 1;
-            stmt = statementList.get(last);
+            statement = statementList.get(last);
             BatchResult batchResult = batchResultList.get(last);
             batchResult.addParameterObject(parameterObject);
         } else {
-            Connection connection = getConnection(ms.getStatementLog());
-            stmt = handler.prepare(connection);
+            //获取同一个事务中的连接
+            Connection connection = getConnection(mappedStatement.getStatementLog());
+            statement = handler.prepare(connection);
             currentSql = sql;
-            currentStatement = ms;
-            statementList.add(stmt);
-            batchResultList.add(new BatchResult(ms, sql, parameterObject));
+            currentStatement = mappedStatement;
+            statementList.add(statement);
+            batchResultList.add(new BatchResult(mappedStatement, sql, parameterObject));
         }
-        handler.parameterize(stmt);
-        handler.batch(stmt);
+        handler.parameterize(statement);
+        handler.batch(statement);
         return BATCH_UPDATE_RETURN_VALUE;
     }
 
     @Override
-    public <E> List<E> doQuery(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql)
-            throws SQLException {
+    public <E> List<E> doQuery(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
         Statement stmt = null;
         try {
             flushStatements();
@@ -74,7 +88,7 @@ public class BatchExecutor extends BaseExecutor {
             Connection connection = getConnection(ms.getStatementLog());
             stmt = handler.prepare(connection);
             handler.parameterize(stmt);
-            return handler.<E>query(stmt, resultHandler);
+            return handler.query(stmt, resultHandler);
         } finally {
             closeStatement(stmt);
         }
@@ -88,19 +102,27 @@ public class BatchExecutor extends BaseExecutor {
                 return Collections.emptyList();
             }
             for (int i = 0, n = statementList.size(); i < n; i++) {
-                Statement stmt = statementList.get(i);
+                Statement statement = statementList.get(i);
                 BatchResult batchResult = batchResultList.get(i);
                 try {
-                    batchResult.setUpdateCounts(stmt.executeBatch());
-                    MappedStatement ms = batchResult.getMappedStatement();
+                    //执行批处理
+                    //an array of update counts containing one element for each
+                    //command in the batch.  The elements of the array are ordered according
+                    //to the order in which commands were added to the batch.
+                    int[] executeBatch = statement.executeBatch();
+                    batchResult.setUpdateCounts(executeBatch);
+                    MappedStatement mappedStatement = batchResult.getMappedStatement();
+                    //参数
                     List<Object> parameterObjects = batchResult.getParameterObjects();
-                    KeyGenerator keyGenerator = ms.getKeyGenerator();
-                    if (Jdbc3KeyGenerator.class.equals(keyGenerator.getClass())) {
+                    KeyGenerator keyGenerator = mappedStatement.getKeyGenerator();
+
+                    Class<? extends KeyGenerator> keyGeneratorClass = keyGenerator.getClass();
+                    if (Jdbc3KeyGenerator.class.equals(keyGeneratorClass)) {
                         Jdbc3KeyGenerator jdbc3KeyGenerator = (Jdbc3KeyGenerator) keyGenerator;
-                        jdbc3KeyGenerator.processBatch(ms, stmt, parameterObjects);
-                    } else if (!NoKeyGenerator.class.equals(keyGenerator.getClass())) { //issue #141
+                        jdbc3KeyGenerator.processBatch(mappedStatement, statement, parameterObjects);
+                    } else if (!NoKeyGenerator.class.equals(keyGeneratorClass)) { //issue #141
                         for (Object parameter : parameterObjects) {
-                            keyGenerator.processAfter(this, ms, stmt, parameter);
+                            keyGenerator.processAfter(this, mappedStatement, statement, parameter);
                         }
                     }
                 } catch (BatchUpdateException e) {
@@ -129,5 +151,4 @@ public class BatchExecutor extends BaseExecutor {
             batchResultList.clear();
         }
     }
-
 }

@@ -82,8 +82,9 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
     private final Map<CacheKey, List<PendingRelation>> pendingRelations = new HashMap<CacheKey, List<PendingRelation>>();
 
-    public DefaultResultSetHandler(Executor executor, MappedStatement mappedStatement, ParameterHandler parameterHandler, ResultHandler resultHandler, BoundSql boundSql,
-            RowBounds rowBounds) {
+    public DefaultResultSetHandler(Executor executor, MappedStatement mappedStatement, ParameterHandler parameterHandler, ResultHandler resultHandler,
+            BoundSql boundSql, RowBounds rowBounds) {
+
         this.executor = executor;
         this.configuration = mappedStatement.getConfiguration();
         this.mappedStatement = mappedStatement;
@@ -99,10 +100,10 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     public void handleOutputParameters(CallableStatement cs) throws SQLException {
         final Object parameterObject = parameterHandler.getParameterObject();
         final MetaObject metaParam = configuration.newMetaObject(parameterObject);
-        final List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+        final List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
         //循环处理每个参数
-        for (int i = 0; i < parameterMappings.size(); i++) {
-            final ParameterMapping parameterMapping = parameterMappings.get(i);
+        for (int i = 0; i < parameterMappingList.size(); i++) {
+            final ParameterMapping parameterMapping = parameterMappingList.get(i);
             //只处理OUT|INOUT
             if (parameterMapping.getMode() == ParameterMode.OUT || parameterMapping.getMode() == ParameterMode.INOUT) {
                 if (ResultSet.class.equals(parameterMapping.getJavaType())) {
@@ -239,28 +240,28 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     }
 
     //处理结果集
-    private void handleResultSet(ResultSetWrapper rsw, ResultMap resultMap, List<Object> multipleResults, ResultMapping parentMapping) throws SQLException {
+    private void handleResultSet(ResultSetWrapper resultSetWrapper, ResultMap resultMap, List<Object> multipleResults, ResultMapping parentMapping) throws SQLException {
         try {
             if (parentMapping != null) {
-                handleRowValues(rsw, resultMap, null, RowBounds.DEFAULT, parentMapping);
+                handleRowValues(resultSetWrapper, resultMap, null, RowBounds.DEFAULT, parentMapping);
             } else {
                 if (resultHandler == null) {
                     //如果没有resultHandler
                     //新建DefaultResultHandler
                     DefaultResultHandler defaultResultHandler = new DefaultResultHandler(objectFactory);
                     //调用自己的handleRowValues
-                    handleRowValues(rsw, resultMap, defaultResultHandler, rowBounds, null);
+                    handleRowValues(resultSetWrapper, resultMap, defaultResultHandler, rowBounds, null);
                     //得到记录的list
                     multipleResults.add(defaultResultHandler.getResultList());
                 } else {
                     //如果有resultHandler
-                    handleRowValues(rsw, resultMap, resultHandler, rowBounds, null);
+                    handleRowValues(resultSetWrapper, resultMap, resultHandler, rowBounds, null);
                 }
             }
         } finally {
             //最后别忘了关闭结果集，这个居然出bug了
             // issue #228 (close resultsets)
-            closeResultSet(rsw.getResultSet());
+            closeResultSet(resultSetWrapper.getResultSet());
         }
     }
 
@@ -269,13 +270,17 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         return multipleResults.size() == 1 ? (List<Object>) multipleResults.get(0) : multipleResults;
     }
 
-    private void handleRowValues(ResultSetWrapper rsw, ResultMap resultMap, ResultHandler resultHandler, RowBounds rowBounds, ResultMapping parentMapping) throws SQLException {
-        if (resultMap.hasNestedResultMaps()) {
+    private void handleRowValues(ResultSetWrapper resultSetWrapper, ResultMap resultMap, ResultHandler resultHandler,
+            RowBounds rowBounds, ResultMapping parentMapping) throws SQLException {
+
+        boolean hasNestedResultMaps = resultMap.hasNestedResultMaps();
+        //有嵌套映射结果
+        if (hasNestedResultMaps) {
             ensureNoRowBounds();
             checkResultHandler();
-            handleRowValuesForNestedResultMap(rsw, resultMap, resultHandler, rowBounds, parentMapping);
+            handleRowValuesForNestedResultMap(resultSetWrapper, resultMap, resultHandler, rowBounds, parentMapping);
         } else {
-            handleRowValuesForSimpleResultMap(rsw, resultMap, resultHandler, rowBounds, parentMapping);
+            handleRowValuesForSimpleResultMap(resultSetWrapper, resultMap, resultHandler, rowBounds, parentMapping);
         }
     }
 
@@ -298,14 +303,17 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         }
     }
 
-    private void handleRowValuesForSimpleResultMap(ResultSetWrapper rsw, ResultMap resultMap, ResultHandler resultHandler, RowBounds rowBounds, ResultMapping parentMapping)
-            throws SQLException {
+    private void handleRowValuesForSimpleResultMap(ResultSetWrapper resultSetWrapper, ResultMap resultMap, ResultHandler resultHandler,
+            RowBounds rowBounds, ResultMapping parentMapping) throws SQLException {
+
         DefaultResultContext resultContext = new DefaultResultContext();
-        skipRows(rsw.getResultSet(), rowBounds);
-        while (shouldProcessMoreRows(resultContext, rowBounds) && rsw.getResultSet().next()) {
-            ResultMap discriminatedResultMap = resolveDiscriminatedResultMap(rsw.getResultSet(), resultMap, null);
-            Object rowValue = getRowValue(rsw, discriminatedResultMap);
-            storeObject(resultHandler, resultContext, rowValue, parentMapping, rsw.getResultSet());
+        //内存分页
+        ResultSet resultSet = resultSetWrapper.getResultSet();
+        skipRows(resultSet, rowBounds);
+        while (shouldProcessMoreRows(resultContext, rowBounds) && resultSet.next()) {
+            ResultMap discriminatedResultMap = resolveDiscriminatedResultMap(resultSet, resultMap, null);
+            Object rowValue = getRowValue(resultSetWrapper, discriminatedResultMap);
+            storeObject(resultHandler, resultContext, rowValue, parentMapping, resultSet);
         }
     }
 
@@ -322,18 +330,29 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         resultHandler.handleResult(resultContext);
     }
 
-    private boolean shouldProcessMoreRows(ResultContext context, RowBounds rowBounds) throws SQLException {
+    private boolean shouldProcessMoreRows(ResultContext context, RowBounds rowBounds) {
         return !context.isStopped() && context.getResultCount() < rowBounds.getLimit();
     }
 
-    private void skipRows(ResultSet rs, RowBounds rowBounds) throws SQLException {
-        if (rs.getType() != ResultSet.TYPE_FORWARD_ONLY) {
+    /**
+     * 通过RowBounds类可以实现Mybatis逻辑分页，原理是首先将所有结果查询出来，然后通过计算offset和limit，
+     * 只返回部分结果，操作在内存中进行，所以也叫内存分页。弊端很明显，当数据量比较大的时候，肯定是不行的，
+     * 所以一般不会去使用RowBounds进行分页查询，这里仅展示一下RowBounds用法。Mybatis Generator原生支持RowBounds查询，
+     * 生成的Mapper接口中存在一个方法selectByExampleWithRowbounds就是通过RowBounds进行分页查询
+     *
+     * @param resultSet 结果
+     * @param rowBounds 分页参数
+     * @throws SQLException 异常
+     */
+    private void skipRows(ResultSet resultSet, RowBounds rowBounds) throws SQLException {
+        if (resultSet.getType() != ResultSet.TYPE_FORWARD_ONLY) {
             if (rowBounds.getOffset() != RowBounds.NO_ROW_OFFSET) {
-                rs.absolute(rowBounds.getOffset());
+                resultSet.absolute(rowBounds.getOffset());
             }
         } else {
             for (int i = 0; i < rowBounds.getOffset(); i++) {
-                rs.next();
+                //游标移动 offset 次
+                resultSet.next();
             }
         }
     }
@@ -746,11 +765,11 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         }
     }
 
-    public ResultMap resolveDiscriminatedResultMap(ResultSet rs, ResultMap resultMap, String columnPrefix) throws SQLException {
+    public ResultMap resolveDiscriminatedResultMap(ResultSet resultSet, ResultMap resultMap, String columnPrefix) throws SQLException {
         Set<String> pastDiscriminators = new HashSet<String>();
         Discriminator discriminator = resultMap.getDiscriminator();
         while (discriminator != null) {
-            final Object value = getDiscriminatorValue(rs, discriminator, columnPrefix);
+            final Object value = getDiscriminatorValue(resultSet, discriminator, columnPrefix);
             final String discriminatedMapId = discriminator.getMapIdFor(String.valueOf(value));
             if (configuration.hasResultMap(discriminatedMapId)) {
                 resultMap = configuration.getResultMap(discriminatedMapId);

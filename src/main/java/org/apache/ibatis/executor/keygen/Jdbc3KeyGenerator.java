@@ -35,11 +35,11 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
     }
 
     //批处理
-    public void processBatch(MappedStatement mappedStatement, Statement stmt, List<Object> parameters) {
+    public void processBatch(MappedStatement mappedStatement, Statement statement, List<Object> parameters) {
         ResultSet resultSet = null;
         try {
             //核心是使用JDBC3的Statement.getGeneratedKeys
-            resultSet = stmt.getGeneratedKeys();
+            resultSet = statement.getGeneratedKeys();
             final Configuration configuration = mappedStatement.getConfiguration();
             final TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
             final String[] keyProperties = mappedStatement.getKeyProperties();
