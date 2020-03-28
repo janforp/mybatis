@@ -28,19 +28,29 @@ public class RoutingStatementHandler implements StatementHandler {
      */
     private final StatementHandler delegate;
 
-    public RoutingStatementHandler(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
+    /**
+     * 创建语句处理器，一共有3种类型的处理器
+     *
+     * @param executor 执行器
+     * @param mappedStatement 映射语句
+     * @param parameter 参数
+     * @param rowBounds 分页传输
+     * @param resultHandler 结果处理器
+     * @param boundSql 绑定的sql
+     */
+    public RoutingStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
 
         //根据语句类型，委派到不同的语句处理器(STATEMENT|PREPARED|CALLABLE)
-        StatementType statementType = ms.getStatementType();
+        StatementType statementType = mappedStatement.getStatementType();
         switch (statementType) {
             case STATEMENT:
-                delegate = new SimpleStatementHandler(executor, ms, parameter, rowBounds, resultHandler, boundSql);
+                delegate = new SimpleStatementHandler(executor, mappedStatement, parameter, rowBounds, resultHandler, boundSql);
                 break;
             case PREPARED:
-                delegate = new PreparedStatementHandler(executor, ms, parameter, rowBounds, resultHandler, boundSql);
+                delegate = new PreparedStatementHandler(executor, mappedStatement, parameter, rowBounds, resultHandler, boundSql);
                 break;
             case CALLABLE:
-                delegate = new CallableStatementHandler(executor, ms, parameter, rowBounds, resultHandler, boundSql);
+                delegate = new CallableStatementHandler(executor, mappedStatement, parameter, rowBounds, resultHandler, boundSql);
                 break;
             default:
                 throw new ExecutorException("Unknown statement type: " + statementType);

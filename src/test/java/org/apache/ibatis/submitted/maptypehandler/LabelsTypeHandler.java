@@ -14,7 +14,7 @@ import java.util.Map;
 public class LabelsTypeHandler implements TypeHandler<Map<String, Object>> {
 
     @Override
-    public void setParameter(PreparedStatement ps, int i, Map<String, Object> parameter, JdbcType jdbcType) throws SQLException {
+    public void setParameter(PreparedStatement preparedStatement, int i, Map<String, Object> parameter, JdbcType jdbcType) throws SQLException {
         // TODO Auto-generated method stub
 
     }

@@ -40,7 +40,7 @@ public abstract class BaseTypeHandler<T> extends TypeReference<T> implements Typ
     }
 
     @Override
-    public void setParameter(PreparedStatement ps, int i, T parameter, JdbcType jdbcType) throws SQLException {
+    public void setParameter(PreparedStatement preparedStatement, int i, T parameter, JdbcType jdbcType) throws SQLException {
         //特殊情况，设置NULL
         if (parameter == null) {
             if (jdbcType == null) {
@@ -49,7 +49,7 @@ public abstract class BaseTypeHandler<T> extends TypeReference<T> implements Typ
             }
             try {
                 //设成NULL
-                ps.setNull(i, jdbcType.TYPE_CODE);
+                preparedStatement.setNull(i, jdbcType.TYPE_CODE);
             } catch (SQLException e) {
                 throw new TypeException("Error setting null for parameter #" + i + " with JdbcType " + jdbcType + " . " +
                         "Try setting a different JdbcType for this parameter or a different jdbcTypeForNull configuration property. " +
@@ -57,7 +57,7 @@ public abstract class BaseTypeHandler<T> extends TypeReference<T> implements Typ
             }
         } else {
             //非NULL情况，怎么设还得交给不同的子类完成, setNonNullParameter是一个抽象方法
-            setNonNullParameter(ps, i, parameter, jdbcType);
+            setNonNullParameter(preparedStatement, i, parameter, jdbcType);
         }
     }
 

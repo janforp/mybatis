@@ -16,6 +16,7 @@
 
 package org.apache.ibatis.mapping;
 
+import lombok.Getter;
 import org.apache.ibatis.session.Configuration;
 
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ import java.util.Set;
  */
 public class ResultMap {
 
+    @Getter
     private String id;
 
     private Class<?> type;
@@ -56,6 +58,7 @@ public class ResultMap {
 
     private List<ResultMapping> propertyResultMappings;
 
+    @Getter
     private Set<String> mappedColumns;
 
     private Discriminator discriminator;
@@ -67,10 +70,6 @@ public class ResultMap {
     private Boolean autoMapping;
 
     private ResultMap() {
-    }
-
-    public String getId() {
-        return id;
     }
 
     public boolean hasNestedResultMaps() {
@@ -99,10 +98,6 @@ public class ResultMap {
 
     public List<ResultMapping> getIdResultMappings() {
         return idResultMappings;
-    }
-
-    public Set<String> getMappedColumns() {
-        return mappedColumns;
     }
 
     public Discriminator getDiscriminator() {

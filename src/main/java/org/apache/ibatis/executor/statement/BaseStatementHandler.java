@@ -19,11 +19,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * @author Clinton Begin
- */
-
-/**
  * 语句处理器的基类
+ * 模版方法模型，一般的套路逻辑在该类实现，留给子类一个模版方法：instantiateStatement
  */
 public abstract class BaseStatementHandler implements StatementHandler {
 
@@ -44,6 +41,14 @@ public abstract class BaseStatementHandler implements StatementHandler {
     protected final RowBounds rowBounds;
 
     protected BoundSql boundSql;
+
+    /**
+     * 如何实例化Statement，交给子类做，有3个实现
+     *
+     * @param connection 数据库连接
+     * @return Statement
+     */
+    protected abstract Statement instantiateStatement(Connection connection) throws SQLException;
 
     protected BaseStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
         this.configuration = mappedStatement.getConfiguration();
@@ -84,6 +89,7 @@ public abstract class BaseStatementHandler implements StatementHandler {
         Statement statement = null;
         try {
             //实例化Statement
+            //模版方法
             statement = instantiateStatement(connection);
             //设置超时
             setStatementTimeout(statement);
@@ -99,25 +105,22 @@ public abstract class BaseStatementHandler implements StatementHandler {
         }
     }
 
-    //如何实例化Statement，交给子类做
-    protected abstract Statement instantiateStatement(Connection connection) throws SQLException;
-
     //设置超时,其实就是调用Statement.setQueryTimeout
-    protected void setStatementTimeout(Statement stmt) throws SQLException {
+    protected void setStatementTimeout(Statement statement) throws SQLException {
         Integer timeout = mappedStatement.getTimeout();
         Integer defaultTimeout = configuration.getDefaultStatementTimeout();
         if (timeout != null) {
-            stmt.setQueryTimeout(timeout);
+            statement.setQueryTimeout(timeout);
         } else if (defaultTimeout != null) {
-            stmt.setQueryTimeout(defaultTimeout);
+            statement.setQueryTimeout(defaultTimeout);
         }
     }
 
     //设置读取条数,其实就是调用Statement.setFetchSize
-    protected void setFetchSize(Statement stmt) throws SQLException {
+    protected void setFetchSize(Statement statement) throws SQLException {
         Integer fetchSize = mappedStatement.getFetchSize();
         if (fetchSize != null) {
-            stmt.setFetchSize(fetchSize);
+            statement.setFetchSize(fetchSize);
         }
     }
 
@@ -132,12 +135,18 @@ public abstract class BaseStatementHandler implements StatementHandler {
         }
     }
 
-    //生成key
+    /**
+     * 生成key
+     *
+     * @param parameter 参数
+     */
     protected void generateKeys(Object parameter) {
         KeyGenerator keyGenerator = mappedStatement.getKeyGenerator();
+
         ErrorContext.instance().store();
+
         keyGenerator.processBefore(executor, mappedStatement, null, parameter);
+
         ErrorContext.instance().recall();
     }
-
 }

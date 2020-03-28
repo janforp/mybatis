@@ -32,7 +32,7 @@ import java.sql.SQLException;
 @MappedTypes(BigInteger.class)
 public class DummyTypeHandler implements TypeHandler<Object> {
 
-    public void setParameter(PreparedStatement ps, int i, Object parameter, JdbcType jdbcType) throws SQLException {
+    public void setParameter(PreparedStatement preparedStatement, int i, Object parameter, JdbcType jdbcType) throws SQLException {
     }
 
     public Object getResult(ResultSet rs, String columnName) throws SQLException {

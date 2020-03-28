@@ -15,9 +15,9 @@ import java.sql.SQLException;
 public class StringTrimmingTypeHandler implements TypeHandler<String> {
 
     @Override
-    public void setParameter(PreparedStatement ps, int i, String parameter,
+    public void setParameter(PreparedStatement preparedStatement, int i, String parameter,
             JdbcType jdbcType) throws SQLException {
-        ps.setString(i, trim(parameter));
+        preparedStatement.setString(i, trim(parameter));
     }
 
     @Override

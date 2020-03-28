@@ -178,7 +178,7 @@ public abstract class BaseExecutor implements Executor {
     @SuppressWarnings("unchecked")
     @Override
     public <E> List<E> query(MappedStatement mappedStatement, Object parameter, RowBounds rowBounds,
-            ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
+            ResultHandler resultHandler, CacheKey cacheKey, BoundSql boundSql) throws SQLException {
 
         ErrorContext.instance().resource(mappedStatement.getResource()).activity("executing a query").object(mappedStatement.getId());
         //如果已经关闭，报错
@@ -186,24 +186,29 @@ public abstract class BaseExecutor implements Executor {
             throw new ExecutorException("Executor was closed.");
         }
         //先清局部缓存，再查询.但仅查询堆栈为0，才清。为了处理递归调用
-        if (queryStack == 0 && mappedStatement.isFlushCacheRequired()) {
+        boolean flushCacheRequired = mappedStatement.isFlushCacheRequired();
+        if (queryStack == 0 && flushCacheRequired) {
+            //开始查询前，并且该statement配置是要刷新缓存，则刷新缓存
             clearLocalCache();
         }
+        //用来装查询结果
         List<E> list;
         try {
             //加一,这样递归调用到上面的时候就不会再清局部缓存了
             queryStack++;
             //先根据cacheKey从localCache去查，如果有 resultHandler ，则无法使用缓存
-            list = (resultHandler == null ? (List<E>) localCache.getObject(key) : null);
+            //如果 resultHandler 为空，则可以是要缓存，但是如果查询前刷新了缓存，则相当于不用缓存
+            list = (resultHandler == null ? (List<E>) localCache.getObject(cacheKey) : null);
             if (list != null) {
+                //缓存命中
                 //若查到localCache缓存，处理localOutputParameterCache
-                handleLocallyCachedOutputParameters(mappedStatement, key, parameter, boundSql);
+                handleLocallyCachedOutputParameters(mappedStatement, cacheKey, parameter, boundSql);
             } else {
-                //从数据库查
-                list = queryFromDatabase(mappedStatement, parameter, rowBounds, resultHandler, key, boundSql);
+                //缓存未命中，从数据库查
+                list = queryFromDatabase(mappedStatement, parameter, rowBounds, resultHandler, cacheKey, boundSql);
             }
         } finally {
-            //清空堆栈
+            //退出一个堆栈
             queryStack--;
         }
         if (queryStack == 0) {
@@ -248,39 +253,49 @@ public abstract class BaseExecutor implements Executor {
         }
     }
 
-    //创建缓存Key
+    /**
+     * 创建CacheKey
+     *
+     * @param mappedStatement 映射的查询
+     * @param parameterObject 参数
+     * @param rowBounds 分页参数
+     * @param boundSql sql
+     * @return 本次查询的cacheKey
+     */
     @Override
-    public CacheKey createCacheKey(MappedStatement ms, Object parameterObject, RowBounds rowBounds, BoundSql boundSql) {
+    public CacheKey createCacheKey(MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, BoundSql boundSql) {
         if (closed) {
             throw new ExecutorException("Executor was closed.");
         }
         CacheKey cacheKey = new CacheKey();
-        //MyBatis 对于其 Key 的生成采取规则为：[mappedStementId + offset + limit + SQL + queryParams + environment]生成一个哈希码
-        cacheKey.update(ms.getId());
+        //MyBatis 对于其 Key 的生成采取规则为：[mappedStatementId + offset + limit + SQL + queryParams + environment]生成一个哈希码
+        cacheKey.update(mappedStatement.getId());
         cacheKey.update(rowBounds.getOffset());
         cacheKey.update(rowBounds.getLimit());
         cacheKey.update(boundSql.getSql());
-        List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
-        TypeHandlerRegistry typeHandlerRegistry = ms.getConfiguration().getTypeHandlerRegistry();
+        List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
+        TypeHandlerRegistry typeHandlerRegistry = mappedStatement.getConfiguration().getTypeHandlerRegistry();
         // mimic DefaultParameterHandler logic
         //模仿DefaultParameterHandler的逻辑,不再重复，请参考DefaultParameterHandler
-        for (int i = 0; i < parameterMappings.size(); i++) {
-            ParameterMapping parameterMapping = parameterMappings.get(i);
-            if (parameterMapping.getMode() != ParameterMode.OUT) {
-                Object value;
-                String propertyName = parameterMapping.getProperty();
-                if (boundSql.hasAdditionalParameter(propertyName)) {
-                    value = boundSql.getAdditionalParameter(propertyName);
-                } else if (parameterObject == null) {
-                    value = null;
-                } else if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
-                    value = parameterObject;
-                } else {
-                    MetaObject metaObject = configuration.newMetaObject(parameterObject);
-                    value = metaObject.getValue(propertyName);
-                }
-                cacheKey.update(value);
+        for (int i = 0; i < parameterMappingList.size(); i++) {
+            ParameterMapping parameterMapping = parameterMappingList.get(i);
+            ParameterMode parameterMode = parameterMapping.getMode();
+            if (parameterMode == ParameterMode.OUT) {
+                continue;
             }
+            Object value;
+            String propertyName = parameterMapping.getProperty();
+            if (boundSql.hasAdditionalParameter(propertyName)) {
+                value = boundSql.getAdditionalParameter(propertyName);
+            } else if (parameterObject == null) {
+                value = null;
+            } else if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
+                value = parameterObject;
+            } else {
+                MetaObject metaObject = configuration.newMetaObject(parameterObject);
+                value = metaObject.getValue(propertyName);
+            }
+            cacheKey.update(value);
         }
         if (configuration.getEnvironment() != null) {
             // issue #176
@@ -290,8 +305,8 @@ public abstract class BaseExecutor implements Executor {
     }
 
     @Override
-    public boolean isCached(MappedStatement ms, CacheKey key) {
-        return localCache.getObject(key) != null;
+    public boolean isCached(MappedStatement mappedStatement, CacheKey cacheKey) {
+        return localCache.getObject(cacheKey) != null;
     }
 
     @Override
@@ -332,8 +347,19 @@ public abstract class BaseExecutor implements Executor {
 
     protected abstract List<BatchResult> doFlushStatements(boolean isRollback) throws SQLException;
 
-    //query-->queryFromDatabase-->doQuery
-    protected abstract <E> List<E> doQuery(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException;
+    /**
+     * query-->queryFromDatabase-->doQuery
+     *
+     * @param mappedStatement 映射查询
+     * @param parameter 参数
+     * @param rowBounds 分页参数
+     * @param resultHandler 结果处理器
+     * @param boundSql sql
+     * @param <E> 结果类型
+     * @return 查询结果
+     * @throws SQLException sql异常
+     */
+    protected abstract <E> List<E> doQuery(MappedStatement mappedStatement, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException;
 
     protected void closeStatement(Statement statement) {
         if (statement != null) {
@@ -345,30 +371,39 @@ public abstract class BaseExecutor implements Executor {
         }
     }
 
-    private void handleLocallyCachedOutputParameters(MappedStatement ms, CacheKey key, Object parameter, BoundSql boundSql) {
+    private void handleLocallyCachedOutputParameters(MappedStatement mappedStatement, CacheKey cacheKey, Object parameter, BoundSql boundSql) {
         //处理存储过程的OUT参数
-        if (ms.getStatementType() == StatementType.CALLABLE) {
-            final Object cachedParameter = localOutputParameterCache.getObject(key);
-            if (cachedParameter != null && parameter != null) {
-                final MetaObject metaCachedParameter = configuration.newMetaObject(cachedParameter);
-                final MetaObject metaParameter = configuration.newMetaObject(parameter);
-                for (ParameterMapping parameterMapping : boundSql.getParameterMappings()) {
-                    if (parameterMapping.getMode() != ParameterMode.IN) {
-                        final String parameterName = parameterMapping.getProperty();
-                        final Object cachedValue = metaCachedParameter.getValue(parameterName);
-                        metaParameter.setValue(parameterName, cachedValue);
-                    }
+        StatementType statementType = mappedStatement.getStatementType();
+        if (statementType != StatementType.CALLABLE) {
+            return;
+        }
+        final Object cachedParameter = localOutputParameterCache.getObject(cacheKey);
+        if (cachedParameter != null && parameter != null) {
+            final MetaObject metaCachedParameter = configuration.newMetaObject(cachedParameter);
+            final MetaObject metaParameter = configuration.newMetaObject(parameter);
+
+            //传入sql的参数列表
+            List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
+            for (ParameterMapping parameterMapping : parameterMappingList) {
+                if (parameterMapping.getMode() != ParameterMode.IN) {
+                    final String parameterName = parameterMapping.getProperty();
+                    final Object cachedValue = metaCachedParameter.getValue(parameterName);
+                    //TODO ?
+                    metaParameter.setValue(parameterName, cachedValue);
                 }
             }
         }
     }
 
     //从数据库查
-    private <E> List<E> queryFromDatabase(MappedStatement mappedStatement, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey cacheKey, BoundSql boundSql) throws SQLException {
+    private <E> List<E> queryFromDatabase(MappedStatement mappedStatement, Object parameter, RowBounds rowBounds,
+            ResultHandler resultHandler, CacheKey cacheKey, BoundSql boundSql) throws SQLException {
+
         List<E> list;
         //先向缓存中放入占位符？？？
         localCache.putObject(cacheKey, EXECUTION_PLACEHOLDER);
         try {
+            //模版方法
             list = doQuery(mappedStatement, parameter, rowBounds, resultHandler, boundSql);
         } finally {
             //最后删除占位符

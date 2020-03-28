@@ -600,21 +600,23 @@ public class Configuration {
     }
 
     /**
-     * 创建语句处理器
+     * 创建语句处理器，一共有3种类型的处理器
      *
      * @param executor 执行器
      * @param mappedStatement 映射语句
-     * @param parameterObject 传输对象
+     * @param parameterObject 参数
      * @param rowBounds 分页传输
      * @param resultHandler 结果处理器
      * @param boundSql 绑定的sql
      * @return 创建语句处理器
      */
-    public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement,
-            Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
+    public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameterObject,
+            RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
+
         //创建路由选择语句处理器，这个 RoutingStatementHandler 是具体三中类型的代理
         StatementHandler statementHandler = new RoutingStatementHandler(executor, mappedStatement, parameterObject, rowBounds, resultHandler, boundSql);
         //插件在这里插入
+        //TODO ?
         statementHandler = (StatementHandler) interceptorChain.pluginAll(statementHandler);
         return statementHandler;
     }

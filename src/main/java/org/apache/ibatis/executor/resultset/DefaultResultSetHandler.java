@@ -143,36 +143,37 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     // HANDLE RESULT SETS
     //
     @Override
-    public List<Object> handleResultSets(Statement stmt) throws SQLException {
+    public List<Object> handleResultSets(Statement statement) throws SQLException {
         ErrorContext.instance().activity("handling results").object(mappedStatement.getId());
 
         final List<Object> multipleResults = new ArrayList<Object>();
 
-        int resultSetCount = 0;
-        ResultSetWrapper rsw = getFirstResultSet(stmt);
-
-        List<ResultMap> resultMaps = mappedStatement.getResultMaps();
+        ResultSetWrapper resultSetWrapper = getFirstResultSet(statement);
+        //结果映射 resultMap
+        List<ResultMap> resultMapList = mappedStatement.getResultMaps();
         //一般resultMaps里只有一个元素
-        int resultMapCount = resultMaps.size();
-        validateResultMapsCount(rsw, resultMapCount);
-        while (rsw != null && resultMapCount > resultSetCount) {
-            ResultMap resultMap = resultMaps.get(resultSetCount);
-            handleResultSet(rsw, resultMap, multipleResults, null);
-            rsw = getNextResultSet(stmt);
+        int resultMapCount = resultMapList.size();
+        validateResultMapsCount(resultSetWrapper, resultMapCount);
+
+        int resultSetCount = 0;
+        while (resultSetWrapper != null && resultMapCount > resultSetCount) {
+            ResultMap resultMap = resultMapList.get(resultSetCount);
+            handleResultSet(resultSetWrapper, resultMap, multipleResults, null);
+            resultSetWrapper = getNextResultSet(statement);
             cleanUpAfterHandlingResultSet();
             resultSetCount++;
         }
 
         String[] resultSets = mappedStatement.getResultSets();
         if (resultSets != null) {
-            while (rsw != null && resultSetCount < resultSets.length) {
+            while (resultSetWrapper != null && resultSetCount < resultSets.length) {
                 ResultMapping parentMapping = nextResultMaps.get(resultSets[resultSetCount]);
                 if (parentMapping != null) {
                     String nestedResultMapId = parentMapping.getNestedResultMapId();
                     ResultMap resultMap = configuration.getResultMap(nestedResultMapId);
-                    handleResultSet(rsw, resultMap, null, parentMapping);
+                    handleResultSet(resultSetWrapper, resultMap, null, parentMapping);
                 }
-                rsw = getNextResultSet(stmt);
+                resultSetWrapper = getNextResultSet(statement);
                 cleanUpAfterHandlingResultSet();
                 resultSetCount++;
             }
@@ -181,22 +182,22 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         return collapseSingleResultList(multipleResults);
     }
 
-    private ResultSetWrapper getFirstResultSet(Statement stmt) throws SQLException {
-        ResultSet rs = stmt.getResultSet();
-        //HSQLDB2.1特殊情况处理
-        while (rs == null) {
+    private ResultSetWrapper getFirstResultSet(Statement statement) throws SQLException {
+        ResultSet resultSet = statement.getResultSet();
+        //HSQLDB2.1特殊情况处理,mysql是不存在这样的情况
+        while (resultSet == null) {
             // move forward to get the first resultset in case the driver
             // doesn't return the resultset as the first result (HSQLDB 2.1)
-            if (stmt.getMoreResults()) {
-                rs = stmt.getResultSet();
+            if (statement.getMoreResults()) {
+                resultSet = statement.getResultSet();
             } else {
-                if (stmt.getUpdateCount() == -1) {
+                if (statement.getUpdateCount() == -1) {
                     // no more results. Must be no resultset
                     break;
                 }
             }
         }
-        return rs != null ? new ResultSetWrapper(rs, configuration) : null;
+        return resultSet != null ? new ResultSetWrapper(resultSet, configuration) : null;
     }
 
     private ResultSetWrapper getNextResultSet(Statement stmt) throws SQLException {
@@ -230,8 +231,8 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         ancestorColumnPrefix.clear();
     }
 
-    private void validateResultMapsCount(ResultSetWrapper rsw, int resultMapCount) {
-        if (rsw != null && resultMapCount < 1) {
+    private void validateResultMapsCount(ResultSetWrapper resultSetWrapper, int resultMapCount) {
+        if (resultSetWrapper != null && resultMapCount < 1) {
             throw new ExecutorException("A query was run and no Result Maps were found for the Mapped Statement '" + mappedStatement.getId()
                     + "'.  It's likely that neither a Result Type nor a Result Map was specified.");
         }

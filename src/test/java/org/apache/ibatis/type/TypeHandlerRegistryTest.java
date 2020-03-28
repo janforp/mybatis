@@ -52,7 +52,7 @@ public class TypeHandlerRegistryTest {
     public void shouldRegisterAndRetrieveComplexTypeHandler() {
         TypeHandler<List<URI>> fakeHandler = new TypeHandler<List<URI>>() {
 
-            public void setParameter(PreparedStatement ps, int i, List<URI> parameter, JdbcType jdbcType)
+            public void setParameter(PreparedStatement preparedStatement, int i, List<URI> parameter, JdbcType jdbcType)
                     throws SQLException {
                 // do nothing, fake method
             }

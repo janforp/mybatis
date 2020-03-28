@@ -26,8 +26,8 @@ import java.sql.SQLException;
 
 public class ExampleTypeHandler implements TypeHandler<String> {
 
-    public void setParameter(PreparedStatement ps, int i, String parameter, JdbcType jdbcType) throws SQLException {
-        ps.setString(i, parameter);
+    public void setParameter(PreparedStatement preparedStatement, int i, String parameter, JdbcType jdbcType) throws SQLException {
+        preparedStatement.setString(i, parameter);
     }
 
     public String getResult(ResultSet rs, String columnName) throws SQLException {

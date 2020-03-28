@@ -42,13 +42,13 @@ public class FirstNameTypeHandler implements TypeHandler {
         return rs.getString(columnIndex);
     }
 
-    public void setParameter(PreparedStatement ps, int i, Object parameter,
+    public void setParameter(PreparedStatement preparedStatement, int i, Object parameter,
             JdbcType jdbcType) throws SQLException {
         if (parameter == null) {
-            ps.setNull(i, Types.VARCHAR);
+            preparedStatement.setNull(i, Types.VARCHAR);
         } else {
             Name name = (Name) parameter;
-            ps.setString(i, name.getFirstName());
+            preparedStatement.setString(i, name.getFirstName());
         }
     }
 

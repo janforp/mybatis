@@ -16,6 +16,7 @@
 
 package org.apache.ibatis.mapping;
 
+import lombok.Getter;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 
@@ -40,6 +41,7 @@ public class BoundSql {
     /**
      * xml中的sql
      */
+    @Getter
     private String sql;
 
     /**
@@ -47,11 +49,13 @@ public class BoundSql {
      *
      * #{property,javaType=int,jdbcType=NUMERIC}
      */
+    @Getter
     private List<ParameterMapping> parameterMappings;
 
     /**
      * 入参数
      */
+    @Getter
     private Object parameterObject;
 
     private Map<String, Object> additionalParameters;
@@ -64,18 +68,6 @@ public class BoundSql {
         this.parameterObject = parameterObject;
         this.additionalParameters = new HashMap<String, Object>();
         this.metaParameters = configuration.newMetaObject(additionalParameters);
-    }
-
-    public String getSql() {
-        return sql;
-    }
-
-    public List<ParameterMapping> getParameterMappings() {
-        return parameterMappings;
-    }
-
-    public Object getParameterObject() {
-        return parameterObject;
     }
 
     public boolean hasAdditionalParameter(String name) {

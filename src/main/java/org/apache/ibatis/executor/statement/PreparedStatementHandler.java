@@ -5,6 +5,7 @@ import org.apache.ibatis.executor.keygen.Jdbc3KeyGenerator;
 import org.apache.ibatis.executor.keygen.KeyGenerator;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ResultSetType;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
@@ -44,30 +45,36 @@ public class PreparedStatementHandler extends BaseStatementHandler {
 
     @Override
     public void batch(Statement statement) throws SQLException {
-        PreparedStatement ps = (PreparedStatement) statement;
-        ps.addBatch();
+        PreparedStatement preparedStatement = (PreparedStatement) statement;
+        preparedStatement.addBatch();
     }
 
     @Override
     public <E> List<E> query(Statement statement, ResultHandler resultHandler) throws SQLException {
         PreparedStatement preparedStatement = (PreparedStatement) statement;
         preparedStatement.execute();
-        return resultSetHandler.<E>handleResultSets(preparedStatement);
+        List<E> resultSetList = resultSetHandler.<E>handleResultSets(preparedStatement);
+        System.out.println(resultSetList);
+        return resultSetList;
     }
 
     @Override
     protected Statement instantiateStatement(Connection connection) throws SQLException {
         //调用Connection.prepareStatement
         String sql = boundSql.getSql();
-        if (mappedStatement.getKeyGenerator() instanceof Jdbc3KeyGenerator) {
+        //TODO
+        KeyGenerator keyGenerator = mappedStatement.getKeyGenerator();
+        ResultSetType resultSetType = mappedStatement.getResultSetType();
+        if (keyGenerator instanceof Jdbc3KeyGenerator) {
             String[] keyColumnNames = mappedStatement.getKeyColumns();
             if (keyColumnNames == null) {
                 return connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             } else {
                 return connection.prepareStatement(sql, keyColumnNames);
             }
-        } else if (mappedStatement.getResultSetType() != null) {
-            return connection.prepareStatement(sql, mappedStatement.getResultSetType().getValue(), ResultSet.CONCUR_READ_ONLY);
+        } else if (resultSetType != null) {
+            int value = resultSetType.getValue();
+            return connection.prepareStatement(sql, value, ResultSet.CONCUR_READ_ONLY);
         } else {
             return connection.prepareStatement(sql);
         }

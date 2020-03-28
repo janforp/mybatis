@@ -57,7 +57,7 @@ public class UserStateTypeHandler<E> implements TypeHandler<Object> {
     }
 
     @Override
-    public void setParameter(PreparedStatement ps, int i, Object value, JdbcType jdbcType) throws SQLException {
+    public void setParameter(PreparedStatement preparedStatement, int i, Object value, JdbcType jdbcType) throws SQLException {
 
         String key = "";
         for (Entry<String, String> entry : lookup.entrySet()) {
@@ -65,7 +65,7 @@ public class UserStateTypeHandler<E> implements TypeHandler<Object> {
                 key = entry.getKey();
             }
         }
-        ps.setInt(i, Integer.valueOf(key));
+        preparedStatement.setInt(i, Integer.valueOf(key));
     }
 
     private String lookupValue(int val) {

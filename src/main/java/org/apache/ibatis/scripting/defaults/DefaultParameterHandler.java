@@ -1,19 +1,3 @@
-/*
- *    Copyright 2009-2012 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.scripting.defaults;
 
 import org.apache.ibatis.executor.ErrorContext;
@@ -82,42 +66,45 @@ public class DefaultParameterHandler implements ParameterHandler {
 
     //设置参数
     @Override
-    public void setParameters(PreparedStatement ps) throws SQLException {
+    public void setParameters(PreparedStatement preparedStatement) throws SQLException {
         ErrorContext.instance().activity("setting parameters").object(mappedStatement.getParameterMap().getId());
         //映射参数列表 #{property,javaType=int,jdbcType=NUMERIC}
-        List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
-        if (parameterMappings != null) {
-            //循环设参数
-            for (int i = 0; i < parameterMappings.size(); i++) {
-                ParameterMapping parameterMapping = parameterMappings.get(i);
-                if (parameterMapping.getMode() != ParameterMode.OUT) {
-                    //如果不是OUT，才设进去
-                    Object value;
-                    //参数名称
-                    String propertyName = parameterMapping.getProperty();
-                    if (boundSql.hasAdditionalParameter(propertyName)) { // issue #448 ask first for additional params
-                        //若有额外的参数, 设为额外的参数
-                        value = boundSql.getAdditionalParameter(propertyName);
-                    } else if (parameterObject == null) {
-                        //若参数为null，直接设null
-                        value = null;
-                    } else if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
-                        //若参数有相应的TypeHandler，直接设object
-                        value = parameterObject;
-                    } else {
-                        //除此以外，MetaObject.getValue反射取得值设进去
-                        MetaObject metaObject = configuration.newMetaObject(parameterObject);
-                        value = metaObject.getValue(propertyName);
-                    }
-                    TypeHandler typeHandler = parameterMapping.getTypeHandler();
-                    JdbcType jdbcType = parameterMapping.getJdbcType();
-                    if (value == null && jdbcType == null) {
-                        //不同类型的set方法不同，所以委派给子类的setParameter方法
-                        jdbcType = configuration.getJdbcTypeForNull();
-                    }
-                    typeHandler.setParameter(ps, i + 1, value, jdbcType);
-                }
+        List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
+        if (parameterMappingList == null) {
+            return;
+        }
+        //循环设参数
+        for (int i = 0; i < parameterMappingList.size(); i++) {
+            ParameterMapping parameterMapping = parameterMappingList.get(i);
+            //如果不是OUT，才设进去
+            if (parameterMapping.getMode() == ParameterMode.OUT) {
+                continue;
             }
+            Object value;
+            //参数名称,如：#{username}
+            String propertyName = parameterMapping.getProperty();
+            if (boundSql.hasAdditionalParameter(propertyName)) { // issue #448 ask first for additional params
+                value = boundSql.getAdditionalParameter(propertyName);
+            } else if (parameterObject == null) {
+                //若参数为null，直接设null
+                value = null;
+            } else if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
+                //若参数有相应的TypeHandler，直接设object
+                value = parameterObject;
+            } else {
+                //除此以外，MetaObject.getValue反射取得值设进去
+                MetaObject metaObject = configuration.newMetaObject(parameterObject);
+                value = metaObject.getValue(propertyName);
+            }
+            TypeHandler typeHandler = parameterMapping.getTypeHandler();
+            JdbcType jdbcType = parameterMapping.getJdbcType();
+            if (value == null && jdbcType == null) {
+                //不同类型的set方法不同，所以委派给子类的setParameter方法
+                jdbcType = configuration.getJdbcTypeForNull();
+            }
+            int parameterIndex = i + 1;
+            //因为循环从0开始，而参数的下标从1开始
+            typeHandler.setParameter(preparedStatement, parameterIndex, value, jdbcType);
         }
     }
 }

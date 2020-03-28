@@ -30,37 +30,37 @@ public class SimpleExecutor extends BaseExecutor {
 
     //update
     @Override
-    public int doUpdate(MappedStatement ms, Object parameter) throws SQLException {
-        Statement stmt = null;
+    public int doUpdate(MappedStatement mappedStatement, Object parameter) throws SQLException {
+        Statement statement = null;
         try {
-            Configuration configuration = ms.getConfiguration();
+            Configuration configuration = mappedStatement.getConfiguration();
             //新建一个StatementHandler
             //这里看到ResultHandler传入的是null
-            StatementHandler handler = configuration.newStatementHandler(this, ms, parameter, RowBounds.DEFAULT, null, null);
+            StatementHandler handler = configuration.newStatementHandler(this, mappedStatement, parameter, RowBounds.DEFAULT, null, null);
             //准备语句
-            stmt = prepareStatement(handler, ms.getStatementLog());
+            statement = prepareStatement(handler, mappedStatement.getStatementLog());
             //StatementHandler.update
-            return handler.update(stmt);
+            return handler.update(statement);
         } finally {
-            closeStatement(stmt);
+            closeStatement(statement);
         }
     }
 
     //select
     @Override
-    public <E> List<E> doQuery(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
-        Statement stmt = null;
+    public <E> List<E> doQuery(MappedStatement mappedStatement, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
+        Statement statement = null;
         try {
-            Configuration configuration = ms.getConfiguration();
+            Configuration configuration = mappedStatement.getConfiguration();
             //新建一个StatementHandler
             //这里看到ResultHandler传入了
-            StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);
+            StatementHandler handler = configuration.newStatementHandler(wrapper, mappedStatement, parameter, rowBounds, resultHandler, boundSql);
             //准备语句
-            stmt = prepareStatement(handler, ms.getStatementLog());
+            statement = prepareStatement(handler, mappedStatement.getStatementLog());
             //StatementHandler.query
-            return handler.<E>query(stmt, resultHandler);
+            return handler.<E>query(statement, resultHandler);
         } finally {
-            closeStatement(stmt);
+            closeStatement(statement);
         }
     }
 
@@ -70,14 +70,21 @@ public class SimpleExecutor extends BaseExecutor {
         return Collections.emptyList();
     }
 
-    private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
-        Statement stmt;
+    /**
+     * 准备 Statement ，步骤：getConnection -》prepare -》parameterize
+     *
+     * @param statementHandler Statement处理器
+     * @param statementLog log
+     * @return Statement
+     * @throws SQLException sql异常
+     */
+    private Statement prepareStatement(StatementHandler statementHandler, Log statementLog) throws SQLException {
+        Statement statement;
         Connection connection = getConnection(statementLog);
         //调用StatementHandler.prepare
-        stmt = handler.prepare(connection);
+        statement = statementHandler.prepare(connection);
         //调用StatementHandler.parameterize
-        handler.parameterize(stmt);
-        return stmt;
+        statementHandler.parameterize(statement);
+        return statement;
     }
-
 }

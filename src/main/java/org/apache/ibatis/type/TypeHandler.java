@@ -67,13 +67,13 @@ public interface TypeHandler<T> {
     /**
      * 用于定义在Mybatis设置参数时该如何把Java类型的参数转换为对应的数据库类型
      *
-     * @param ps 当前的PreparedStatement对象
+     * @param preparedStatement 当前的PreparedStatement对象
      * @param parameterIndex 当前参数的位置
      * @param parameter 当前参数的Java对象
      * @param jdbcType 当前参数的数据库类型
      * @throws SQLException
      */
-    void setParameter(PreparedStatement ps, int parameterIndex, T parameter, JdbcType jdbcType) throws SQLException;
+    void setParameter(PreparedStatement preparedStatement, int parameterIndex, T parameter, JdbcType jdbcType) throws SQLException;
 
     /**
      * 用于在Mybatis获取数据结果集时如何把数据库类型转换为对应的Java类型
