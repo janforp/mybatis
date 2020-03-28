@@ -1,19 +1,3 @@
-/*
- *    Copyright 2009-2012 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.reflection;
 
 import org.apache.ibatis.reflection.invoker.GetFieldInvoker;
@@ -34,14 +18,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-/*
+/**
  * This class represents a cached set of class definition information that
  * allows for easy mapping between property names and getter/setter methods.
- */
-
-/**
+ *
  * 反射器, 属性->getter/setter的映射器，而且加了缓存
  * 可参考ReflectorTest来理解这个类的用处
  * 其实就是一个缓存，一个类型有一个 Reflector 缓存实例
@@ -50,6 +33,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Reflector {
 
+    /**
+     * 是否开启 class 缓存
+     */
     private static boolean classCacheEnabled = true;
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
@@ -57,6 +43,9 @@ public class Reflector {
     //这里用ConcurrentHashMap，多线程支持，作为一个缓存
     private static final Map<Class<?>, Reflector> REFLECTOR_MAP = new ConcurrentHashMap<Class<?>, Reflector>();
 
+    /**
+     * 每一个class都有一个Reflector
+     */
     private Class<?> type;
 
     //getter的属性列表
@@ -74,7 +63,7 @@ public class Reflector {
     //setter的类型列表
     private Map<String, Class<?>> setTypes = new HashMap<String, Class<?>>();
 
-    //getter的类型列表
+    //get函数的返回类型
     private Map<String, Class<?>> getTypes = new HashMap<String, Class<?>>();
 
     //构造函数
@@ -122,17 +111,19 @@ public class Reflector {
     }
 
     private void addGetMethods(Class<?> cls) {
+        //有冲突的，因为子类跟父类的关系
         Map<String, List<Method>> conflictingGetters = new HashMap<String, List<Method>>();
         //这里getter和setter都调用了getClassMethods，有点浪费效率了。不妨把addGetMethods,addSetMethods合并成一个方法叫addMethods
         Method[] methods = getClassMethods(cls);
         for (Method method : methods) {
             String name = method.getName();
             if (name.startsWith("get") && name.length() > 3) {//从一个方法的名称判断是否为get方法的基本条件：以get开头，并且get后还有其他字符
-                if (method.getParameterTypes().length == 0) {//从一个方法的名称判断是否为get方法的毕业条件：get方法是无参数的
+                if (method.getParameterTypes().length == 0) {//从一个方法的名称判断是否为get方法的必要条件：get方法是无参数的
                     name = PropertyNamer.methodToProperty(name);//方法转属性，如 getId -> id
                     addMethodConflict(conflictingGetters, name, method);//把该 name method 对放进 Map<String, List<Method>> conflictingGetters
                 }
-            } else if (name.startsWith("is") && name.length() > 2) {//如果为 boolean 类型的属性
+            } else if (name.startsWith("is") && name.length() > 2) {
+                //如果为 boolean 类型的属性
                 if (method.getParameterTypes().length == 0) {
                     name = PropertyNamer.methodToProperty(name);
                     addMethodConflict(conflictingGetters, name, method);
@@ -143,14 +134,21 @@ public class Reflector {
         resolveGetterConflicts(conflictingGetters);
     }
 
+    /**
+     * 解决冲突
+     * @param conflictingGetters key:属性名称,value:该属性对应的所有get方法集合
+     */
     private void resolveGetterConflicts(Map<String, List<Method>> conflictingGetters) {
-        for (String propName : conflictingGetters.keySet()) {
+        Set<String> propertyNameSet = conflictingGetters.keySet();
+        for (String propName : propertyNameSet) {
             List<Method> getters = conflictingGetters.get(propName);
             Iterator<Method> iterator = getters.iterator();
             Method firstMethod = iterator.next();
             if (getters.size() == 1) {
+                //如果只有一个，则直接添加
                 addGetMethod(propName, firstMethod);
             } else {
+                //如果一个属性有多个 get 函数，则：
                 Method getter = firstMethod;
                 Class<?> getterType = firstMethod.getReturnType();
                 while (iterator.hasNext()) {
@@ -272,6 +270,7 @@ public class Reflector {
                     // pr #16 - final static can only be set by the classloader
                     int modifiers = field.getModifiers();
                     if (!(Modifier.isFinal(modifiers) && Modifier.isStatic(modifiers))) {
+                        //final/static的方法不行
                         addSetField(field);
                     }
                 }
@@ -314,30 +313,33 @@ public class Reflector {
      * @return An array containing all methods in this class
      */
     private Method[] getClassMethods(Class<?> cls) {
+        //解决冲突之后，一个属性就只有一个方法
         Map<String, Method> uniqueMethods = new HashMap<String, Method>();
         Class<?> currentClass = cls;
         while (currentClass != null) {
-            addUniqueMethods(uniqueMethods, currentClass.getDeclaredMethods());
-
+            //当前class中申明的方法
+            Method[] declaredMethods = currentClass.getDeclaredMethods();
+            addUniqueMethods(uniqueMethods, declaredMethods);
             // we also need to look for interface methods -
             // because the class may be abstract
             Class<?>[] interfaces = currentClass.getInterfaces();
             for (Class<?> anInterface : interfaces) {
+                //往 uniqueMethods 中添加方法
                 addUniqueMethods(uniqueMethods, anInterface.getMethods());
             }
-
+            //遍历他的父类型
             currentClass = currentClass.getSuperclass();
         }
-
         Collection<Method> methods = uniqueMethods.values();
-
-        return methods.toArray(new Method[methods.size()]);
+        return methods.toArray(new Method[0]);
     }
 
     private void addUniqueMethods(Map<String, Method> uniqueMethods, Method[] methods) {
         for (Method currentMethod : methods) {
-            if (!currentMethod.isBridge()) {
-                //取得签名
+            //是否是范型桥接函数/方法
+            boolean bridge = currentMethod.isBridge();
+            if (!bridge) {
+                //获取方法签名，包括返回，方法名称，参数名称组成的字符串
                 String signature = getSignature(currentMethod);
                 // check to see if the method is already known
                 // if it is known, then an extended class must have
@@ -350,30 +352,38 @@ public class Reflector {
                             // Ignored. This is only a final precaution, nothing we can do.
                         }
                     }
-
                     uniqueMethods.put(signature, currentMethod);
                 }
             }
         }
     }
 
+    /**
+     * 获取方法签名，包括返回，方法名称，参数名称
+     *
+     * @param method 方法
+     * @return 方法签名
+     */
     private String getSignature(Method method) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         Class<?> returnType = method.getReturnType();
         if (returnType != null) {
-            sb.append(returnType.getName()).append('#');
+            stringBuilder.append(returnType.getName()).append('#');
         }
-        sb.append(method.getName());
+        stringBuilder.append(method.getName());
+        //方法参数类型
         Class<?>[] parameters = method.getParameterTypes();
         for (int i = 0; i < parameters.length; i++) {
             if (i == 0) {
-                sb.append(':');
+                stringBuilder.append(':');
             } else {
-                sb.append(',');
+                stringBuilder.append(',');
             }
-            sb.append(parameters[i].getName());
+            //当前参数类型名称
+            String name = parameters[i].getName();
+            stringBuilder.append(name);
         }
-        return sb.toString();
+        return stringBuilder.toString();
     }
 
     private static boolean canAccessPrivateMethods() {

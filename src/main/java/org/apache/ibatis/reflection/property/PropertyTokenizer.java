@@ -1,25 +1,9 @@
-/*
- *    Copyright 2009-2012 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.reflection.property;
 
 import java.util.Iterator;
 
 /**
- * 属性分解为标记，迭代子模式
+ * 属性分解为标记，迭代模式
  * 如person[0].birthdate.year，将依次取得person[0], birthdate, year
  *
  * @author Clinton Begin
@@ -35,16 +19,16 @@ public class PropertyTokenizer implements Iterable<PropertyTokenizer>, Iterator<
 
     private String children; //birthdate.year
 
-    public PropertyTokenizer(String fullname) {
+    public PropertyTokenizer(String fullName) {
         //person[0].birthdate.year
         //找.
-        int delim = fullname.indexOf('.');
+        int delim = fullName.indexOf('.');
         if (delim > -1) {
-            name = fullname.substring(0, delim);
-            children = fullname.substring(delim + 1);
+            name = fullName.substring(0, delim);
+            children = fullName.substring(delim + 1);
         } else {
             //找不到.的话，取全部部分
-            name = fullname;
+            name = fullName;
             children = null;
         }
         indexedName = name;

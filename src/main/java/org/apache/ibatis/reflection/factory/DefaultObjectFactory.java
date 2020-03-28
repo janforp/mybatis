@@ -1,19 +1,3 @@
-/*
- *    Copyright 2009-2012 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.reflection.factory;
 
 import org.apache.ibatis.reflection.ReflectionException;
@@ -114,7 +98,7 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
         }
     }
 
-    //1.解析接口,将interface转为实际class
+    //1.解析接口,将interface转为能实例化的类型
     protected Class<?> resolveInterface(Class<?> type) {
         Class<?> classToCreate;
         if (type == List.class || type == Collection.class || type == Iterable.class) {
@@ -141,10 +125,4 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
         //是否是Collection的子类
         return Collection.class.isAssignableFrom(type);
     }
-
-    public static void main(String[] args) {
-        Class<List> listClass = List.class;
-        System.out.println(Collection.class.isAssignableFrom(listClass));
-    }
-
 }
