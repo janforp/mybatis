@@ -46,7 +46,7 @@ import java.util.Set;
  */
 
 /**
- * 默认Map结果处理器
+ * 默认结果处理器
  */
 public class DefaultResultSetHandler implements ResultSetHandler {
 
@@ -140,9 +140,13 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         }
     }
 
-    //
-    // HANDLE RESULT SETS
-    //
+    /**
+     * 处理sql执行结果
+     *
+     * @param statement 已经执行过数据库查询的 statement，通过 ResultSet resultSet = statement.getResultSet();可以拿到结果
+     * @return sql执行结果
+     * @throws SQLException 异常
+     */
     @Override
     public List<Object> handleResultSets(Statement statement) throws SQLException {
         ErrorContext.instance().activity("handling results").object(mappedStatement.getId());
@@ -643,14 +647,14 @@ public class DefaultResultSetHandler implements ResultSetHandler {
      * 通过构造器创建对象的映射
      *
      * <resultMap id="blogUsingConstructor" type="Blog">
-     *         <constructor>
-     *             <idArg column="id" javaType="_int"/>
-     *             <arg column="title" javaType="java.lang.String"/>
-     *             <arg column="author_id" javaType="org.apache.ibatis.domain.blog.Author"
-     *                  select="org.apache.ibatis.binding.BoundAuthorMapper.selectAuthor"/>
-     *             <arg column="id" javaType="java.util.List" select="selectPostsForBlog"/>
-     *         </constructor>
-     *     </resultMap>
+     * <constructor>
+     * <idArg column="id" javaType="_int"/>
+     * <arg column="title" javaType="java.lang.String"/>
+     * <arg column="author_id" javaType="org.apache.ibatis.domain.blog.Author"
+     * select="org.apache.ibatis.binding.BoundAuthorMapper.selectAuthor"/>
+     * <arg column="id" javaType="java.util.List" select="selectPostsForBlog"/>
+     * </constructor>
+     * </resultMap>
      *
      * @param resultSetWrapper 包装器
      * @param resultType 映射结果类型

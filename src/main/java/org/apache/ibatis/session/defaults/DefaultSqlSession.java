@@ -135,7 +135,9 @@ public class DefaultSqlSession implements SqlSession {
             mapResultHandler.handleResult(resultContext);
         }
         //注意这个DefaultMapResultHandler里面存了所有已处理的记录(内部实现可能就是一个Map)，最后再返回一个Map
-        return mapResultHandler.getMappedResults();
+        Map<K, V> mappedResults = mapResultHandler.getMappedResults();
+        System.out.println(mappedResults);
+        return mappedResults;
     }
 
     /**
@@ -171,8 +173,11 @@ public class DefaultSqlSession implements SqlSession {
             //每次要更新之前，dirty标志设为true
             dirty = true;
             MappedStatement ms = configuration.getMappedStatement(statement);
+            Object wrapCollection = wrapCollection(parameter);
             //转而用执行器来update结果
-            return executor.update(ms, wrapCollection(parameter));
+            int update = executor.update(ms, wrapCollection);
+            System.out.println(update);
+            return update;
         } catch (Exception e) {
             throw ExceptionFactory.wrapException("Error updating database.  Cause: " + e, e);
         } finally {

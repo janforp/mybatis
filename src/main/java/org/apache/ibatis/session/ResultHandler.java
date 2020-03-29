@@ -23,12 +23,15 @@ package org.apache.ibatis.session;
  * 当使用高级的结果映射集（resultMap）时，MyBatis 很可能需要数行结果来构造一个对象。
  * 如果你使用了 ResultHandler，你可能会接收到关联（association）或者集合（collection）中尚未被完整填充的对象。
  *
+ * 处理结果也会存在该对象的一个属性中，处理的时候是循环结果记录处理，处理完之后通过该对象的属性get到最终的结果
+ *
  * @author Clinton Begin
  */
 public interface ResultHandler {
 
     /**
      * 处理结果，给一个结果上下文
+     *
      * @param resultContext 结果上下文
      */
     void handleResult(ResultContext resultContext);

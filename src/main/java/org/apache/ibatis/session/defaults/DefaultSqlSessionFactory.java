@@ -86,7 +86,8 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     //以下6个方法都会调用openSessionFromDataSource
     @Override
     public SqlSession openSession() {
-        return openSessionFromDataSource(configuration.getDefaultExecutorType(), null, false);
+        ExecutorType defaultExecutorType = configuration.getDefaultExecutorType();
+        return openSessionFromDataSource(defaultExecutorType, null, false);
     }
 
     @Override
