@@ -1,7 +1,6 @@
 package org.apache.ibatis.scripting.xmltags;
 
 import org.apache.ibatis.session.Configuration;
-import org.junit.Assert;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,19 +61,6 @@ public class TrimSqlNode implements SqlNode {
         this.suffix = suffix;
         this.suffixesToOverride = suffixesToOverride;
         this.configuration = configuration;
-    }
-
-    public static void main(String[] args) {
-        final StringTokenizer parser = new StringTokenizer("a|b|c", "|", false);
-        Assert.assertEquals(3, (int) parser.countTokens());
-        final List<String> list = new ArrayList<String>(parser.countTokens());
-        while (parser.hasMoreTokens()) {
-            String token = parser.nextToken().toUpperCase(Locale.ENGLISH);
-            list.add(token);
-        }
-        Assert.assertEquals("A", list.get(0));
-        Assert.assertEquals("B", list.get(1));
-        Assert.assertEquals("C", list.get(2));
     }
 
     private static List<String> parseOverrides(String overrides) {
