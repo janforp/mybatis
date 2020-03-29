@@ -1,21 +1,7 @@
-/*
- *    Copyright 2009-2014 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.session;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.ibatis.binding.MapperRegistry;
 import org.apache.ibatis.builder.CacheRefResolver;
 import org.apache.ibatis.builder.ResultMapResolver;
@@ -90,7 +76,7 @@ import java.util.Set;
 
 /**
  * @author Clinton Begin
- * @url https://mybatis.org/mybatis-3/zh/configuration.html
+ * @see https://mybatis.org/mybatis-3/zh/configuration.html
  */
 public class Configuration {
 
@@ -99,11 +85,14 @@ public class Configuration {
     //---------以下都是<settings>节点-------
 
     //类型处理器注册机
+    @Getter
     protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry();
 
     //类型别名注册机
+    @Getter
     protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
 
+    @Getter
     protected final LanguageDriverRegistry languageRegistry = new LanguageDriverRegistry();
 
     /**
@@ -131,16 +120,21 @@ public class Configuration {
     //加载过的资源，避免重复加载
     protected final Set<String> loadedResources = new HashSet<String>();
 
+    @Getter
     protected final Map<String, XNode> sqlFragments = new StrictMap<XNode>("XML fragments parsed from previous mappers");
 
     //不完整的SQL语句
+    @Getter
     protected final Collection<XMLStatementBuilder> incompleteStatements = new LinkedList<XMLStatementBuilder>();
 
+    @Getter
     protected final Collection<CacheRefResolver> incompleteCacheRefs = new LinkedList<CacheRefResolver>();
 
     //未完成的映射
+    @Getter
     protected final Collection<ResultMapResolver> incompleteResultMaps = new LinkedList<ResultMapResolver>();
 
+    @Getter
     protected final Collection<MethodResolver> incompleteMethods = new LinkedList<MethodResolver>();
 
     /**
@@ -157,17 +151,23 @@ public class Configuration {
     //默认为简单执行器
 
     //环境
+    @Getter
+    @Setter
     protected Environment environment;
 
     /**
      * 是否允许在嵌套语句中使用分页（RowBounds）。如果允许使用则设置为 false。
      */
+    @Setter
+    @Getter
     protected boolean safeRowBoundsEnabled = false;
     //---------以上都是<settings>节点-------
 
     /**
      * 是否允许在嵌套语句中使用结果处理器（ResultHandler）。如果允许使用则设置为 false
      */
+    @Setter
+    @Getter
     protected boolean safeResultHandlerEnabled = true;
 
     /**
@@ -201,6 +201,8 @@ public class Configuration {
      *
      * <setting name="cacheEnabled" value="true"/>
      */
+    @Getter
+    @Setter
     protected boolean cacheEnabled = true;
 
     /**
@@ -208,16 +210,21 @@ public class Configuration {
      * 这在依赖于 Map.keySet() 或 null 值进行初始化时比较有用。
      * 注意基本类型（int、boolean 等）是不能设置成 null 的。
      */
+    @Getter
+    @Setter
     protected boolean callSettersOnNulls = false;
 
     /**
      * 指定 MyBatis 增加到日志名称的前缀。
      */
+    @Getter
+    @Setter
     protected String logPrefix;
 
     /**
      * 指定 MyBatis 所用日志的具体实现，未指定时将自动查找。
      */
+    @Getter
     protected Class<? extends Log> logImpl;
 
     /**
@@ -227,6 +234,8 @@ public class Configuration {
      *
      * SESSION | STATEMENT
      */
+    @Getter
+    @Setter
     protected LocalCacheScope localCacheScope = LocalCacheScope.SESSION;
 
     /**
@@ -234,16 +243,22 @@ public class Configuration {
      * 某些数据库驱动需要指定列的 JDBC 类型，多数情况直接用一般类型即可，
      * 比如 NULL、VARCHAR 或 OTHER。
      */
+    @Getter
+    @Setter
     protected JdbcType jdbcTypeForNull = JdbcType.OTHER;
 
     /**
      * 指定对象的哪些方法触发一次延迟加载。
      */
+    @Getter
+    @Setter
     protected Set<String> lazyLoadTriggerMethods = new HashSet<String>(Arrays.asList(new String[] { "equals", "clone", "hashCode", "toString" }));
 
     /**
      * 设置超时时间，它决定数据库驱动等待数据库响应的秒数。
      */
+    @Getter
+    @Setter
     protected Integer defaultStatementTimeout;
 
     /**
@@ -251,28 +266,45 @@ public class Configuration {
      * REUSE 执行器会重用预处理语句（PreparedStatement）；
      * BATCH 执行器不仅重用语句还会执行批量更新。
      */
+    @Getter
+    @Setter
     protected ExecutorType defaultExecutorType = ExecutorType.SIMPLE;
 
+    @Getter
+    @Setter
     protected AutoMappingBehavior autoMappingBehavior = AutoMappingBehavior.PARTIAL;
 
     /**
      * 配置的变量
      */
+    @Getter
+    @Setter
     protected Properties variables = new Properties();
 
     //对象工厂和对象包装器工厂
+    @Getter
+    @Setter
     protected ObjectFactory objectFactory = new DefaultObjectFactory();
 
+    @Getter
+    @Setter
     protected ObjectWrapperFactory objectWrapperFactory = new DefaultObjectWrapperFactory();
 
     //映射注册机
+    @Getter
+    @Setter
     protected MapperRegistry mapperRegistry = new MapperRegistry(this);
 
     //默认禁用延迟加载
+    @Getter
+    @Setter
     protected boolean lazyLoadingEnabled = false;
 
+    @Getter
     protected ProxyFactory proxyFactory = new JavassistProxyFactory(); // #224 Using internal Javassist instead of OGNL
 
+    @Getter
+    @Setter
     protected String databaseId;
 
     /**
@@ -323,16 +355,132 @@ public class Configuration {
         languageRegistry.register(RawLanguageDriver.class);
     }
 
-    public String getLogPrefix() {
-        return logPrefix;
+    /**
+     * 创建元对象,可以当做任何对象
+     *
+     * @param object 对象
+     * @return 该对象的元对象
+     */
+    public MetaObject newMetaObject(Object object) {
+        return MetaObject.forObject(object, objectFactory, objectWrapperFactory);
     }
 
-    public void setLogPrefix(String logPrefix) {
-        this.logPrefix = logPrefix;
+    /**
+     * 创建参数处理器，返回一个 org.apache.ibatis.scripting.defaults.DefaultParameterHandler 默认的参数处理器
+     *
+     * @param mappedStatement 映射语句对象
+     * @param parameterObject 参数
+     * @param boundSql 绑定的sql
+     * @return 参数处理器
+     */
+    public ParameterHandler newParameterHandler(MappedStatement mappedStatement, Object parameterObject, BoundSql boundSql) {
+        LanguageDriver languageDriver = mappedStatement.getLang();
+        //创建ParameterHandler
+        ParameterHandler parameterHandler = languageDriver.createParameterHandler(mappedStatement, parameterObject, boundSql);
+        //插件在这里插入
+        parameterHandler = (ParameterHandler) interceptorChain.pluginAll(parameterHandler);
+        return parameterHandler;
     }
 
-    public Class<? extends Log> getLogImpl() {
-        return logImpl;
+    /**
+     * 创建结果集处理器，返回一个 org.apache.ibatis.executor.resultset.DefaultResultSetHandler
+     *
+     * @param executor 执行器
+     * @param mappedStatement 映射语句对象
+     * @param rowBounds 分页参数
+     * @param parameterHandler 参数处理器
+     * @param resultHandler 结果处理器
+     * @param boundSql 绑定的sql
+     * @return 创建结果集处理器
+     */
+    public ResultSetHandler newResultSetHandler(Executor executor, MappedStatement mappedStatement, RowBounds rowBounds,
+            ParameterHandler parameterHandler, ResultHandler resultHandler, BoundSql boundSql) {
+
+        //创建DefaultResultSetHandler(稍老一点的版本3.1是创建NestedResultSetHandler或者FastResultSetHandler)
+        ResultSetHandler resultSetHandler = new DefaultResultSetHandler(executor, mappedStatement, parameterHandler, resultHandler, boundSql, rowBounds);
+        //插件在这里插入
+        resultSetHandler = (ResultSetHandler) interceptorChain.pluginAll(resultSetHandler);
+        return resultSetHandler;
+    }
+
+    /**
+     * 创建语句处理器，一共有3种类型的处理器，通过
+     * RoutingStatementHandler ，根据 mappedStatement.getStatementType() 的类型，决定使用具体的statement处理器，共
+     * * 普通的 statement
+     * STATEMENT,
+     *
+     * * 预处理，可以防止 sql 注入
+     * PREPARED,
+     *
+     * * 存储过程
+     * CALLABLE
+     *
+     * @param executor 执行器
+     * @param mappedStatement 映射语句
+     * @param parameterObject 参数
+     * @param rowBounds 分页传输
+     * @param resultHandler 结果处理器
+     * @param boundSql 绑定的sql
+     * @return 创建语句处理器
+     */
+    public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameterObject,
+            RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
+
+        //创建路由选择语句处理器，这个 RoutingStatementHandler 是具体三中类型的代理
+        StatementHandler statementHandler = new RoutingStatementHandler(executor, mappedStatement, parameterObject, rowBounds, resultHandler, boundSql);
+        //插件在这里插入
+        //TODO ?
+        statementHandler = (StatementHandler) interceptorChain.pluginAll(statementHandler);
+        return statementHandler;
+    }
+
+    /**
+     * 产生执行器，执行器有3种类型：
+     *
+     * * 这个执行器类型不做特殊的事情。它为每个语句的执行创建一个新的预处理语句。
+     * SIMPLE,
+     * * 这个执行器类型会复用预处理语句。
+     * REUSE,
+     *
+     * * 这个执行器会批量执行所有更新语句，如果SELECT在它们中间执行还会标定它们是必须的，来保证一个简单并易于理解的行为。
+     * *
+     * * 但batch模式也有自己的问题，比如在Insert操作时，在事务没有提交之前，是没有办法获取到自增的id，这在某型情形下是不符合业务要求的；
+     * BATCH
+     *
+     * 但是如果开启了二级缓存，则生成 CachingExecutor， 该执行器只是统一管理缓存，具体的操作数据库还是通过代理交给具体的上面3个执行器中的一个
+     *
+     * @param transaction 事务
+     * @param executorType 执行器类型，可以为空，如果空，则选择默认的类型
+     * @return 一个执行器
+     */
+    public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
+        executorType = (executorType == null ? defaultExecutorType : executorType);
+        //这句再做一下保护,囧,防止粗心大意的人将defaultExecutorType设成null?
+        executorType = (executorType == null ? ExecutorType.SIMPLE : executorType);
+        //保证 executorType 不能空
+
+        Executor executor;
+        //然后就是简单的3个分支，产生3种执行器BatchExecutor/ReuseExecutor/SimpleExecutor
+        if (ExecutorType.BATCH == executorType) {
+            executor = new BatchExecutor(this, transaction);
+        } else if (ExecutorType.REUSE == executorType) {
+            executor = new ReuseExecutor(this, transaction);
+        } else {
+            executor = new SimpleExecutor(this, transaction);
+        }
+        //如果要求缓存，生成另一种CachingExecutor(默认就是有缓存),装饰者模式,所以默认都是返回CachingExecutor
+        if (cacheEnabled) {
+            //一级缓存中，其最大的共享范围就是一个SqlSession内部，如果多个SqlSession之间需要共享缓存，则需要使用到二级缓存。
+            // 开启二级缓存后，会使用CachingExecutor装饰Executor，进入一级缓存的查询流程前，先在CachingExecutor进行二级缓存的查询
+            executor = new CachingExecutor(executor);
+        }
+        //此处调用插件,通过插件可以改变Executor行为
+        executor = (Executor) interceptorChain.pluginAll(executor);
+        return executor;
+    }
+
+    public Executor newExecutor(Transaction transaction) {
+        return newExecutor(transaction, defaultExecutorType);
     }
 
     @SuppressWarnings("unchecked")
@@ -343,44 +491,12 @@ public class Configuration {
         }
     }
 
-    public boolean isCallSettersOnNulls() {
-        return callSettersOnNulls;
-    }
-
-    public void setCallSettersOnNulls(boolean callSettersOnNulls) {
-        this.callSettersOnNulls = callSettersOnNulls;
-    }
-
-    public String getDatabaseId() {
-        return databaseId;
-    }
-
-    public void setDatabaseId(String databaseId) {
-        this.databaseId = databaseId;
-    }
-
     public Class<?> getConfigurationFactory() {
         return configurationFactory;
     }
 
     public void setConfigurationFactory(Class<?> configurationFactory) {
         this.configurationFactory = configurationFactory;
-    }
-
-    public boolean isSafeResultHandlerEnabled() {
-        return safeResultHandlerEnabled;
-    }
-
-    public void setSafeResultHandlerEnabled(boolean safeResultHandlerEnabled) {
-        this.safeResultHandlerEnabled = safeResultHandlerEnabled;
-    }
-
-    public boolean isSafeRowBoundsEnabled() {
-        return safeRowBoundsEnabled;
-    }
-
-    public void setSafeRowBoundsEnabled(boolean safeRowBoundsEnabled) {
-        this.safeRowBoundsEnabled = safeRowBoundsEnabled;
     }
 
     public boolean isMapUnderscoreToCamelCase() {
@@ -397,34 +513,6 @@ public class Configuration {
 
     public boolean isResourceLoaded(String resource) {
         return loadedResources.contains(resource);
-    }
-
-    public Environment getEnvironment() {
-        return environment;
-    }
-
-    public void setEnvironment(Environment environment) {
-        this.environment = environment;
-    }
-
-    public AutoMappingBehavior getAutoMappingBehavior() {
-        return autoMappingBehavior;
-    }
-
-    public void setAutoMappingBehavior(AutoMappingBehavior autoMappingBehavior) {
-        this.autoMappingBehavior = autoMappingBehavior;
-    }
-
-    public boolean isLazyLoadingEnabled() {
-        return lazyLoadingEnabled;
-    }
-
-    public void setLazyLoadingEnabled(boolean lazyLoadingEnabled) {
-        this.lazyLoadingEnabled = lazyLoadingEnabled;
-    }
-
-    public ProxyFactory getProxyFactory() {
-        return proxyFactory;
     }
 
     public void setProxyFactory(ProxyFactory proxyFactory) {
@@ -450,44 +538,12 @@ public class Configuration {
         this.multipleResultSetsEnabled = multipleResultSetsEnabled;
     }
 
-    public Set<String> getLazyLoadTriggerMethods() {
-        return lazyLoadTriggerMethods;
-    }
-
-    public void setLazyLoadTriggerMethods(Set<String> lazyLoadTriggerMethods) {
-        this.lazyLoadTriggerMethods = lazyLoadTriggerMethods;
-    }
-
     public boolean isUseGeneratedKeys() {
         return useGeneratedKeys;
     }
 
     public void setUseGeneratedKeys(boolean useGeneratedKeys) {
         this.useGeneratedKeys = useGeneratedKeys;
-    }
-
-    public ExecutorType getDefaultExecutorType() {
-        return defaultExecutorType;
-    }
-
-    public void setDefaultExecutorType(ExecutorType defaultExecutorType) {
-        this.defaultExecutorType = defaultExecutorType;
-    }
-
-    public boolean isCacheEnabled() {
-        return cacheEnabled;
-    }
-
-    public void setCacheEnabled(boolean cacheEnabled) {
-        this.cacheEnabled = cacheEnabled;
-    }
-
-    public Integer getDefaultStatementTimeout() {
-        return defaultStatementTimeout;
-    }
-
-    public void setDefaultStatementTimeout(Integer defaultStatementTimeout) {
-        this.defaultStatementTimeout = defaultStatementTimeout;
     }
 
     public boolean isUseColumnLabel() {
@@ -498,70 +554,11 @@ public class Configuration {
         this.useColumnLabel = useColumnLabel;
     }
 
-    public LocalCacheScope getLocalCacheScope() {
-        return localCacheScope;
-    }
-
-    public void setLocalCacheScope(LocalCacheScope localCacheScope) {
-        this.localCacheScope = localCacheScope;
-    }
-
-    public JdbcType getJdbcTypeForNull() {
-        return jdbcTypeForNull;
-    }
-
-    public void setJdbcTypeForNull(JdbcType jdbcTypeForNull) {
-        this.jdbcTypeForNull = jdbcTypeForNull;
-    }
-
-    public Properties getVariables() {
-        return variables;
-    }
-
-    public void setVariables(Properties variables) {
-        this.variables = variables;
-    }
-
-    public TypeHandlerRegistry getTypeHandlerRegistry() {
-        return typeHandlerRegistry;
-    }
-
-    public TypeAliasRegistry getTypeAliasRegistry() {
-        return typeAliasRegistry;
-    }
-
-    /**
-     * @since 3.2.2
-     */
-    public MapperRegistry getMapperRegistry() {
-        return mapperRegistry;
-    }
-
-    public ObjectFactory getObjectFactory() {
-        return objectFactory;
-    }
-
-    public void setObjectFactory(ObjectFactory objectFactory) {
-        this.objectFactory = objectFactory;
-    }
-
-    public ObjectWrapperFactory getObjectWrapperFactory() {
-        return objectWrapperFactory;
-    }
-
-    public void setObjectWrapperFactory(ObjectWrapperFactory objectWrapperFactory) {
-        this.objectWrapperFactory = objectWrapperFactory;
-    }
-
     /**
      * @since 3.2.2
      */
     public List<Interceptor> getInterceptors() {
         return interceptorChain.getInterceptors();
-    }
-
-    public LanguageDriverRegistry getLanguageRegistry() {
-        return languageRegistry;
     }
 
     public void setDefaultScriptingLanguage(Class<?> driver) {
@@ -573,81 +570,6 @@ public class Configuration {
 
     public LanguageDriver getDefaultScriptingLanuageInstance() {
         return languageRegistry.getDefaultDriver();
-    }
-
-    //创建元对象
-    public MetaObject newMetaObject(Object object) {
-        return MetaObject.forObject(object, objectFactory, objectWrapperFactory);
-    }
-
-    //创建参数处理器
-    public ParameterHandler newParameterHandler(MappedStatement mappedStatement, Object parameterObject, BoundSql boundSql) {
-        //创建ParameterHandler
-        ParameterHandler parameterHandler = mappedStatement.getLang().createParameterHandler(mappedStatement, parameterObject, boundSql);
-        //插件在这里插入
-        parameterHandler = (ParameterHandler) interceptorChain.pluginAll(parameterHandler);
-        return parameterHandler;
-    }
-
-    //创建结果集处理器
-    public ResultSetHandler newResultSetHandler(Executor executor, MappedStatement mappedStatement, RowBounds rowBounds, ParameterHandler parameterHandler,
-            ResultHandler resultHandler, BoundSql boundSql) {
-        //创建DefaultResultSetHandler(稍老一点的版本3.1是创建NestedResultSetHandler或者FastResultSetHandler)
-        ResultSetHandler resultSetHandler = new DefaultResultSetHandler(executor, mappedStatement, parameterHandler, resultHandler, boundSql, rowBounds);
-        //插件在这里插入
-        resultSetHandler = (ResultSetHandler) interceptorChain.pluginAll(resultSetHandler);
-        return resultSetHandler;
-    }
-
-    /**
-     * 创建语句处理器，一共有3种类型的处理器
-     *
-     * @param executor 执行器
-     * @param mappedStatement 映射语句
-     * @param parameterObject 参数
-     * @param rowBounds 分页传输
-     * @param resultHandler 结果处理器
-     * @param boundSql 绑定的sql
-     * @return 创建语句处理器
-     */
-    public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameterObject,
-            RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
-
-        //创建路由选择语句处理器，这个 RoutingStatementHandler 是具体三中类型的代理
-        StatementHandler statementHandler = new RoutingStatementHandler(executor, mappedStatement, parameterObject, rowBounds, resultHandler, boundSql);
-        //插件在这里插入
-        //TODO ?
-        statementHandler = (StatementHandler) interceptorChain.pluginAll(statementHandler);
-        return statementHandler;
-    }
-
-    public Executor newExecutor(Transaction transaction) {
-        return newExecutor(transaction, defaultExecutorType);
-    }
-
-    //产生执行器
-    public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
-        executorType = (executorType == null ? defaultExecutorType : executorType);
-        //这句再做一下保护,囧,防止粗心大意的人将defaultExecutorType设成null?
-        executorType = (executorType == null ? ExecutorType.SIMPLE : executorType);
-        Executor executor;
-        //然后就是简单的3个分支，产生3种执行器BatchExecutor/ReuseExecutor/SimpleExecutor
-        if (ExecutorType.BATCH == executorType) {
-            executor = new BatchExecutor(this, transaction);
-        } else if (ExecutorType.REUSE == executorType) {
-            executor = new ReuseExecutor(this, transaction);
-        } else {
-            executor = new SimpleExecutor(this, transaction);
-        }
-        //如果要求缓存，生成另一种CachingExecutor(默认就是有缓存),装饰者模式,所以默认都是返回CachingExecutor
-        if (cacheEnabled) {
-            //一级缓存中，其最大的共享范围就是一个SqlSession内部，如果多个SqlSession之间需要共享缓存，则需要使用到二级缓存。
-            // 开启二级缓存后，会使用CachingExecutor装饰Executor，进入一级缓存的查询流程前，先在CachingExecutor进行二级缓存的查询
-            executor = new CachingExecutor(executor);
-        }
-        //此处调用插件,通过插件可以改变Executor行为
-        executor = (Executor) interceptorChain.pluginAll(executor);
-        return executor;
     }
 
     public void addKeyGenerator(String id, KeyGenerator keyGenerator) {
@@ -746,24 +668,12 @@ public class Configuration {
         return mappedStatements.values();
     }
 
-    public Collection<XMLStatementBuilder> getIncompleteStatements() {
-        return incompleteStatements;
-    }
-
     public void addIncompleteStatement(XMLStatementBuilder incompleteStatement) {
         incompleteStatements.add(incompleteStatement);
     }
 
-    public Collection<CacheRefResolver> getIncompleteCacheRefs() {
-        return incompleteCacheRefs;
-    }
-
     public void addIncompleteCacheRef(CacheRefResolver incompleteCacheRef) {
         incompleteCacheRefs.add(incompleteCacheRef);
-    }
-
-    public Collection<ResultMapResolver> getIncompleteResultMaps() {
-        return incompleteResultMaps;
     }
 
     public void addIncompleteResultMap(ResultMapResolver resultMapResolver) {
@@ -772,10 +682,6 @@ public class Configuration {
 
     public void addIncompleteMethod(MethodResolver builder) {
         incompleteMethods.add(builder);
-    }
-
-    public Collection<MethodResolver> getIncompleteMethods() {
-        return incompleteMethods;
     }
 
     //由DefaultSqlSession.selectList调用过来
@@ -789,10 +695,6 @@ public class Configuration {
             buildAllStatements();
         }
         return mappedStatements.get(id);
-    }
-
-    public Map<String, XNode> getSqlFragments() {
-        return sqlFragments;
     }
 
     public void addInterceptor(Interceptor interceptor) {
@@ -940,6 +842,7 @@ public class Configuration {
         }
 
         @SuppressWarnings("unchecked")
+        @Override
         public V put(String key, V value) {
             if (containsKey(key)) {
                 //如果已经存在此key了，直接报错
@@ -961,6 +864,7 @@ public class Configuration {
             //可以看到，如果有包名，会放2个key到这个map，一个缩略，一个全名
         }
 
+        @Override
         public V get(Object key) {
             V value = super.get(key);
             //如果找不到相应的key，直接报错
@@ -997,5 +901,4 @@ public class Configuration {
             }
         }
     }
-
 }

@@ -30,7 +30,8 @@ public class TransactionalCacheManager {
     }
 
     public void putObject(Cache cache, CacheKey key, Object value) {
-        getTransactionalCache(cache).putObject(key, value);
+        TransactionalCache transactionalCache = getTransactionalCache(cache);
+        transactionalCache.putObject(key, value);
     }
 
     //提交时全部提交
@@ -48,11 +49,11 @@ public class TransactionalCacheManager {
     }
 
     private TransactionalCache getTransactionalCache(Cache cache) {
-        TransactionalCache txCache = transactionalCaches.get(cache);
-        if (txCache == null) {
-            txCache = new TransactionalCache(cache);
-            transactionalCaches.put(cache, txCache);
+        TransactionalCache transactionalCache = transactionalCaches.get(cache);
+        if (transactionalCache == null) {
+            transactionalCache = new TransactionalCache(cache);
+            transactionalCaches.put(cache, transactionalCache);
         }
-        return txCache;
+        return transactionalCache;
     }
 }

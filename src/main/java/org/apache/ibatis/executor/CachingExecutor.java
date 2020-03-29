@@ -1,19 +1,3 @@
-/*
- *    Copyright 2009-2014 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.executor;
 
 import org.apache.ibatis.cache.Cache;
@@ -53,6 +37,9 @@ public class CachingExecutor implements Executor {
      */
     private Executor delegate;
 
+    /**
+     * 事务缓存管理器，被CachingExecutor使用
+     */
     private TransactionalCacheManager transactionalCacheManager = new TransactionalCacheManager();
 
     public CachingExecutor(Executor delegate) {
@@ -94,37 +81,43 @@ public class CachingExecutor implements Executor {
 
     @Override
     public <E> List<E> query(MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
+
         BoundSql boundSql = mappedStatement.getBoundSql(parameterObject);
-        //query时传入一个cachekey参数
-        CacheKey key = createCacheKey(mappedStatement, parameterObject, rowBounds, boundSql);
-        return query(mappedStatement, parameterObject, rowBounds, resultHandler, key, boundSql);
+        //query时传入一个cacheKey参数
+        CacheKey cacheKey = createCacheKey(mappedStatement, parameterObject, rowBounds, boundSql);
+        return query(mappedStatement, parameterObject, rowBounds, resultHandler, cacheKey, boundSql);
     }
 
     //被ResultLoader.selectList调用
     @Override
-    public <E> List<E> query(MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)
-            throws SQLException {
+    public <E> List<E> query(MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds,
+            ResultHandler resultHandler, CacheKey cacheKey, BoundSql boundSql) throws SQLException {
+
         Cache cache = mappedStatement.getCache();
         //默认情况下是没有开启缓存的(二级缓存).要开启二级缓存,你需要在你的 SQL 映射文件中添加一行: <cache/>
         //简单的说，就是先查CacheKey，查不到再委托给实际的执行器去查
-        if (cache != null) {
+
+        //是否在该statement中配置了 useCache = "true"
+        boolean isThisStatementUseCache = (cache != null);
+        if (isThisStatementUseCache) {
             flushCacheIfRequired(mappedStatement);
             //resultHandler 什么缓存都无法使用
             if (mappedStatement.isUseCache() && resultHandler == null) {
+                //Caching stored procedures with OUT params is not supported，所有参数的模式必须是 IN，否则不支持二级缓存
                 ensureNoOutParams(mappedStatement, parameterObject, boundSql);
-                @SuppressWarnings("unchecked")
                 //先拿缓存
-                        List<E> list = (List<E>) transactionalCacheManager.getObject(cache, key);
+                @SuppressWarnings("unchecked")
+                List<E> list = (List<E>) transactionalCacheManager.getObject(cache, cacheKey);
                 if (list == null) {
-                    //没缓存，去数据库
-                    list = delegate.<E>query(mappedStatement, parameterObject, rowBounds, resultHandler, key, boundSql);
+                    //没缓存，去数据库，去数据库查询是交给被代理者
+                    list = delegate.query(mappedStatement, parameterObject, rowBounds, resultHandler, cacheKey, boundSql);
                     //缓存结果
-                    transactionalCacheManager.putObject(cache, key, list); // issue #578 and #116
+                    transactionalCacheManager.putObject(cache, cacheKey, list); // issue #578 and #116
                 }
                 return list;
             }
         }
-        return delegate.<E>query(mappedStatement, parameterObject, rowBounds, resultHandler, key, boundSql);
+        return delegate.query(mappedStatement, parameterObject, rowBounds, resultHandler, cacheKey, boundSql);
     }
 
     @Override
@@ -149,9 +142,12 @@ public class CachingExecutor implements Executor {
         }
     }
 
+    @SuppressWarnings("unused")
     private void ensureNoOutParams(MappedStatement ms, Object parameter, BoundSql boundSql) {
         if (ms.getStatementType() == StatementType.CALLABLE) {
-            for (ParameterMapping parameterMapping : boundSql.getParameterMappings()) {
+            //#{property,javaType=int,jdbcType=NUMERIC}列表
+            List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
+            for (ParameterMapping parameterMapping : parameterMappingList) {
                 if (parameterMapping.getMode() != ParameterMode.IN) {
                     throw new ExecutorException("Caching stored procedures with OUT params is not supported.  Please configure useCache=false in " + ms.getId() + " statement.");
                 }

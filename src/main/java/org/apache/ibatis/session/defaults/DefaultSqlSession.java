@@ -132,9 +132,9 @@ public class DefaultSqlSession implements SqlSession {
     public <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds) {
         try {
             //根据statement id找到对应的MappedStatement
-            MappedStatement ms = configuration.getMappedStatement(statement);
+            MappedStatement mappedStatement = configuration.getMappedStatement(statement);
             //转而用执行器来查询结果,注意这里传入的ResultHandler是null
-            return executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
+            return executor.query(mappedStatement, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
         } catch (Exception e) {
             throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);
         } finally {
