@@ -67,8 +67,8 @@ public class NestedResultHandlerAssociationTest {
         try {
             sqlSession.select("collectPageByBirthMonth", targetMonth, new RowBounds(1, 2), new ResultHandler() {
                 @Override
-                public void handleResult(ResultContext context) {
-                    Account account = (Account) context.getResultObject();
+                public void handleResult(ResultContext resultContext) {
+                    Account account = (Account) resultContext.getResultObject();
                     accounts.add(account);
                 }
             });
@@ -89,11 +89,11 @@ public class NestedResultHandlerAssociationTest {
             Date targetMonth = fmt.parse("2014-01-01");
             sqlSession.select("collectPageByBirthMonth", targetMonth, new ResultHandler() {
                 @Override
-                public void handleResult(ResultContext context) {
-                    Account account = (Account) context.getResultObject();
+                public void handleResult(ResultContext resultContext) {
+                    Account account = (Account) resultContext.getResultObject();
                     accounts.add(account);
                     if (accounts.size() > 1) {
-                        context.stop();
+                        resultContext.stop();
                     }
                 }
             });

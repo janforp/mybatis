@@ -79,8 +79,8 @@ public class CommonPropertyDeferLoadError {
                 List<Child> children = new ArrayList<Child>();
 
                 @Override
-                public void handleResult(ResultContext context) {
-                    Child child = (Child) context.getResultObject();
+                public void handleResult(ResultContext resultContext) {
+                    Child child = (Child) resultContext.getResultObject();
                     children.add(child);
                 }
             }
@@ -102,8 +102,8 @@ public class CommonPropertyDeferLoadError {
             class MyResultHandler implements ResultHandler {
 
                 @Override
-                public void handleResult(ResultContext context) {
-                    Child child = (Child) context.getResultObject();
+                public void handleResult(ResultContext resultContext) {
+                    Child child = (Child) resultContext.getResultObject();
                     assertNotNull(child.getFather());
                 }
             }
@@ -123,8 +123,8 @@ public class CommonPropertyDeferLoadError {
                 List<Child> children = new ArrayList<Child>();
 
                 @Override
-                public void handleResult(ResultContext context) {
-                    Child child = (Child) context.getResultObject();
+                public void handleResult(ResultContext resultContext) {
+                    Child child = (Child) resultContext.getResultObject();
                     children.add(child);
                 }
             }
@@ -146,8 +146,8 @@ public class CommonPropertyDeferLoadError {
             class MyResultHandler implements ResultHandler {
 
                 @Override
-                public void handleResult(ResultContext context) {
-                    Child child = (Child) context.getResultObject();
+                public void handleResult(ResultContext resultContext) {
+                    Child child = (Child) resultContext.getResultObject();
                     assertNotNull(child.getFather());
                 }
             }

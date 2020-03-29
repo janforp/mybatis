@@ -9,6 +9,7 @@ import org.apache.ibatis.session.ResultContext;
 
 /**
  * 默认结果上下文
+ * 查询的结果都会先放到该对象
  */
 public class DefaultResultContext implements ResultContext {
 
@@ -33,6 +34,7 @@ public class DefaultResultContext implements ResultContext {
      * @param resultObject 结果
      */
     public void nextResultObject(Object resultObject) {
+        //每接收一条记录，就把结果记录的计数 +1
         resultCount++;
         this.resultObject = resultObject;
     }

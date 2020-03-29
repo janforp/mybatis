@@ -878,5 +878,5 @@ public class Configuration {
                 return subject;
             }
         }
-    }¬¬¬¬
+    }
 }

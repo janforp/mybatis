@@ -90,8 +90,8 @@ public class NestedResultHandlerTest {
         try {
             sqlSession.select("getPersons", new ResultHandler() {
                 @Override
-                public void handleResult(ResultContext context) {
-                    Person person = (Person) context.getResultObject();
+                public void handleResult(ResultContext resultContext) {
+                    Person person = (Person) resultContext.getResultObject();
                     if ("grandma".equals(person.getName())) {
                         Assert.assertEquals(2, person.getItems().size());
                     }
@@ -108,8 +108,8 @@ public class NestedResultHandlerTest {
         try {
             sqlSession.select("getPersonsWithItemsOrdered", new ResultHandler() {
                 @Override
-                public void handleResult(ResultContext context) {
-                    Person person = (Person) context.getResultObject();
+                public void handleResult(ResultContext resultContext) {
+                    Person person = (Person) resultContext.getResultObject();
                     if ("grandma".equals(person.getName())) {
                         Assert.assertEquals(2, person.getItems().size());
                     }

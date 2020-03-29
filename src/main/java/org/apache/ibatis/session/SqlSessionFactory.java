@@ -1,19 +1,3 @@
-/*
- *    Copyright 2009-2012 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.session;
 
 import java.sql.Connection;
@@ -25,7 +9,7 @@ import java.sql.Connection;
  */
 
 /**
- * SqlSessionFactory 有六个方法创建 SqlSession 实例。通常来说，当你选择其中一个方法时，你需要考虑以下几点：
+ * SqlSessionFactory 有8个方法创建 SqlSession 实例。通常来说，当你选择其中一个方法时，你需要考虑以下几点：
  *
  * 事务处理：你希望在 session 作用域中使用事务作用域，还是使用自动提交（auto-commit）？（对很多数据库和/或 JDBC 驱动来说，等同于关闭事务支持）
  * 数据库连接：你希望 MyBatis 帮你从已配置的数据源获取连接，还是使用自己提供的连接？
@@ -43,7 +27,7 @@ public interface SqlSessionFactory {
      * 事务隔离级别将会使用驱动或数据源的默认设置。
      * 预处理语句不会被复用，也不会批量处理更新。
      *
-     * @return
+     * @return SqlSession
      */
     SqlSession openSession();
 
@@ -65,8 +49,8 @@ public interface SqlSessionFactory {
      * ExecutorType.REUSE：该类型的执行器会复用预处理语句。
      * ExecutorType.BATCH：该类型的执行器会批量执行所有更新语句，如果 SELECT 在多个更新中间执行，将在必要时将多条更新语句分隔开来，以方便理解。
      *
-     * @param execType
-     * @return
+     * @param execType 执行器类型
+     * @return SqlSession
      */
     SqlSession openSession(ExecutorType execType);
 

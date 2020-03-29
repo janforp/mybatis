@@ -16,8 +16,8 @@ public class UserResultHandler implements ResultHandler {
     }
 
     @Override
-    public void handleResult(ResultContext context) {
-        User user = (User) context.getResultObject();
+    public void handleResult(ResultContext resultContext) {
+        User user = (User) resultContext.getResultObject();
         users.add(user);
     }
 
