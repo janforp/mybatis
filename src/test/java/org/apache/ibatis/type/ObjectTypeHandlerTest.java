@@ -28,22 +28,22 @@ public class ObjectTypeHandlerTest extends BaseTypeHandlerTest {
 
     @Test
     public void shouldSetParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, "Hello", null);
-        verify(ps).setObject(1, "Hello");
+        TYPE_HANDLER.setParameter(preparedStatement, 1, "Hello", null);
+        verify(preparedStatement).setObject(1, "Hello");
     }
 
     @Test
     public void shouldGetResultFromResultSet() throws Exception {
-        when(rs.getObject("column")).thenReturn("Hello");
-        when(rs.wasNull()).thenReturn(false);
-        assertEquals("Hello", TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getObject("column")).thenReturn("Hello");
+        when(resultSet.wasNull()).thenReturn(false);
+        assertEquals("Hello", TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetResultFromCallableStatement() throws Exception {
-        when(cs.getObject(1)).thenReturn("Hello");
-        when(cs.wasNull()).thenReturn(false);
-        assertEquals("Hello", TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getObject(1)).thenReturn("Hello");
+        when(callableStatement.wasNull()).thenReturn(false);
+        assertEquals("Hello", TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
 }

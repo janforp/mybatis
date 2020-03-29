@@ -28,22 +28,22 @@ public class BooleanTypeHandlerTest extends BaseTypeHandlerTest {
 
     @Test
     public void shouldSetParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, true, null);
-        verify(ps).setBoolean(1, true);
+        TYPE_HANDLER.setParameter(preparedStatement, 1, true, null);
+        verify(preparedStatement).setBoolean(1, true);
     }
 
     @Test
     public void shouldGetResultFromResultSet() throws Exception {
-        when(rs.getBoolean("column")).thenReturn(true);
-        when(rs.wasNull()).thenReturn(false);
-        assertEquals(true, TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getBoolean("column")).thenReturn(true);
+        when(resultSet.wasNull()).thenReturn(false);
+        assertEquals(true, TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetResultFromCallableStatement() throws Exception {
-        when(cs.getBoolean(1)).thenReturn(true);
-        when(cs.wasNull()).thenReturn(false);
-        assertEquals(true, TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getBoolean(1)).thenReturn(true);
+        when(callableStatement.wasNull()).thenReturn(false);
+        assertEquals(true, TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
 }

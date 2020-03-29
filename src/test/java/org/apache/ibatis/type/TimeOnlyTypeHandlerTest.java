@@ -34,22 +34,22 @@ public class TimeOnlyTypeHandlerTest extends BaseTypeHandlerTest {
 
     @Test
     public void shouldSetParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, DATE, null);
-        verify(ps).setTime(1, SQL_TIME);
+        TYPE_HANDLER.setParameter(preparedStatement, 1, DATE, null);
+        verify(preparedStatement).setTime(1, SQL_TIME);
     }
 
     @Test
     public void shouldGetResultFromResultSet() throws Exception {
-        when(rs.getTime("column")).thenReturn(SQL_TIME);
-        when(rs.wasNull()).thenReturn(false);
-        assertEquals(DATE, TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getTime("column")).thenReturn(SQL_TIME);
+        when(resultSet.wasNull()).thenReturn(false);
+        assertEquals(DATE, TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetResultFromCallableStatement() throws Exception {
-        when(cs.getTime(1)).thenReturn(SQL_TIME);
-        when(cs.wasNull()).thenReturn(false);
-        assertEquals(DATE, TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getTime(1)).thenReturn(SQL_TIME);
+        when(callableStatement.wasNull()).thenReturn(false);
+        assertEquals(DATE, TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
 }

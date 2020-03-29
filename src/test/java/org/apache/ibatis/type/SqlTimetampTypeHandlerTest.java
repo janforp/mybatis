@@ -33,22 +33,22 @@ public class SqlTimetampTypeHandlerTest extends BaseTypeHandlerTest {
 
     @Test
     public void shouldSetParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, SQL_TIME, null);
-        verify(ps).setTimestamp(1, SQL_TIME);
+        TYPE_HANDLER.setParameter(preparedStatement, 1, SQL_TIME, null);
+        verify(preparedStatement).setTimestamp(1, SQL_TIME);
     }
 
     @Test
     public void shouldGetResultFromResultSet() throws Exception {
-        when(rs.getTimestamp("column")).thenReturn(SQL_TIME);
-        when(rs.wasNull()).thenReturn(false);
-        assertEquals(SQL_TIME, TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getTimestamp("column")).thenReturn(SQL_TIME);
+        when(resultSet.wasNull()).thenReturn(false);
+        assertEquals(SQL_TIME, TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetResultFromCallableStatement() throws Exception {
-        when(cs.getTimestamp(1)).thenReturn(SQL_TIME);
-        when(cs.wasNull()).thenReturn(false);
-        assertEquals(SQL_TIME, TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getTimestamp(1)).thenReturn(SQL_TIME);
+        when(callableStatement.wasNull()).thenReturn(false);
+        assertEquals(SQL_TIME, TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
 }

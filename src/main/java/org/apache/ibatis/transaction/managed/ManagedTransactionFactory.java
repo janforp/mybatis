@@ -1,19 +1,3 @@
-/*
- *    Copyright 2009-2012 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.transaction.managed;
 
 import org.apache.ibatis.session.TransactionIsolationLevel;
@@ -26,24 +10,15 @@ import java.util.Properties;
 
 /**
  * Creates {@link ManagedTransaction} instances.
- *
- * @author Clinton Begin
- * @author Clinton Begin
- * @author Clinton Begin
- * @author Clinton Begin
- * @see ManagedTransaction
- */
-/**
- * @author Clinton Begin
- */
-
-/**
  * 托管事务工厂
  * 默认 情况下它会关闭连接。
  * 然而一些容器并不希望这样, 因此如果你需要从连接中停止 它,将 closeConnection 属性设置为 false。
  */
 public class ManagedTransactionFactory implements TransactionFactory {
 
+    /**
+     * 是否需要关闭连接
+     */
     private boolean closeConnection = true;
 
     @Override
@@ -52,7 +27,7 @@ public class ManagedTransactionFactory implements TransactionFactory {
         if (props != null) {
             String closeConnectionProperty = props.getProperty("closeConnection");
             if (closeConnectionProperty != null) {
-                closeConnection = Boolean.valueOf(closeConnectionProperty);
+                closeConnection = Boolean.parseBoolean(closeConnectionProperty);
             }
         }
     }
@@ -63,10 +38,10 @@ public class ManagedTransactionFactory implements TransactionFactory {
     }
 
     @Override
-    public Transaction newTransaction(DataSource ds, TransactionIsolationLevel level, boolean autoCommit) {
+    public Transaction newTransaction(DataSource dataSource, TransactionIsolationLevel level, boolean autoCommit) {
         // Silently ignores autocommit and isolation level, as managed transactions are entirely
         // controlled by an external manager.  It's silently ignored so that
         // code remains portable between managed and unmanaged configurations.
-        return new ManagedTransaction(ds, level, closeConnection);
+        return new ManagedTransaction(dataSource, level, closeConnection);
     }
 }

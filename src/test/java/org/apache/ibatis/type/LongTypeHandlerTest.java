@@ -28,22 +28,22 @@ public class LongTypeHandlerTest extends BaseTypeHandlerTest {
 
     @Test
     public void shouldSetParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, 100l, null);
-        verify(ps).setLong(1, 100l);
+        TYPE_HANDLER.setParameter(preparedStatement, 1, 100l, null);
+        verify(preparedStatement).setLong(1, 100l);
     }
 
     @Test
     public void shouldGetResultFromResultSet() throws Exception {
-        when(rs.getLong("column")).thenReturn(100l);
-        when(rs.wasNull()).thenReturn(false);
-        assertEquals(new Long(100l), TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getLong("column")).thenReturn(100l);
+        when(resultSet.wasNull()).thenReturn(false);
+        assertEquals(new Long(100l), TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetResultFromCallableStatement() throws Exception {
-        when(cs.getLong(1)).thenReturn(100l);
-        when(cs.wasNull()).thenReturn(false);
-        assertEquals(new Long(100l), TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getLong(1)).thenReturn(100l);
+        when(callableStatement.wasNull()).thenReturn(false);
+        assertEquals(new Long(100l), TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
 }

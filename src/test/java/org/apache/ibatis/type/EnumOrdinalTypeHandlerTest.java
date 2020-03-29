@@ -28,42 +28,42 @@ public class EnumOrdinalTypeHandlerTest extends BaseTypeHandlerTest {
 
     @Test
     public void shouldSetParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, MyEnum.ONE, null);
-        verify(ps).setInt(1, 0);
+        TYPE_HANDLER.setParameter(preparedStatement, 1, MyEnum.ONE, null);
+        verify(preparedStatement).setInt(1, 0);
     }
 
     @Test
     public void shouldSetNullParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, null, JdbcType.VARCHAR);
-        verify(ps).setNull(1, JdbcType.VARCHAR.TYPE_CODE);
+        TYPE_HANDLER.setParameter(preparedStatement, 1, null, JdbcType.VARCHAR);
+        verify(preparedStatement).setNull(1, JdbcType.VARCHAR.TYPE_CODE);
     }
 
     @Test
     public void shouldGetResultFromResultSet() throws Exception {
-        when(rs.getInt("column")).thenReturn(0);
-        when(rs.wasNull()).thenReturn(false);
-        assertEquals(MyEnum.ONE, TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getInt("column")).thenReturn(0);
+        when(resultSet.wasNull()).thenReturn(false);
+        assertEquals(MyEnum.ONE, TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetNullResultFromResultSet() throws Exception {
-        when(rs.getInt("column")).thenReturn(0);
-        when(rs.wasNull()).thenReturn(true);
-        assertEquals(null, TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getInt("column")).thenReturn(0);
+        when(resultSet.wasNull()).thenReturn(true);
+        assertEquals(null, TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetResultFromCallableStatement() throws Exception {
-        when(cs.getInt(1)).thenReturn(0);
-        when(cs.wasNull()).thenReturn(false);
-        assertEquals(MyEnum.ONE, TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getInt(1)).thenReturn(0);
+        when(callableStatement.wasNull()).thenReturn(false);
+        assertEquals(MyEnum.ONE, TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
     @Test
     public void shouldGetNullResultFromCallableStatement() throws Exception {
-        when(cs.getInt(1)).thenReturn(0);
-        when(cs.wasNull()).thenReturn(true);
-        assertEquals(null, TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getInt(1)).thenReturn(0);
+        when(callableStatement.wasNull()).thenReturn(true);
+        assertEquals(null, TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
     enum MyEnum {

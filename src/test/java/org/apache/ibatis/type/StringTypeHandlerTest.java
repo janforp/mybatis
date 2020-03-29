@@ -28,36 +28,36 @@ public class StringTypeHandlerTest extends BaseTypeHandlerTest {
 
     @Test
     public void shouldSetParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, "Hello", null);
-        verify(ps).setString(1, "Hello");
+        TYPE_HANDLER.setParameter(preparedStatement, 1, "Hello", null);
+        verify(preparedStatement).setString(1, "Hello");
     }
 
     @Test
     public void shouldGetResultFromResultSet() throws Exception {
-        when(rs.getString("column")).thenReturn("Hello");
-        when(rs.wasNull()).thenReturn(false);
-        assertEquals("Hello", TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getString("column")).thenReturn("Hello");
+        when(resultSet.wasNull()).thenReturn(false);
+        assertEquals("Hello", TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetNullResultFromResultSet() throws Exception {
-        when(cs.getString(1)).thenReturn(null);
-        when(cs.wasNull()).thenReturn(true);
-        assertEquals(null, TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getString(1)).thenReturn(null);
+        when(callableStatement.wasNull()).thenReturn(true);
+        assertEquals(null, TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
     @Test
     public void shouldGetResultFromCallableStatement() throws Exception {
-        when(cs.getString(1)).thenReturn("Hello");
-        when(cs.wasNull()).thenReturn(false);
-        assertEquals("Hello", TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getString(1)).thenReturn("Hello");
+        when(callableStatement.wasNull()).thenReturn(false);
+        assertEquals("Hello", TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
     @Test
     public void shouldGetNullResultFromCallableStatement() throws Exception {
-        when(cs.getString(1)).thenReturn(null);
-        when(cs.wasNull()).thenReturn(true);
-        assertEquals(null, TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getString(1)).thenReturn(null);
+        when(callableStatement.wasNull()).thenReturn(true);
+        assertEquals(null, TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
 }

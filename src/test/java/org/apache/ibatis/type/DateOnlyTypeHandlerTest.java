@@ -34,22 +34,22 @@ public class DateOnlyTypeHandlerTest extends BaseTypeHandlerTest {
 
     @Test
     public void shouldSetParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, DATE, null);
-        verify(ps).setDate(1, new java.sql.Date(DATE.getTime()));
+        TYPE_HANDLER.setParameter(preparedStatement, 1, DATE, null);
+        verify(preparedStatement).setDate(1, new java.sql.Date(DATE.getTime()));
     }
 
     @Test
     public void shouldGetResultFromResultSet() throws Exception {
-        when(rs.getDate("column")).thenReturn(SQL_DATE);
-        when(rs.wasNull()).thenReturn(false);
-        assertEquals(DATE, TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getDate("column")).thenReturn(SQL_DATE);
+        when(resultSet.wasNull()).thenReturn(false);
+        assertEquals(DATE, TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetResultFromCallableStatement() throws Exception {
-        when(cs.getDate(1)).thenReturn(SQL_DATE);
-        when(cs.wasNull()).thenReturn(false);
-        assertEquals(DATE, TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getDate(1)).thenReturn(SQL_DATE);
+        when(callableStatement.wasNull()).thenReturn(false);
+        assertEquals(DATE, TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
 }

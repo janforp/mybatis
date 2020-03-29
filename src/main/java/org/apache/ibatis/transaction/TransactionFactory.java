@@ -17,12 +17,12 @@ public interface TransactionFactory {
     /**
      * 从 3.5.2 开始，该方法为默认方法
      * Sets transaction factory custom properties.
+     * 设置属性
      *
      * 在事务管理器实例化后，所有在 XML 中配置的属性将会被传递给 setProperties() 方法
      *
-     * @param props
+     * @param props 参数
      */
-    //设置属性
     void setProperties(Properties props);
 
     /**
@@ -46,5 +46,4 @@ public interface TransactionFactory {
      */
     //根据数据源和事务隔离级别创建Transaction
     Transaction newTransaction(DataSource dataSource, TransactionIsolationLevel level, boolean autoCommit);
-
 }

@@ -28,27 +28,27 @@ public class UnknownTypeHandlerTest extends BaseTypeHandlerTest {
 
     @Test
     public void shouldSetParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, "Hello", null);
-        verify(ps).setString(1, "Hello");
+        TYPE_HANDLER.setParameter(preparedStatement, 1, "Hello", null);
+        verify(preparedStatement).setString(1, "Hello");
     }
 
     @Test
     public void shouldGetResultFromResultSet() throws Exception {
-        when(rs.getMetaData()).thenReturn(rsmd);
-        when(rsmd.getColumnCount()).thenReturn(1);
-        when(rsmd.getColumnName(1)).thenReturn("column");
-        when(rsmd.getColumnClassName(1)).thenReturn(String.class.getName());
-        when(rsmd.getColumnType(1)).thenReturn(JdbcType.VARCHAR.TYPE_CODE);
-        when(rs.getString("column")).thenReturn("Hello");
-        when(rs.wasNull()).thenReturn(false);
-        assertEquals("Hello", TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
+        when(resultSetMetaData.getColumnCount()).thenReturn(1);
+        when(resultSetMetaData.getColumnName(1)).thenReturn("column");
+        when(resultSetMetaData.getColumnClassName(1)).thenReturn(String.class.getName());
+        when(resultSetMetaData.getColumnType(1)).thenReturn(JdbcType.VARCHAR.TYPE_CODE);
+        when(resultSet.getString("column")).thenReturn("Hello");
+        when(resultSet.wasNull()).thenReturn(false);
+        assertEquals("Hello", TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetResultFromCallableStatement() throws Exception {
-        when(cs.getObject(1)).thenReturn("Hello");
-        when(cs.wasNull()).thenReturn(false);
-        assertEquals("Hello", TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getObject(1)).thenReturn("Hello");
+        when(callableStatement.wasNull()).thenReturn(false);
+        assertEquals("Hello", TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
 }

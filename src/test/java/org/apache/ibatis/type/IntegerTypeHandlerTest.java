@@ -28,22 +28,22 @@ public class IntegerTypeHandlerTest extends BaseTypeHandlerTest {
 
     @Test
     public void shouldSetParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, 100, null);
-        verify(ps).setInt(1, 100);
+        TYPE_HANDLER.setParameter(preparedStatement, 1, 100, null);
+        verify(preparedStatement).setInt(1, 100);
     }
 
     @Test
     public void shouldGetResultFromResultSet() throws Exception {
-        when(rs.getInt("column")).thenReturn(100);
-        when(rs.wasNull()).thenReturn(false);
-        assertEquals(new Integer(100), TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getInt("column")).thenReturn(100);
+        when(resultSet.wasNull()).thenReturn(false);
+        assertEquals(new Integer(100), TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetResultFromCallableStatement() throws Exception {
-        when(cs.getInt(1)).thenReturn(100);
-        when(cs.wasNull()).thenReturn(false);
-        assertEquals(new Integer(100), TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getInt(1)).thenReturn(100);
+        when(callableStatement.wasNull()).thenReturn(false);
+        assertEquals(new Integer(100), TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
 }

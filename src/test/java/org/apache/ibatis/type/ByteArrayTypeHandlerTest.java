@@ -28,22 +28,22 @@ public class ByteArrayTypeHandlerTest extends BaseTypeHandlerTest {
 
     @Test
     public void shouldSetParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, new byte[] { 1, 2, 3 }, null);
-        verify(ps).setBytes(1, new byte[] { 1, 2, 3 });
+        TYPE_HANDLER.setParameter(preparedStatement, 1, new byte[] { 1, 2, 3 }, null);
+        verify(preparedStatement).setBytes(1, new byte[] { 1, 2, 3 });
     }
 
     @Test
     public void shouldGetResultFromResultSet() throws Exception {
-        when(rs.getBytes("column")).thenReturn(new byte[] { 1, 2, 3 });
-        when(rs.wasNull()).thenReturn(false);
-        assertArrayEquals(new byte[] { 1, 2, 3 }, TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getBytes("column")).thenReturn(new byte[] { 1, 2, 3 });
+        when(resultSet.wasNull()).thenReturn(false);
+        assertArrayEquals(new byte[] { 1, 2, 3 }, TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetResultFromCallableStatement() throws Exception {
-        when(cs.getBytes(1)).thenReturn(new byte[] { 1, 2, 3 });
-        when(cs.wasNull()).thenReturn(false);
-        assertArrayEquals(new byte[] { 1, 2, 3 }, TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getBytes(1)).thenReturn(new byte[] { 1, 2, 3 });
+        when(callableStatement.wasNull()).thenReturn(false);
+        assertArrayEquals(new byte[] { 1, 2, 3 }, TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
 }

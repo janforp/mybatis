@@ -28,22 +28,22 @@ public class ByteTypeHandlerTest extends BaseTypeHandlerTest {
 
     @Test
     public void shouldSetParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, (byte) 100, null);
-        verify(ps).setByte(1, (byte) 100);
+        TYPE_HANDLER.setParameter(preparedStatement, 1, (byte) 100, null);
+        verify(preparedStatement).setByte(1, (byte) 100);
     }
 
     @Test
     public void shouldGetResultFromResultSet() throws Exception {
-        when(rs.getByte("column")).thenReturn((byte) 100);
-        when(rs.wasNull()).thenReturn(false);
-        assertEquals(new Byte((byte) 100), TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getByte("column")).thenReturn((byte) 100);
+        when(resultSet.wasNull()).thenReturn(false);
+        assertEquals(new Byte((byte) 100), TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetResultFromCallableStatement() throws Exception {
-        when(cs.getByte(1)).thenReturn((byte) 100);
-        when(cs.wasNull()).thenReturn(false);
-        assertEquals(new Byte((byte) 100), TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getByte(1)).thenReturn((byte) 100);
+        when(callableStatement.wasNull()).thenReturn(false);
+        assertEquals(new Byte((byte) 100), TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
 }

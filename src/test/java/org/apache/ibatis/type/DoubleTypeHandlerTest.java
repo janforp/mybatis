@@ -28,22 +28,22 @@ public class DoubleTypeHandlerTest extends BaseTypeHandlerTest {
 
     @Test
     public void shouldSetParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, 100d, null);
-        verify(ps).setDouble(1, 100d);
+        TYPE_HANDLER.setParameter(preparedStatement, 1, 100d, null);
+        verify(preparedStatement).setDouble(1, 100d);
     }
 
     @Test
     public void shouldGetResultFromResultSet() throws Exception {
-        when(rs.getDouble("column")).thenReturn(100d);
-        when(rs.wasNull()).thenReturn(false);
-        assertEquals(new Double(100d), TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getDouble("column")).thenReturn(100d);
+        when(resultSet.wasNull()).thenReturn(false);
+        assertEquals(new Double(100d), TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetResultFromCallableStatement() throws Exception {
-        when(cs.getDouble(1)).thenReturn(100d);
-        when(cs.wasNull()).thenReturn(false);
-        assertEquals(new Double(100d), TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getDouble(1)).thenReturn(100d);
+        when(callableStatement.wasNull()).thenReturn(false);
+        assertEquals(new Double(100d), TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
 }

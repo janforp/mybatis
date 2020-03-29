@@ -28,42 +28,42 @@ public class EnumTypeHandlerTest extends BaseTypeHandlerTest {
 
     @Test
     public void shouldSetParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, MyEnum.ONE, null);
-        verify(ps).setString(1, "ONE");
+        TYPE_HANDLER.setParameter(preparedStatement, 1, MyEnum.ONE, null);
+        verify(preparedStatement).setString(1, "ONE");
     }
 
     @Test
     public void shouldSetNullParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, null, JdbcType.VARCHAR);
-        verify(ps).setNull(1, JdbcType.VARCHAR.TYPE_CODE);
+        TYPE_HANDLER.setParameter(preparedStatement, 1, null, JdbcType.VARCHAR);
+        verify(preparedStatement).setNull(1, JdbcType.VARCHAR.TYPE_CODE);
     }
 
     @Test
     public void shouldGetResultFromResultSet() throws Exception {
-        when(rs.getString("column")).thenReturn("ONE");
-        when(rs.wasNull()).thenReturn(false);
-        assertEquals(MyEnum.ONE, TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getString("column")).thenReturn("ONE");
+        when(resultSet.wasNull()).thenReturn(false);
+        assertEquals(MyEnum.ONE, TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetNullResultFromResultSet() throws Exception {
-        when(rs.getString("column")).thenReturn(null);
-        when(rs.wasNull()).thenReturn(true);
-        assertEquals(null, TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getString("column")).thenReturn(null);
+        when(resultSet.wasNull()).thenReturn(true);
+        assertEquals(null, TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetResultFromCallableStatement() throws Exception {
-        when(cs.getString(1)).thenReturn("ONE");
-        when(cs.wasNull()).thenReturn(false);
-        assertEquals(MyEnum.ONE, TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getString(1)).thenReturn("ONE");
+        when(callableStatement.wasNull()).thenReturn(false);
+        assertEquals(MyEnum.ONE, TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
     @Test
     public void shouldGetNullResultFromCallableStatement() throws Exception {
-        when(cs.getString(1)).thenReturn(null);
-        when(cs.wasNull()).thenReturn(true);
-        assertEquals(null, TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getString(1)).thenReturn(null);
+        when(callableStatement.wasNull()).thenReturn(true);
+        assertEquals(null, TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
     enum MyEnum {

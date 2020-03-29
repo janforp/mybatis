@@ -28,22 +28,22 @@ public class ShortTypeHandlerTest extends BaseTypeHandlerTest {
 
     @Test
     public void shouldSetParameter() throws Exception {
-        TYPE_HANDLER.setParameter(ps, 1, (short) 100, null);
-        verify(ps).setShort(1, (short) 100);
+        TYPE_HANDLER.setParameter(preparedStatement, 1, (short) 100, null);
+        verify(preparedStatement).setShort(1, (short) 100);
     }
 
     @Test
     public void shouldGetResultFromResultSet() throws Exception {
-        when(rs.getShort("column")).thenReturn((short) 100);
-        when(rs.wasNull()).thenReturn(false);
-        assertEquals(new Short((short) 100), TYPE_HANDLER.getResult(rs, "column"));
+        when(resultSet.getShort("column")).thenReturn((short) 100);
+        when(resultSet.wasNull()).thenReturn(false);
+        assertEquals(new Short((short) 100), TYPE_HANDLER.getResult(resultSet, "column"));
     }
 
     @Test
     public void shouldGetResultFromCallableStatement() throws Exception {
-        when(cs.getShort(1)).thenReturn((short) 100);
-        when(cs.wasNull()).thenReturn(false);
-        assertEquals(new Short((short) 100), TYPE_HANDLER.getResult(cs, 1));
+        when(callableStatement.getShort(1)).thenReturn((short) 100);
+        when(callableStatement.wasNull()).thenReturn(false);
+        assertEquals(new Short((short) 100), TYPE_HANDLER.getResult(callableStatement, 1));
     }
 
 }
