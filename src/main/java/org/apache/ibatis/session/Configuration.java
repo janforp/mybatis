@@ -63,6 +63,7 @@ import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeAliasRegistry;
 import org.apache.ibatis.type.TypeHandlerRegistry;
+import org.junit.Assert;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -76,7 +77,7 @@ import java.util.Set;
 
 /**
  * @author Clinton Begin
- * @see https://mybatis.org/mybatis-3/zh/configuration.html
+ * @see < https://mybatis.org/mybatis-3/zh/configuration.html
  */
 public class Configuration {
 
@@ -148,8 +149,6 @@ public class Configuration {
      */
     protected final Map<String, String> cacheRefMap = new HashMap<String, String>();
 
-    //默认为简单执行器
-
     //环境
     @Getter
     @Setter
@@ -173,27 +172,37 @@ public class Configuration {
     /**
      * 是否开启驼峰命名自动映射，即从经典数据库列名 A_COLUMN 映射到经典 Java 属性名 aColumn。
      */
+    @Getter
+    @Setter
     protected boolean mapUnderscoreToCamelCase = false;
 
     /**
      * 开启时，任一方法的调用都会加载该对象的所有延迟加载属性。 否则，每个延迟加载属性会按需加载（参考 lazyLoadTriggerMethods)。
      */
+    @Setter
+    @Getter
     protected boolean aggressiveLazyLoading = true;
 
     /**
      * 是否允许单个语句返回多结果集（需要数据库驱动支持）
      */
+    @Setter
+    @Getter
     protected boolean multipleResultSetsEnabled = true;
 
     /**
      * 允许 JDBC 支持自动生成主键，需要数据库驱动支持。如果设置为 true，
      * 将强制使用自动生成主键。尽管一些数据库驱动不支持此特性，但仍可正常工作（如 Derby）
      */
+    @Setter
+    @Getter
     protected boolean useGeneratedKeys = false;
 
     /**
      * 使用列标签代替列名。实际表现依赖于数据库驱动，具体可参考数据库驱动的相关文档，或通过对比测试来观察。
      */
+    @Setter
+    @Getter
     protected boolean useColumnLabel = true;
 
     /**
@@ -262,6 +271,8 @@ public class Configuration {
     protected Integer defaultStatementTimeout;
 
     /**
+     * 默认为简单执行器
+     *
      * 配置默认的执行器。SIMPLE 就是普通的执行器；
      * REUSE 执行器会重用预处理语句（PreparedStatement）；
      * BATCH 执行器不仅重用语句还会执行批量更新。
@@ -313,12 +324,9 @@ public class Configuration {
      *
      * @see <a href='https://code.google.com/p/mybatis/issues/detail?id=300'>Issue 300</a> (google code)
      */
+    @Getter
+    @Setter
     protected Class<?> configurationFactory;
-
-    public Configuration(Environment environment) {
-        this();
-        this.environment = environment;
-    }
 
     public Configuration() {
         //注册更多的类型别名，至于为何不直接在TypeAliasRegistry里注册，还需进一步研究
@@ -353,6 +361,11 @@ public class Configuration {
 
         languageRegistry.setDefaultDriverClass(XMLLanguageDriver.class);
         languageRegistry.register(RawLanguageDriver.class);
+    }
+
+    public Configuration(Environment environment) {
+        this();
+        this.environment = environment;
     }
 
     /**
@@ -491,22 +504,6 @@ public class Configuration {
         }
     }
 
-    public Class<?> getConfigurationFactory() {
-        return configurationFactory;
-    }
-
-    public void setConfigurationFactory(Class<?> configurationFactory) {
-        this.configurationFactory = configurationFactory;
-    }
-
-    public boolean isMapUnderscoreToCamelCase() {
-        return mapUnderscoreToCamelCase;
-    }
-
-    public void setMapUnderscoreToCamelCase(boolean mapUnderscoreToCamelCase) {
-        this.mapUnderscoreToCamelCase = mapUnderscoreToCamelCase;
-    }
-
     public void addLoadedResource(String resource) {
         loadedResources.add(resource);
     }
@@ -520,38 +517,6 @@ public class Configuration {
             proxyFactory = new JavassistProxyFactory();
         }
         this.proxyFactory = proxyFactory;
-    }
-
-    public boolean isAggressiveLazyLoading() {
-        return aggressiveLazyLoading;
-    }
-
-    public void setAggressiveLazyLoading(boolean aggressiveLazyLoading) {
-        this.aggressiveLazyLoading = aggressiveLazyLoading;
-    }
-
-    public boolean isMultipleResultSetsEnabled() {
-        return multipleResultSetsEnabled;
-    }
-
-    public void setMultipleResultSetsEnabled(boolean multipleResultSetsEnabled) {
-        this.multipleResultSetsEnabled = multipleResultSetsEnabled;
-    }
-
-    public boolean isUseGeneratedKeys() {
-        return useGeneratedKeys;
-    }
-
-    public void setUseGeneratedKeys(boolean useGeneratedKeys) {
-        this.useGeneratedKeys = useGeneratedKeys;
-    }
-
-    public boolean isUseColumnLabel() {
-        return useColumnLabel;
-    }
-
-    public void setUseColumnLabel(boolean useColumnLabel) {
-        this.useColumnLabel = useColumnLabel;
     }
 
     /**
@@ -814,11 +779,18 @@ public class Configuration {
         }
     }
 
-    //静态内部类,严格的Map，不允许多次覆盖key所对应的value
+    /**
+     * 静态内部类,严格的Map，不允许多次覆盖key所对应的value
+     *
+     * @param <V> 值类型
+     */
     protected static class StrictMap<V> extends HashMap<String, V> {
 
         private static final long serialVersionUID = -4950446264854982944L;
 
+        /**
+         * 给每一个实例指定一个名称，在抛出异常的地方，可以指明是什么场景
+         */
         private String name;
 
         public StrictMap(String name, int initialCapacity, float loadFactor) {
@@ -844,7 +816,7 @@ public class Configuration {
         @SuppressWarnings("unchecked")
         @Override
         public V put(String key, V value) {
-            if (containsKey(key)) {
+            if (super.containsKey(key)) {
                 //如果已经存在此key了，直接报错
                 throw new IllegalArgumentException(name + " already contains value for " + key);
             }
@@ -852,7 +824,6 @@ public class Configuration {
                 //如果有.符号，取得短名称，大致用意就是包名不同，类名相同，提供模糊查询的功能
                 final String shortKey = getShortName(key);
                 if (super.get(shortKey) == null) {
-                    //如果没有这个缩略，则放一个缩略
                     super.put(shortKey, value);
                 } else {
                     //如果已经有此缩略，表示模糊，放一个Ambiguity型的
@@ -880,10 +851,17 @@ public class Configuration {
             return value;
         }
 
-        //取得短名称，也就是取得最后那个句号的后面那部分
+        /**
+         * com.janita.service ----->  servic
+         *
+         * @param key 键
+         * @return 获取最后 . 后面的值
+         */
         private String getShortName(String key) {
-            final String[] keyparts = key.split("\\.");
-            return keyparts[keyparts.length - 1];
+            //按 . 分隔字符串到数组中
+            final String[] keyParts = key.split("\\.");
+            //获取数组最后一个值
+            return keyParts[keyParts.length - 1];
         }
 
         //模糊，居然放在Map里面的一个静态内部类，
@@ -900,5 +878,5 @@ public class Configuration {
                 return subject;
             }
         }
-    }
+    }¬¬¬¬
 }

@@ -47,54 +47,6 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
         this.configuration = configuration;
     }
 
-    //最终都会调用2种方法：openSessionFromDataSource,openSessionFromConnection
-    //以下6个方法都会调用openSessionFromDataSource
-    @Override
-    public SqlSession openSession() {
-        return openSessionFromDataSource(configuration.getDefaultExecutorType(), null, false);
-    }
-
-    @Override
-    public SqlSession openSession(boolean autoCommit) {
-        return openSessionFromDataSource(configuration.getDefaultExecutorType(), null, autoCommit);
-    }
-
-    @Override
-    public SqlSession openSession(ExecutorType execType) {
-        return openSessionFromDataSource(execType, null, false);
-    }
-
-    @Override
-    public SqlSession openSession(TransactionIsolationLevel level) {
-        return openSessionFromDataSource(configuration.getDefaultExecutorType(), level, false);
-    }
-
-    @Override
-    public SqlSession openSession(ExecutorType execType, TransactionIsolationLevel level) {
-        return openSessionFromDataSource(execType, level, false);
-    }
-
-    @Override
-    public SqlSession openSession(ExecutorType execType, boolean autoCommit) {
-        return openSessionFromDataSource(execType, null, autoCommit);
-    }
-
-    //以下2个方法都会调用openSessionFromConnection
-    @Override
-    public SqlSession openSession(Connection connection) {
-        return openSessionFromConnection(configuration.getDefaultExecutorType(), connection);
-    }
-
-    @Override
-    public SqlSession openSession(ExecutorType execType, Connection connection) {
-        return openSessionFromConnection(execType, connection);
-    }
-
-    @Override
-    public Configuration getConfiguration() {
-        return configuration;
-    }
-
     /**
      * SqlSession
      *
@@ -144,6 +96,54 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
         } finally {
             ErrorContext.instance().reset();
         }
+    }
+
+    //最终都会调用2种方法：openSessionFromDataSource,openSessionFromConnection
+    //以下6个方法都会调用openSessionFromDataSource
+    @Override
+    public SqlSession openSession() {
+        return openSessionFromDataSource(configuration.getDefaultExecutorType(), null, false);
+    }
+
+    @Override
+    public SqlSession openSession(boolean autoCommit) {
+        return openSessionFromDataSource(configuration.getDefaultExecutorType(), null, autoCommit);
+    }
+
+    @Override
+    public SqlSession openSession(ExecutorType execType) {
+        return openSessionFromDataSource(execType, null, false);
+    }
+
+    @Override
+    public SqlSession openSession(TransactionIsolationLevel level) {
+        return openSessionFromDataSource(configuration.getDefaultExecutorType(), level, false);
+    }
+
+    @Override
+    public SqlSession openSession(ExecutorType execType, TransactionIsolationLevel level) {
+        return openSessionFromDataSource(execType, level, false);
+    }
+
+    @Override
+    public SqlSession openSession(ExecutorType execType, boolean autoCommit) {
+        return openSessionFromDataSource(execType, null, autoCommit);
+    }
+
+    //以下2个方法都会调用openSessionFromConnection
+    @Override
+    public SqlSession openSession(Connection connection) {
+        return openSessionFromConnection(configuration.getDefaultExecutorType(), connection);
+    }
+
+    @Override
+    public SqlSession openSession(ExecutorType execType, Connection connection) {
+        return openSessionFromConnection(execType, connection);
+    }
+
+    @Override
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
     /**

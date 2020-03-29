@@ -46,6 +46,9 @@ public class MapperBuilderAssistant extends BaseBuilder {
 
     private String resource;
 
+    /**
+     * 该 statement 语句对应的缓存
+     */
     private Cache currentCache;
 
     // issue #676
