@@ -96,8 +96,23 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         this.resultHandler = resultHandler;
     }
 
+    /**
+     * 处理OUT参数,只有存储过程采用
+     *
+     * <mapper namespace="mybatis2.Tssss">
+     * <select id="getCount" resultType="hashmap" statementType="CALLABLE">
+     * {call
+     * ges_user_count(#{sex_id,mode=IN,jdbcType=INTEGER},#{result,mode=OUT,jdbcType=INTEGER})
+     * }
+     * </select>
+     * </mapper>
+     *
+     * @param callableStatement 存储过程的statement
+     * @throws SQLException 异常
+     */
     @Override
-    public void handleOutputParameters(CallableStatement cs) throws SQLException {
+    public void handleOutputParameters(CallableStatement callableStatement) throws SQLException {
+        //sql中的入参数，此时，mode=OUT的属性是null
         final Object parameterObject = parameterHandler.getParameterObject();
         final MetaObject metaParam = configuration.newMetaObject(parameterObject);
         final List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
@@ -110,11 +125,18 @@ public class DefaultResultSetHandler implements ResultSetHandler {
                     //如果是ResultSet型(游标)
                     //#{result, jdbcType=CURSOR, mode=OUT, javaType=ResultSet, resultMap=userResultMap}
                     //先用CallableStatement.getObject取得这个游标，作为参数传进去
-                    handleRefCursorOutputParameter((ResultSet) cs.getObject(i + 1), parameterMapping, metaParam);
+                    handleRefCursorOutputParameter((ResultSet) callableStatement.getObject(i + 1), parameterMapping, metaParam);
                 } else {
                     //否则是普通型，核心就是CallableStatement.getXXX取得值
                     final TypeHandler<?> typeHandler = parameterMapping.getTypeHandler();
-                    metaParam.setValue(parameterMapping.getProperty(), typeHandler.getResult(cs, i + 1));
+
+                    //sql中的参数名称，如：ges_user_count(#{sex_id,mode=IN,jdbcType=INTEGER},#{result,mode=OUT,jdbcType=INTEGER}) 的 result
+                    String property = parameterMapping.getProperty();
+                    //结果
+                    Object result = typeHandler.getResult(callableStatement, i + 1);
+                    //赋值
+                    //该句的时候将存储过程的result值设置给了输入的参数map。
+                    metaParam.setValue(property, result);
                 }
             }
         }
@@ -205,7 +227,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         return resultSet != null ? new ResultSetWrapper(resultSet, configuration) : null;
     }
 
-    private ResultSetWrapper getNextResultSet(Statement stmt) throws SQLException {
+    private ResultSetWrapper getNextResultSet(Statement stmt) {
         // Making this method tolerant of bad JDBC drivers
         try {
             if (stmt.getConnection().getMetaData().supportsMultipleResultSets()) {

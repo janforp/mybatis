@@ -31,7 +31,7 @@ public class BoundSql {
     /**
      * xml中的参数
      *
-     * #{property,javaType=int,jdbcType=NUMERIC}
+     * #{property,javaType=int,jdbcType=NUMERIC} 列表
      */
     @Getter
     private List<ParameterMapping> parameterMappings;
