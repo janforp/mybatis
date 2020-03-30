@@ -30,14 +30,57 @@ public class SqlSessionManager implements SqlSessionFactory, SqlSession {
 
     private SqlSessionManager(SqlSessionFactory sqlSessionFactory) {
         this.sqlSessionFactory = sqlSessionFactory;
-        this.sqlSessionProxy = (SqlSession) Proxy.newProxyInstance(
-                SqlSessionFactory.class.getClassLoader(),
-                new Class[] { SqlSession.class },
-                new SqlSessionInterceptor());
+        //类加载器
+        ClassLoader classLoader = SqlSessionFactory.class.getClassLoader();
+        //被代理的类型，必须是接口
+        Class[] classes = { SqlSession.class };
+        //被代理类的实现
+        SqlSessionInterceptor sqlSessionInterceptor = new SqlSessionInterceptor();
+        this.sqlSessionProxy = (SqlSession) Proxy.newProxyInstance(classLoader, classes, sqlSessionInterceptor);
+    }
+
+    /**
+     * java动态代理
+     */
+    private class SqlSessionInterceptor implements InvocationHandler {
+
+        public SqlSessionInterceptor() {
+            // Prevent Synthetic Access
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            final SqlSession sqlSession = SqlSessionManager.this.localSqlSession.get();
+            if (sqlSession != null) {
+                //如果当前线程已经有SqlSession了，则直接调用
+                try {
+                    //调用 DefaultSqlSession 的 method 方法
+                    return method.invoke(sqlSession, args);
+                } catch (Throwable t) {
+                    throw ExceptionUtil.unwrapThrowable(t);
+                }
+            } else {
+                //如果当前线程没有SqlSession，先打开session，再调用,最后提交
+                final SqlSession autoSqlSession = openSession();
+                try {
+                    //调用 DefaultSqlSession 的 method 方法
+                    final Object result = method.invoke(autoSqlSession, args);
+                    autoSqlSession.commit();
+                    return result;
+                } catch (Throwable t) {
+                    autoSqlSession.rollback();
+                    throw ExceptionUtil.unwrapThrowable(t);
+                } finally {
+                    autoSqlSession.close();
+                }
+            }
+        }
     }
 
     public static SqlSessionManager newInstance(Reader reader) {
-        return new SqlSessionManager(new SqlSessionFactoryBuilder().build(reader, null, null));
+        //返回的是 return new DefaultSqlSessionFactory(config);
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader, null, null);
+        return new SqlSessionManager(sqlSessionFactory);
     }
 
     public static SqlSessionManager newInstance(Reader reader, String environment) {
@@ -308,40 +351,6 @@ public class SqlSessionManager implements SqlSessionFactory, SqlSession {
             sqlSession.close();
         } finally {
             localSqlSession.set(null);
-        }
-    }
-
-    //代理模式
-    private class SqlSessionInterceptor implements InvocationHandler {
-
-        public SqlSessionInterceptor() {
-            // Prevent Synthetic Access
-        }
-
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            final SqlSession sqlSession = SqlSessionManager.this.localSqlSession.get();
-            if (sqlSession != null) {
-                //如果当前线程已经有SqlSession了，则直接调用
-                try {
-                    return method.invoke(sqlSession, args);
-                } catch (Throwable t) {
-                    throw ExceptionUtil.unwrapThrowable(t);
-                }
-            } else {
-                //如果当前线程没有SqlSession，先打开session，再调用,最后提交
-                final SqlSession autoSqlSession = openSession();
-                try {
-                    final Object result = method.invoke(autoSqlSession, args);
-                    autoSqlSession.commit();
-                    return result;
-                } catch (Throwable t) {
-                    autoSqlSession.rollback();
-                    throw ExceptionUtil.unwrapThrowable(t);
-                } finally {
-                    autoSqlSession.close();
-                }
-            }
         }
     }
 }
