@@ -26,7 +26,13 @@ public class TransactionalCacheManager {
 
     //得到某个TransactionalCache的值
     public Object getObject(Cache cache, CacheKey key) {
-        return getTransactionalCache(cache).getObject(key);
+
+        //二级缓存
+        TransactionalCache transactionalCache = getTransactionalCache(cache);
+        //结果
+        Object object = transactionalCache.getObject(key);
+        System.out.println(object);
+        return object;
     }
 
     public void putObject(Cache cache, CacheKey key, Object value) {

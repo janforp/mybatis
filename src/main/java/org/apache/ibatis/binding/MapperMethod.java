@@ -170,11 +170,12 @@ public class MapperMethod {
         List<E> result;
         Object param = method.convertArgsToSqlCommandParam(args);
         //代入RowBounds
+        String commandName = command.getName();
         if (method.hasRowBounds()) {
             RowBounds rowBounds = method.extractRowBounds(args);
-            result = sqlSession.selectList(command.getName(), param, rowBounds);
+            result = sqlSession.selectList(commandName, param, rowBounds);
         } else {
-            result = sqlSession.selectList(command.getName(), param);
+            result = sqlSession.selectList(commandName, param);
         }
         // issue #510 Collections & arrays support
         if (!method.getReturnType().isAssignableFrom(result.getClass())) {
@@ -323,6 +324,8 @@ public class MapperMethod {
             this.resultHandlerIndex = getUniqueParamIndex(method, ResultHandler.class);
 
             //该方法的参数下标跟名称或者序号的映射
+            //{0:"subjectQuery",1:"bodyQuery"}
+            //key:下标。value:名称或者下标
             SortedMap<Integer, String> params = getParamsIndexMap(method, this.hasNamedParameters);
             this.paramsIndexMap = Collections.unmodifiableSortedMap(params);
         }
@@ -376,6 +379,7 @@ public class MapperMethod {
                     }
                     i++;
                 }
+                //{"subjectQuery":"%a%","bodyQuery":"%a%","param1":"%a%","param2":"%a%"}
                 return param;
             }
         }

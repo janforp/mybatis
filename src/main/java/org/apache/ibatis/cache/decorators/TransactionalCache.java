@@ -110,12 +110,17 @@ public class TransactionalCache implements Cache {
         entriesToAddOnCommit.clear();
     }
 
-    //多了commit方法，提供事务功能
+    /**
+     * 多了commit方法，提供事务功能
+     * 二级缓存只有在一个事务提交之后，其他的时候才能使用，否则岂不是出现 另外一个事务读到了该事务没有提交的数据了？
+     *
+     * 读未提交(Read Uncommitted)：允许脏读，也就是可能读取到其他会话中未提交事务修改的数据
+     */
     public void commit() {
         if (clearOnCommit) {
             delegate.clear();
         }
-        //如果不调用commit方法的话，由于TranscationalCache的作用，并不会对二级缓存造成直接的影响
+        //如果不调用commit方法的话，由于 TransactionalCache 的作用，并不会对二级缓存造成直接的影响
         flushPendingEntries();
         reset();
     }
@@ -131,9 +136,15 @@ public class TransactionalCache implements Cache {
         entriesMissedInCache.clear();
     }
 
+    /**
+     * 把map中的缓存刷到代理缓存中去，实现垮 sqlSession 的缓存
+     */
     private void flushPendingEntries() {
-        for (Map.Entry<Object, Object> entry : entriesToAddOnCommit.entrySet()) {
-            delegate.putObject(entry.getKey(), entry.getValue());
+        Set<Map.Entry<Object, Object>> entrySet = entriesToAddOnCommit.entrySet();
+        for (Map.Entry<Object, Object> entry : entrySet) {
+            Object key = entry.getKey();
+            Object value = entry.getValue();
+            delegate.putObject(key, value);
         }
         for (Object entry : entriesMissedInCache) {
             if (!entriesToAddOnCommit.containsKey(entry)) {

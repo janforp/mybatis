@@ -185,7 +185,7 @@ public abstract class BaseExecutor implements Executor {
         if (closed) {
             throw new ExecutorException("Executor was closed.");
         }
-        //先清局部缓存，再查询.但仅查询堆栈为0，才清。为了处理递归调用
+        //先清局部缓存，再查询.但仅查询堆栈为0，才清。为了处理递归调用 ，            //如果该 statement 要要刷新缓存，则一级，二级缓存都会傻笑
         boolean flushCacheRequired = mappedStatement.isFlushCacheRequired();
         if (queryStack == 0 && flushCacheRequired) {
             //开始查询前，并且该statement配置是要刷新缓存，则刷新缓存
@@ -198,6 +198,7 @@ public abstract class BaseExecutor implements Executor {
             queryStack++;
             //先根据cacheKey从localCache去查，如果有 resultHandler ，则无法使用缓存
             //如果 resultHandler 为空，则可以是要缓存，但是如果查询前刷新了缓存，则相当于不用缓存
+            //二级缓存
             list = (resultHandler == null ? (List<E>) localCache.getObject(cacheKey) : null);
             if (list != null) {
                 //缓存命中

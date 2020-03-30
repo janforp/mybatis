@@ -345,7 +345,14 @@ public class BindingTest {
         SqlSession session = sqlSessionFactory.openSession();
         try {
             BoundBlogMapper mapper = session.getMapper(BoundBlogMapper.class);
-            List<Post> posts = mapper.selectPostsLikeSubjectAndBody(new RowBounds(1, 1), "%a%", "%a%");
+            List<Post> posts = mapper.selectPostsLikeSubjectAndBody("%a%", "%a%", new RowBounds(1, 1));
+            assertEquals(1, posts.size());
+
+            //二级缓存只有在一个事务提交之后，其他的时候才能使用，否则岂不是出现 另外一个事务读到了该事务没有提交的数据了？
+            //读未提交(Read Uncommitted)：允许脏读，也就是可能读取到其他会话中未提交事务修改的数据
+            session.commit();
+            //这一次查询不会到一级缓存，在二级缓存就命中
+            posts = mapper.selectPostsLikeSubjectAndBody("%a%", "%a%", new RowBounds(1, 1));
             assertEquals(1, posts.size());
         } finally {
             session.close();

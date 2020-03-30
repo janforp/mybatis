@@ -105,11 +105,11 @@ public class CachingExecutor implements Executor {
             if (mappedStatement.isUseCache() && resultHandler == null) {
                 //Caching stored procedures with OUT params is not supported，所有参数的模式必须是 IN，否则不支持二级缓存
                 ensureNoOutParams(mappedStatement, parameterObject, boundSql);
-                //先拿缓存
+                //先从二级缓存拿
                 @SuppressWarnings("unchecked")
                 List<E> list = (List<E>) transactionalCacheManager.getObject(cache, cacheKey);
                 if (list == null) {
-                    //没缓存，去数据库，去数据库查询是交给被代理者
+                    //二级缓存没命中，去被代理的执行器，在哪里会进行一级缓存查询
                     list = delegate.query(mappedStatement, parameterObject, rowBounds, resultHandler, cacheKey, boundSql);
                     //缓存结果
                     transactionalCacheManager.putObject(cache, cacheKey, list); // issue #578 and #116
@@ -183,6 +183,7 @@ public class CachingExecutor implements Executor {
     private void flushCacheIfRequired(MappedStatement mappedStatement) {
         Cache cache = mappedStatement.getCache();
         if (cache != null && mappedStatement.isFlushCacheRequired()) {
+            //如果该 statement 要要刷新缓存，则一级，二级缓存都会傻笑
             transactionalCacheManager.clear(cache);
         }
     }
