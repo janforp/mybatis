@@ -36,6 +36,15 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
         this.methodCache = methodCache;
     }
 
+    /**
+     * java动态代理，如果sqlSession.getMapper(Mapper.class)获取到的映射接口去操作的话，就会通过该动态代理生成mapper接口的实例
+     *
+     * @param proxy MapperProxy 实例
+     * @param method mapper接口的某一个方法
+     * @param args mapper接口的某一个方法的入参数
+     * @return 函数执行结果
+     * @throws Throwable 异常
+     */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         //代理以后，所有Mapper的方法调用时，都会调用这个invoke方法
@@ -46,6 +55,7 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
         //如果该方法是 Object 里面的方法，则直执行即可
         if (Object.class.equals(declaringClass)) {
             try {
+                //进入此分支的是：toString,equal等方法
                 return method.invoke(this, args);
             } catch (Throwable t) {
                 throw ExceptionUtil.unwrapThrowable(t);
