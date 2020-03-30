@@ -72,6 +72,7 @@ public class VelocitySqlSource implements SqlSource {
         return bindings;
     }
 
+    @Override
     public BoundSql getBoundSql(Object parameterObject) {
         Map<String, Object> bindings = createBindings(parameterObject, configuration);
         VelocityContext context = new VelocityContext(bindings);

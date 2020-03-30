@@ -22,13 +22,17 @@ public class BigDecimalTypeHandlerTest extends BaseTypeHandlerTest {
     public void shouldGetResultFromResultSet() throws Exception {
         when(resultSet.getBigDecimal("column")).thenReturn(new BigDecimal(1));
         when(resultSet.wasNull()).thenReturn(false);
-        assertEquals(new BigDecimal(1), TYPE_HANDLER.getResult(resultSet, "column"));
+
+        BigDecimal columnResult = TYPE_HANDLER.getResult(resultSet, "column");
+        assertEquals(new BigDecimal(1), columnResult);
     }
 
     @Test
     public void shouldGetResultFromCallableStatement() throws Exception {
         when(callableStatement.getBigDecimal(1)).thenReturn(new BigDecimal(1));
         when(callableStatement.wasNull()).thenReturn(false);
-        assertEquals(new BigDecimal(1), TYPE_HANDLER.getResult(callableStatement, 1));
+
+        BigDecimal result = TYPE_HANDLER.getResult(callableStatement, 1);
+        assertEquals(new BigDecimal(1), result);
     }
 }

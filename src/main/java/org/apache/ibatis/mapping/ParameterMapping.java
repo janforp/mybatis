@@ -1,21 +1,6 @@
-/*
- *    Copyright 2009-2013 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.mapping;
 
+import lombok.Getter;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
@@ -34,110 +19,65 @@ public class ParameterMapping {
     private Configuration configuration;
 
     //property
+    @Getter
     private String property;
 
     /**
+     * Used for handling output of callable statements
      * IN,
      * OUT,
      * INOUT
      */
+    @Getter
     private ParameterMode mode;
 
+    /**
+     * Used for handling output of callable statements
+     */
     //javaType=int
+    @Getter
     private Class<?> javaType = Object.class;
-
-    //jdbcType=NUMERIC
-    private JdbcType jdbcType;
-
-    //numericScale
-    private Integer numericScale;
-
-    private TypeHandler<?> typeHandler;
-
-    private String resultMapId;
-
-    //jdbcType=NUMERIC
-    private String jdbcTypeName;
-
-    private String expression;
-
-    private ParameterMapping() {
-    }
-
-    public String getProperty() {
-        return property;
-    }
-
-    /**
-     * Used for handling output of callable statements
-     *
-     * @return
-     */
-    public ParameterMode getMode() {
-        return mode;
-    }
-
-    /**
-     * Used for handling output of callable statements
-     *
-     * @return
-     */
-    public Class<?> getJavaType() {
-        return javaType;
-    }
 
     /**
      * Used in the UnknownTypeHandler in case there is no handler for the property type
-     *
-     * @return
      */
-    public JdbcType getJdbcType() {
-        return jdbcType;
-    }
+    //jdbcType=NUMERIC
+    @Getter
+    private JdbcType jdbcType;
 
     /**
      * Used for handling output of callable statements
-     *
-     * @return
      */
-    public Integer getNumericScale() {
-        return numericScale;
-    }
+    //numericScale
+    @Getter
+    private Integer numericScale;
 
     /**
      * Used when setting parameters to the PreparedStatement
-     *
-     * @return
      */
-    public TypeHandler<?> getTypeHandler() {
-        return typeHandler;
-    }
+    @Getter
+    private TypeHandler<?> typeHandler;
 
     /**
      * Used for handling output of callable statements
-     *
-     * @return
      */
-    public String getResultMapId() {
-        return resultMapId;
-    }
+    @Getter
+    private String resultMapId;
 
     /**
      * Used for handling output of callable statements
-     *
-     * @return
      */
-    public String getJdbcTypeName() {
-        return jdbcTypeName;
-    }
+    //jdbcType=NUMERIC
+    @Getter
+    private String jdbcTypeName;
 
     /**
      * Not used
-     *
-     * @return
      */
-    public String getExpression() {
-        return expression;
+    @Getter
+    private String expression;
+
+    private ParameterMapping() {
     }
 
     //静态内部类，建造者模式
@@ -238,7 +178,5 @@ public class ParameterMapping {
                 parameterMapping.typeHandler = typeHandlerRegistry.getTypeHandler(parameterMapping.javaType, parameterMapping.jdbcType);
             }
         }
-
     }
-
 }

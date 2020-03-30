@@ -1,21 +1,7 @@
-/*
- *    Copyright 2009-2014 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.mapping;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
@@ -48,103 +34,55 @@ public class ResultMapping {
 
     private Configuration configuration;
 
+    @Getter
     private String property;
 
+    @Getter
     private String column;
 
+    @Getter
     private Class<?> javaType;
 
+    @Getter
     private JdbcType jdbcType;
 
+    @Getter
     private TypeHandler<?> typeHandler;
 
+    @Getter
     private String nestedResultMapId;
 
+    @Getter
     private String nestedQueryId;
 
+    @Getter
     private Set<String> notNullColumns;
 
+    @Getter
     private String columnPrefix;
 
+    @Getter
     private List<ResultFlag> flags;
 
+    @Getter
     private List<ResultMapping> composites;
 
+    @Getter
     private String resultSet;
 
+    @Getter
+    @Setter
     private String foreignColumn;
 
+    @Getter
+    @Setter
     private boolean lazy;
 
     ResultMapping() {
     }
 
-    public String getProperty() {
-        return property;
-    }
-
-    public String getColumn() {
-        return column;
-    }
-
-    public Class<?> getJavaType() {
-        return javaType;
-    }
-
-    public JdbcType getJdbcType() {
-        return jdbcType;
-    }
-
-    public TypeHandler<?> getTypeHandler() {
-        return typeHandler;
-    }
-
-    public String getNestedResultMapId() {
-        return nestedResultMapId;
-    }
-
-    public String getNestedQueryId() {
-        return nestedQueryId;
-    }
-
-    public Set<String> getNotNullColumns() {
-        return notNullColumns;
-    }
-
-    public String getColumnPrefix() {
-        return columnPrefix;
-    }
-
-    public List<ResultFlag> getFlags() {
-        return flags;
-    }
-
-    public List<ResultMapping> getComposites() {
-        return composites;
-    }
-
     public boolean isCompositeResult() {
         return this.composites != null && !this.composites.isEmpty();
-    }
-
-    public String getResultSet() {
-        return this.resultSet;
-    }
-
-    public String getForeignColumn() {
-        return foreignColumn;
-    }
-
-    public void setForeignColumn(String foreignColumn) {
-        this.foreignColumn = foreignColumn;
-    }
-
-    public boolean isLazy() {
-        return lazy;
-    }
-
-    public void setLazy(boolean lazy) {
-        this.lazy = lazy;
     }
 
     @Override
@@ -155,13 +93,10 @@ public class ResultMapping {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         ResultMapping that = (ResultMapping) o;
-
         if (property == null || !property.equals(that.property)) {
             return false;
         }
-
         return true;
     }
 
@@ -312,5 +247,4 @@ public class ResultMapping {
             return this;
         }
     }
-
 }

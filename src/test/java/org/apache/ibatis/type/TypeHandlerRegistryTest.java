@@ -1,19 +1,3 @@
-/*
- *    Copyright 2009-2012 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.type;
 
 import org.apache.ibatis.domain.misc.RichType;
@@ -35,6 +19,9 @@ public class TypeHandlerRegistryTest {
 
     private TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry();
 
+    /**
+     * 重新得到
+     */
     @Test
     public void shouldRegisterAndRetrieveTypeHandler() {
         TypeHandler<String> stringTypeHandler = typeHandlerRegistry.getTypeHandler(String.class);
@@ -50,6 +37,7 @@ public class TypeHandlerRegistryTest {
 
     @Test
     public void shouldRegisterAndRetrieveComplexTypeHandler() {
+
         TypeHandler<List<URI>> fakeHandler = new TypeHandler<List<URI>>() {
 
             public void setParameter(PreparedStatement preparedStatement, int i, List<URI> parameter, JdbcType jdbcType)
@@ -132,5 +120,4 @@ public class TypeHandlerRegistryTest {
         assertSame(IntegerTypeHandler.class, typeHandlerRegistry.getTypeHandler(Integer.class).getClass());
         typeHandlerRegistry.register(Integer.class, IntegerTypeHandler.class);
     }
-
 }

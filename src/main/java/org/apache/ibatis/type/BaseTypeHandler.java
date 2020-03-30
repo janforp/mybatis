@@ -102,5 +102,4 @@ public abstract class BaseTypeHandler<T> extends TypeReference<T> implements Typ
     public abstract T getNullableResult(ResultSet rs, int columnIndex) throws SQLException;
 
     public abstract T getNullableResult(CallableStatement cs, int columnIndex) throws SQLException;
-
 }
