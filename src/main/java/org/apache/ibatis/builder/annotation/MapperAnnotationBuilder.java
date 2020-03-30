@@ -103,7 +103,7 @@ public class MapperAnnotationBuilder {
     }
 
     public void parse() {
-        String resource = mapperCLass.toString();
+        String resource = mapperCLass.toString();//interface org.apache.ibatis.binding.WrongNamespaceMapper
         if (!configuration.isResourceLoaded(resource)) {
             loadXmlResource();
             configuration.addLoadedResource(resource);
@@ -144,7 +144,9 @@ public class MapperAnnotationBuilder {
         // Spring may not know the real resource name so we check a flag
         // to prevent loading again a resource twice
         // this flag is set at XMLMapperBuilder#bindMapperForNamespace
-        if (!configuration.isResourceLoaded("namespace:" + mapperCLass.getName())) {
+
+        String resource = "namespace:" + mapperCLass.getName();
+        if (!configuration.isResourceLoaded(resource)) {
             String xmlResource = mapperCLass.getName().replace('.', '/') + ".xml";
             InputStream inputStream = null;
             try {

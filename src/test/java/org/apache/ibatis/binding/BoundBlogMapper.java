@@ -191,5 +191,4 @@ public interface BoundBlogMapper {
             @Result(property = "posts", column = "id", many = @Many(select = "selectPostsById", fetchType = FetchType.EAGER))
     })
     List<Blog> selectBlogsWithAutorAndPostsEagerly();
-
 }
