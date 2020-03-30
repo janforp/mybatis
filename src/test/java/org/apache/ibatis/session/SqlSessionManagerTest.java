@@ -80,5 +80,4 @@ public class SqlSessionManagerTest extends BaseDataTest {
         Author actual = mapper.selectAuthor(502);
         assertNull(actual);
     }
-
 }

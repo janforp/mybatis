@@ -24,19 +24,23 @@ public class SqlSessionManager implements SqlSessionFactory, SqlSession {
 
     private final SqlSessionFactory sqlSessionFactory;
 
+    /**
+     * 这是一个动态代理的实现
+     */
     private final SqlSession sqlSessionProxy;
 
     private ThreadLocal<SqlSession> localSqlSession = new ThreadLocal<SqlSession>();
 
     private SqlSessionManager(SqlSessionFactory sqlSessionFactory) {
         this.sqlSessionFactory = sqlSessionFactory;
+
         //类加载器
         ClassLoader classLoader = SqlSessionFactory.class.getClassLoader();
         //被代理的类型，必须是接口
         Class[] classes = { SqlSession.class };
         //被代理类的实现
-        SqlSessionInterceptor sqlSessionInterceptor = new SqlSessionInterceptor();
-        this.sqlSessionProxy = (SqlSession) Proxy.newProxyInstance(classLoader, classes, sqlSessionInterceptor);
+        InvocationHandler invocationHandler = new SqlSessionInterceptor();
+        this.sqlSessionProxy = (SqlSession) Proxy.newProxyInstance(classLoader, classes, invocationHandler);
     }
 
     /**
