@@ -1,5 +1,6 @@
 package org.apache.ibatis.builder;
 
+import lombok.Getter;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.decorators.LruCache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
@@ -42,6 +43,7 @@ import java.util.StringTokenizer;
 public class MapperBuilderAssistant extends BaseBuilder {
 
     //每个助手都有1个namespace,resource,cache
+    @Getter
     private String currentNamespace;
 
     private String resource;
@@ -58,10 +60,6 @@ public class MapperBuilderAssistant extends BaseBuilder {
         super(configuration);
         ErrorContext.instance().resource(resource);
         this.resource = resource;
-    }
-
-    public String getCurrentNamespace() {
-        return currentNamespace;
     }
 
     public void setCurrentNamespace(String currentNamespace) {
@@ -335,23 +333,17 @@ public class MapperBuilderAssistant extends BaseBuilder {
         return value == null ? defaultValue : value;
     }
 
-    private void setStatementCache(
-            boolean isSelect,
-            boolean flushCache,
-            boolean useCache,
-            Cache cache,
-            MappedStatement.Builder statementBuilder) {
+    private void setStatementCache(boolean isSelect, boolean flushCache, boolean useCache, Cache cache, MappedStatement.Builder statementBuilder) {
         flushCache = valueOrDefault(flushCache, !isSelect);
         useCache = valueOrDefault(useCache, isSelect);
+
+        //下面是build模式
         statementBuilder.flushCacheRequired(flushCache);
         statementBuilder.useCache(useCache);
         statementBuilder.cache(cache);
     }
 
-    private void setStatementParameterMap(
-            String parameterMap,
-            Class<?> parameterTypeClass,
-            MappedStatement.Builder statementBuilder) {
+    private void setStatementParameterMap(String parameterMap, Class<?> parameterTypeClass, MappedStatement.Builder statementBuilder) {
         parameterMap = applyCurrentNamespace(parameterMap, true);
 
         if (parameterMap != null) {
@@ -372,11 +364,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
     }
 
     //2.result map
-    private void setStatementResultMap(
-            String resultMap,
-            Class<?> resultType,
-            ResultSetType resultSetType,
-            MappedStatement.Builder statementBuilder) {
+    private void setStatementResultMap(String resultMap, Class<?> resultType, ResultSetType resultSetType, MappedStatement.Builder statementBuilder) {
         resultMap = applyCurrentNamespace(resultMap, true);
 
         List<ResultMap> resultMaps = new ArrayList<ResultMap>();
@@ -398,12 +386,8 @@ public class MapperBuilderAssistant extends BaseBuilder {
             //创建一个inline result map, 把resultType设上就OK了，
             //然后后面被DefaultResultSetHandler.createResultObject()使用
             //DefaultResultSetHandler.getRowValue()使用
-            ResultMap.Builder inlineResultMapBuilder = new ResultMap.Builder(
-                    configuration,
-                    statementBuilder.id() + "-Inline",
-                    resultType,
-                    new ArrayList<ResultMapping>(),
-                    null);
+            ResultMap.Builder inlineResultMapBuilder = new ResultMap.Builder(configuration, statementBuilder.id() + "-Inline",
+                    resultType, new ArrayList<ResultMapping>(), null);
             resultMaps.add(inlineResultMapBuilder.build());
         }
         statementBuilder.resultMaps(resultMaps);
@@ -425,6 +409,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
     public ResultMapping buildResultMapping(Class<?> resultMapType, String property, String column, Class<?> javaType,
             JdbcType jdbcType, String nestedSelect, String nestedResultMap, String notNullColumn, String columnPrefix,
             Class<? extends TypeHandler<?>> typeHandler, List<ResultFlag> flags, String resultSet, String foreignColumn, boolean lazy) {
+
         //根据 resultMap 的 java 类型， 该列的 属性 以及 该列的 java 类型，推断出最终的 列类型
         Class<?> propertyJavaTypeClass = resolveResultJavaType(resultMapType, property, javaType);
         TypeHandler<?> typeHandlerInstance = resolveTypeHandler(propertyJavaTypeClass, typeHandler);
