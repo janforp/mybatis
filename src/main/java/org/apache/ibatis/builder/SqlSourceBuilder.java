@@ -56,6 +56,7 @@ public class SqlSourceBuilder extends BaseBuilder {
             return parameterMappings;
         }
 
+        @Override
         public String handleToken(String content) {
             //先构建参数映射
             parameterMappings.add(buildParameterMapping(content));

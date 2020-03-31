@@ -1,19 +1,3 @@
-/*
- *    Copyright 2009-2011 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.parsing;
 
 import org.w3c.dom.CharacterData;
@@ -402,7 +386,9 @@ public class XNode {
         if (attributeNodes != null) {
             for (int i = 0; i < attributeNodes.getLength(); i++) {
                 Node attribute = attributeNodes.item(i);
-                String value = PropertyParser.parse(attribute.getNodeValue(), variables);
+                String nodeValue = attribute.getNodeValue();
+                //输入字符串 (name = ${username}),可能会输出(name = 张三)，当然映射中要有 key=username,value=张三
+                String value = PropertyParser.parse(nodeValue, variables);
                 attributes.put(attribute.getNodeName(), value);
             }
         }
@@ -429,6 +415,7 @@ public class XNode {
         if (child.getNodeType() == Node.CDATA_SECTION_NODE
                 || child.getNodeType() == Node.TEXT_NODE) {
             String data = ((CharacterData) child).getData();
+            //输入字符串 (name = ${username}),可能会输出(name = 张三)，当然映射中要有 key=username,value=张三
             data = PropertyParser.parse(data, variables);
             return data;
         }

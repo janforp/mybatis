@@ -13,6 +13,8 @@ import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.ibatis.scripting.defaults.RawSqlSource;
 import org.apache.ibatis.session.Configuration;
 
+import java.util.Properties;
+
 /**
  * @author Eduardo Macarron
  */
@@ -45,7 +47,9 @@ public class XMLLanguageDriver implements LanguageDriver {
             return createSqlSource(configuration, parser.evalNode("/script"), parameterType);
         } else {
             // issue #127
-            script = PropertyParser.parse(script, configuration.getVariables());
+            Properties configurationVariables = configuration.getVariables();
+            //输入字符串 (name = ${username}),可能会输出(name = 张三)，当然映射中要有 key=username,value=张三
+            script = PropertyParser.parse(script, configurationVariables);
             TextSqlNode textSqlNode = new TextSqlNode(script);
             //一种是动态，一种是原始
             if (textSqlNode.isDynamic()) {

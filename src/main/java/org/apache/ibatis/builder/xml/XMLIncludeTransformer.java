@@ -8,6 +8,8 @@ import org.apache.ibatis.session.Configuration;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.Properties;
+
 /**
  * XML include转换器
  * select <include refid="Base_Column_List"/>
@@ -62,7 +64,9 @@ public class XMLIncludeTransformer {
     }
 
     private Node findSqlFragment(String refid) {
-        refid = PropertyParser.parse(refid, configuration.getVariables());
+        Properties configurationVariables = configuration.getVariables();
+        //输入字符串 (name = ${username}),可能会输出(name = 张三)，当然映射中要有 key=username,value=张三
+        refid = PropertyParser.parse(refid, configurationVariables);
         refid = builderAssistant.applyCurrentNamespace(refid, true);
         try {
             //去之前存到内存map的SQL片段中寻找

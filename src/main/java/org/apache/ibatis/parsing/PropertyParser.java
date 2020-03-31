@@ -1,19 +1,3 @@
-/*
- *    Copyright 2009-2012 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.parsing;
 
 import java.util.Properties;
@@ -29,18 +13,23 @@ public class PropertyParser {
         // Prevent Instantiation
     }
 
+    /**
+     * Properties variables = new Properties();
+     * variables.setProperty("name", "张三");
+     * variables.setProperty("gender", "2");
+     * String name = PropertyParser.parse("${name}", variables);
+     * Assert.assertEquals("张三", name);
+     *
+     * 如：输入字符串 (name = ${username}),可能会输出(name = 张三)，当然映射中要有 key=username,value=张三
+     *
+     * @param string 待处理的字符串
+     * @param variables 映射
+     * @return 处理之后的字符串
+     */
     public static String parse(String string, Properties variables) {
         VariableTokenHandler handler = new VariableTokenHandler(variables);
         GenericTokenParser parser = new GenericTokenParser("${", "}", handler);
         return parser.parse(string);
-    }
-
-    public static void main(String[] args) {
-        Properties variables = new Properties();
-        variables.setProperty("name", "张三");
-        variables.setProperty("gender", "2");
-        String name = PropertyParser.parse("name", variables);
-        System.out.println(name);
     }
 
     //就是一个map，用相应的value替换key

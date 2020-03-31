@@ -154,6 +154,7 @@ public class XPathParser {
         //1.先用xpath解析
         String result = (String) evaluate(expression, root, XPathConstants.STRING);
         //2.再调用PropertyParser去解析,也就是替换 ${} 这种格式的字符串
+        //输入字符串 (name = ${username}),可能会输出(name = 张三)，当然映射中要有 key=username,value=张三
         result = PropertyParser.parse(result, variables);
         return result;
     }

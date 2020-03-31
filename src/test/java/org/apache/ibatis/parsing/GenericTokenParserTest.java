@@ -1,19 +1,3 @@
-/*
- *    Copyright 2009-2012 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.apache.ibatis.parsing;
 
 import org.junit.Test;
@@ -26,17 +10,38 @@ import static org.junit.Assert.assertEquals;
 public class GenericTokenParserTest {
 
     @Test
+    public void shouldDemonstrateGenericTokenReplacementOne() {
+
+        HashMap<String, String> hashMap = new HashMap<String, String>() {
+            {
+                put("username", "Kobe");
+            }
+        };
+        //标志处理器实现
+        VariableTokenHandler tokenHandler = new VariableTokenHandler(hashMap);
+        GenericTokenParser parser = new GenericTokenParser("${", "}", tokenHandler);
+
+        String parsedStr = parser.parse("AND username = ${username};");
+        assertEquals("AND username = Kobe;", parsedStr);
+    }
+
+    @Test
     public void shouldDemonstrateGenericTokenReplacement() {
-        GenericTokenParser parser = new GenericTokenParser("${", "}", new VariableTokenHandler(new HashMap<String, String>() {
+
+        HashMap<String, String> hashMap = new HashMap<String, String>() {
             {
                 put("first_name", "James");
                 put("initial", "T");
                 put("last_name", "Kirk");
                 put("", "");
             }
-        }));
+        };
+        //标志处理器实现
+        VariableTokenHandler tokenHandler = new VariableTokenHandler(hashMap);
+        GenericTokenParser parser = new GenericTokenParser("${", "}", tokenHandler);
 
-        assertEquals("James T Kirk reporting.", parser.parse("${first_name} ${initial} ${last_name} reporting."));
+        String parsedStr = parser.parse("${first_name} ${initial} ${last_name} reporting.");
+        assertEquals("James T Kirk reporting.", parsedStr);
         assertEquals("Hello captain James T Kirk", parser.parse("Hello captain ${first_name} ${initial} ${last_name}"));
         assertEquals("James T Kirk", parser.parse("${first_name} ${initial} ${last_name}"));
         assertEquals("JamesTKirk", parser.parse("${first_name}${initial}${last_name}"));
@@ -90,17 +95,21 @@ public class GenericTokenParserTest {
         assertEquals(expected.toString(), parser.parse(input.toString()));
     }
 
+    /**
+     * 记号处理器,一个简单的实现
+     */
     public static class VariableTokenHandler implements TokenHandler {
 
-        private Map<String, String> variables = new HashMap<String, String>();
+        private Map<String, String> variables;
 
         public VariableTokenHandler(Map<String, String> variables) {
             this.variables = variables;
         }
 
+        @Override
         public String handleToken(String content) {
-            return variables.get(content);
+            String s = variables.get(content);
+            return s;
         }
     }
-
 }

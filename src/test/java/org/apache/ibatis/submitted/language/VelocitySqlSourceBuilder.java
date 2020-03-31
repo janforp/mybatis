@@ -65,6 +65,7 @@ public class VelocitySqlSourceBuilder extends BaseBuilder {
             return parameterMappings;
         }
 
+        @Override
         public String handleToken(String content) {
             parameterMappings.add(buildParameterMapping(content));
             return "?";
