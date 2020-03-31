@@ -3,6 +3,7 @@ package org.apache.ibatis.builder;
 import java.util.HashMap;
 
 /**
+ * 参数表达式,继承自HashMap，可以参考ParameterExpressionTest
  * Inline parameter expression parser. Supported grammar (simplified):
  *
  * <pre>
@@ -15,17 +16,6 @@ import java.util.HashMap;
  * </pre>
  *
  * @author Frank D. Martinez [mnesarco]
- * @author Frank D. Martinez [mnesarco]
- * @author Frank D. Martinez [mnesarco]
- * @author Frank D. Martinez [mnesarco]
- */
-/**
- * @author Frank D. Martinez [mnesarco]
- */
-
-/**
- * 参数表达式,继承自HashMap，可以参考ParameterExpressionTest
- *
  */
 public class ParameterExpression extends HashMap<String, String> {
 

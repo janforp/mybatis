@@ -1,5 +1,7 @@
 package org.apache.ibatis.builder.xml.dynamic;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.apache.ibatis.BaseDataTest;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.mapping.BoundSql;
@@ -361,21 +363,10 @@ public class DynamicSqlSourceTest extends BaseDataTest {
         Assert.assertEquals("id=", sql);
     }
 
+    @Data
+    @AllArgsConstructor
     public static class Bean {
 
         public String id;
-
-        public Bean(String property) {
-            this.id = property;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String property) {
-            this.id = property;
-        }
     }
-
 }

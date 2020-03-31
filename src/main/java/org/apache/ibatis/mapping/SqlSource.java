@@ -10,5 +10,11 @@ package org.apache.ibatis.mapping;
  */
 public interface SqlSource {
 
+    /**
+     * SQL + 参数 + 占位符列表
+     *
+     * @param parameterObject 参数
+     * @return SQL + 参数 + 占位符列表
+     */
     BoundSql getBoundSql(Object parameterObject);
 }

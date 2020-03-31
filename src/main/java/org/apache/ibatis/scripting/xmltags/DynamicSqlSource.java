@@ -28,7 +28,12 @@ public class DynamicSqlSource implements SqlSource {
         this.rootSqlNode = rootSqlNode;
     }
 
-    //得到绑定的SQL
+    /**
+     * SQL + 参数 + 占位符列表
+     *
+     * @param parameterObject 参数
+     * @return SQL + 参数 + 占位符列表
+     */
     @Override
     public BoundSql getBoundSql(Object parameterObject) {
         //生成一个动态上下文
@@ -37,13 +42,17 @@ public class DynamicSqlSource implements SqlSource {
         rootSqlNode.apply(context);
         //调用SqlSourceBuilder
         SqlSourceBuilder sqlSourceParser = new SqlSourceBuilder(configuration);
-        Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
+        Class<?> parameterType = (parameterObject == null ? Object.class : parameterObject.getClass());
         //SqlSourceBuilder.parse,注意这里返回的是StaticSqlSource,解析完了就把那些参数都替换成?了，也就是最基本的JDBC的SQL写法
-        SqlSource sqlSource = sqlSourceParser.parse(context.getSql(), parameterType, context.getBindings());
+        String contextSql = context.getSql();
+        Map<String, Object> contextBindings = context.getBindings();
+        SqlSource sqlSource = sqlSourceParser.parse(contextSql, parameterType, contextBindings);
         //看似是又去递归调用SqlSource.getBoundSql，其实因为是StaticSqlSource，所以没问题，不是递归调用
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
-        for (Map.Entry<String, Object> entry : context.getBindings().entrySet()) {
-            boundSql.setAdditionalParameter(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, Object> entry : contextBindings.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            boundSql.setAdditionalParameter(key, value);
         }
         return boundSql;
     }

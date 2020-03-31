@@ -143,6 +143,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
         typeClass = valueOrDefault(typeClass, PerpetualCache.class);
         evictionClass = valueOrDefault(evictionClass, LruCache.class);
         //调用CacheBuilder构建cache,id=currentNamespace
+        //得到一个缓存实例
         Cache cache = new CacheBuilder(currentNamespace)
                 .implementation(typeClass)
                 .addDecorator(evictionClass)
