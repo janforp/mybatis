@@ -3,15 +3,21 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.apache.ibatis.submitted.force_flush.Employee">
+<mapper namespace="org.apache.ibatis.submitted.force_flush.EmployeeMapper">
 
     <!-- One hour cache -->
     <cache flushInterval="3600000"/>
 
-    <resultMap id="personMap" type="Employee">
+    <resultMap id="EmployeeMap" type="employee">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
-        <result property="idNo" column="id_no"/>
+        <result property="idNo" column="idNo"/>
     </resultMap>
+
+    <select id="selectByNameFlush" parameterType="string" resultMap="EmployeeMap">
+        SELECT id, name, idNo
+        FROM employee
+        WHERE name = #{name,jdbcType=VARCHAR}
+    </select>
 
 </mapper>

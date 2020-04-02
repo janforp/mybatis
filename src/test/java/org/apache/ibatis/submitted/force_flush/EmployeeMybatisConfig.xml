@@ -14,13 +14,13 @@
             <transactionManager type="JDBC"></transactionManager>
             <dataSource type="UNPOOLED">
                 <property name="driver" value="org.hsqldb.jdbcDriver"/>
-                <property name="url" value="jdbc:hsqldb:mem:force_flush_on_select"/>
+                <property name="url" value="jdbc:hsqldb:mem:force_flush"/>
                 <property name="username" value="sa"/>
             </dataSource>
         </environment>
     </environments>
 
     <mappers>
-        <mapper resource="org.apache.ibatis.submitted.force_flush.EmployeeMapper.xml"/>
+        <mapper resource="org/apache/ibatis/submitted/force_flush/EmployeeMapper.xml"/>
     </mappers>
 </configuration>

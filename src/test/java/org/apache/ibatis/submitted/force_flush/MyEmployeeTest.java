@@ -34,7 +34,7 @@ public class MyEmployeeTest {
         Connection conn = null;
         try {
             Class.forName("org.hsqldb.jdbcDriver");
-            conn = DriverManager.getConnection("jdbc:hsqldb:mem:force_flush_on_select", "sa", "");
+            conn = DriverManager.getConnection("jdbc:hsqldb:mem:force_flush", "sa", "");
 
             //org/apache/ibatis/submitted/force_flush_on_select/CreateDB.sql
             Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/force_flush/employeeDmlDdl.sql");
@@ -57,18 +57,19 @@ public class MyEmployeeTest {
 
     /**
      * 初始化的数据：
-     * INSERT INTO person (id, firstName, lastName)
-     * VALUES (1, 'John', 'Smith');
      *
-     * INSERT INTO person (id, firstName, lastName)
-     * VALUES (2, 'Christian', 'Poitras');
+     * INSERT INTO employee (id, name, id_no)
+     * VALUES (1, '张三', '4311101');
      *
-     * INSERT INTO person (id, firstName, lastName)
-     * VALUES (3, 'Clinton', 'Begin');
+     * INSERT INTO employee (id, name, id_no)
+     * VALUES (2, '李四', '4311102');
+     *
+     * INSERT INTO employee (id, name, id_no)
+     * VALUES (3, '王五', '4311103');
      */
     private void updateDatabase(Connection conn) throws SQLException {
         Statement stmt = conn.createStatement();
-        stmt.executeUpdate("UPDATE mt_employee SET name = '呵呵' WHERE id = 1");
+        stmt.executeUpdate("UPDATE employee SET name = '呵呵' WHERE id = 1");
         stmt.close();
     }
 
@@ -81,11 +82,11 @@ public class MyEmployeeTest {
         try {
             EmployeeMapper personMapper = sqlSession.getMapper(EmployeeMapper.class);
             //第一次查询
-            Employee oldPerson = personMapper.selectByIdFlush(1);
+            Employee oldPerson = personMapper.selectByNameFlush("张三");
             //把id=1的人员的firstName修改为Simone
             updateDatabase(sqlSession.getConnection());
             //修改之后查询
-            Employee updatedPerson = personMapper.selectByIdFlush(1);
+            Employee updatedPerson = personMapper.selectByNameFlush("李四");
             assertEquals("呵呵", updatedPerson.getName());
             sqlSession.commit();
         } finally {
