@@ -29,9 +29,9 @@ public class CacheBuilder {
      * @return 一个缓存实例
      */
     public Cache build() {
-        setDefaultImplementations();
+        setDefaultImplementations();//保险
         //先new一个base的cache(PerpetualCache)
-        //实例化一个cache的实现对象
+        //实例化一个cache的实现对象 class org.apache.ibatis.cache.impl.PerpetualCache
         Cache cache = newBaseCacheInstance(implementation, id);
         //为缓存实例塞入用户配置的值
         setCacheProperties(cache);

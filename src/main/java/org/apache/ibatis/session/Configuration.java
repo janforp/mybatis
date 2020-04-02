@@ -103,10 +103,10 @@ public class Configuration {
     /**
      * 二级缓存
      *
-     * key:namespace
+     * key:namespace如：org.apache.ibatis.submitted.force_flush_on_select.PersonMapper
      * value:缓存实例
      */
-    protected final Map<String, Cache> caches = new StrictMap<Cache>("Caches collection");
+    protected final Map<String, Cache> cacheMap = new StrictMap<Cache>("Caches collection");
 
     /**
      * 结果映射,存在Map里
@@ -590,23 +590,25 @@ public class Configuration {
     }
 
     public void addCache(Cache cache) {
-        caches.put(cache.getId(), cache);
+        //org.apache.ibatis.submitted.force_flush_on_select.PersonMapper
+        String id = cache.getId();
+        cacheMap.put(id, cache);
     }
 
     public Collection<String> getCacheNames() {
-        return caches.keySet();
+        return cacheMap.keySet();
     }
 
-    public Collection<Cache> getCaches() {
-        return caches.values();
+    public Collection<Cache> getCacheMap() {
+        return cacheMap.values();
     }
 
     public Cache getCache(String id) {
-        return caches.get(id);
+        return cacheMap.get(id);
     }
 
     public boolean hasCache(String id) {
-        return caches.containsKey(id);
+        return cacheMap.containsKey(id);
     }
 
     public void addResultMap(ResultMap rm) {
