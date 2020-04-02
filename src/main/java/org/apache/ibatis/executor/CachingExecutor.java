@@ -62,7 +62,10 @@ public class CachingExecutor implements Executor {
      */
     private void flushCacheIfRequired(MappedStatement mappedStatement) {
         Cache cache = mappedStatement.getCache();
-        if (cache != null && mappedStatement.isFlushCacheRequired()) {
+        //在对应namespace的mapper文件加：<cache flushInterval="3600000"/>
+        //在对应的sql添加 <select id="selectByIdFlush" resultMap="personMap" parameterType="int" flushCache="true">，则刷新，否则该sql不刷新
+        boolean flushCacheRequired = mappedStatement.isFlushCacheRequired();
+        if (cache != null && flushCacheRequired) {
             //如果该 statement 要要刷新缓存，则一级，二级缓存都会傻笑
             transactionalCacheManager.clear(cache);
         }
@@ -94,12 +97,13 @@ public class CachingExecutor implements Executor {
         //默认情况下是没有开启缓存的(二级缓存).要开启二级缓存,你需要在你的 SQL 映射文件中添加一行: <cache/>
         //简单的说，就是先查CacheKey，查不到再委托给实际的执行器去查
 
-        //是否在该statement中配置了 useCache = "true"
-        boolean isThisStatementUseCache = (cache != null);
-        if (isThisStatementUseCache) {
-            flushCacheIfRequired(mappedStatement);
-            //resultHandler 什么缓存都无法使用
-            if (mappedStatement.isUseCache() && resultHandler == null) {
+        //TODO <cache flushInterval="3600000"/> 则true?
+        boolean isThisNamespaceUseCache = (cache != null);
+        if (isThisNamespaceUseCache) {
+            flushCacheIfRequired(mappedStatement);// <select id="selectByIdFlush" resultMap="personMap" parameterType="int" flushCache="true">
+            //当该namespace开启了二级缓存，则里面的statement默认使用缓存，除非指定 useCache="false"
+            boolean isThisStatementUseCache = mappedStatement.isUseCache();
+            if (isThisStatementUseCache && resultHandler == null) {//resultHandler 什么缓存都无法使用
                 //Caching stored procedures with OUT params is not supported，所有参数的模式必须是 IN，否则不支持二级缓存
                 ensureNoOutParams(mappedStatement, parameterObject, boundSql);
                 //先从二级缓存拿

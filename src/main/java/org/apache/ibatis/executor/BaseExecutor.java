@@ -203,10 +203,10 @@ public abstract class BaseExecutor implements Executor {
         if (closed) {
             throw new ExecutorException("Executor was closed.");
         }
-        //先清局部缓存，再查询.但仅查询堆栈为0，才清。为了处理递归调用 ，            //如果该 statement 要要刷新缓存，则一级，二级缓存都会傻笑
-        boolean flushCacheRequired = mappedStatement.isFlushCacheRequired();
-        if (queryStack == 0 && flushCacheRequired) {
-            //开始查询前，并且该statement配置是要刷新缓存，则刷新缓存
+        //先清局部缓存，再查询.但仅查询堆栈为0，才清。为了处理递归调用 ，            //如果该 statement 要要刷新缓存，则一级，二级缓存都会刷新
+        boolean isThisStatementFlushCache = mappedStatement.isFlushCacheRequired();
+        if (queryStack == 0 && isThisStatementFlushCache) {
+            //刷新二级缓存，开始查询前，并且该statement配置是要刷新缓存，则刷新缓存
             clearLocalCache();
         }
         //用来装查询结果
@@ -410,7 +410,7 @@ public abstract class BaseExecutor implements Executor {
             //最后删除占位符
             localCache.removeObject(cacheKey);
         }
-        //加入缓存
+        //加入以及缓存
         localCache.putObject(cacheKey, list);
         //如果是存储过程，OUT参数也加入缓存
         if (mappedStatement.getStatementType() == StatementType.CALLABLE) {
