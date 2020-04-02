@@ -141,8 +141,9 @@ public class CacheBuilder {
     private Cache setStandardDecorators(Cache cache) {
         try {
             MetaObject metaCache = SystemMetaObject.forObject(cache);
-            if (size != null && metaCache.hasSetter("size")) {
-                metaCache.setValue("size", size);
+            boolean hasSizeSetter = metaCache.hasSetter("size");
+            if (this.size != null && hasSizeSetter) {
+                metaCache.setValue("size", this.size);
             }
             if (clearInterval != null) {
                 //刷新缓存间隔,怎么刷新呢，用ScheduledCache来刷，还是装饰者模式，漂亮！

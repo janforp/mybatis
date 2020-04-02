@@ -558,7 +558,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
 
     private void bindMapperForNamespace() {
-        String namespace = builderAssistant.getCurrentNamespace();
+        String namespace = builderAssistant.getCurrentNamespace();//org.apache.ibatis.submitted.force_flush_on_select.PersonMapper
         if (namespace != null) {
             Class<?> boundType = null;
             try {
