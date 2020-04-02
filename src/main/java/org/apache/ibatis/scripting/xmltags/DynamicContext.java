@@ -78,7 +78,7 @@ public class DynamicContext {
     }
 
     public void appendSql(String sql) {
-        sqlBuilder.append(sql);
+        sqlBuilder.append(sql);//SELECT id, firstName, lastName FROM person WHERE id = #{id}
         sqlBuilder.append(" ");
     }
 

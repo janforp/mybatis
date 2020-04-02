@@ -14,6 +14,22 @@
         <result property="lastName" column="lastName"/>
     </resultMap>
 
+    <resultMap id="personMapWithFirstName" type="Person">
+        <id property="id" column="id"/>
+        <result property="firstName" column="firstName"/>
+    </resultMap>
+
+    <sql id="selectAll">
+        SELECT id, firstName, lastName
+    </sql>
+
+    <!--    测试sql加载，一般情况注释掉  lang=""-->
+<!--    <select id="testAttributeInSql" resultMap="personMap" parameterType="int" flushCache="true" useCache="true" resultOrdered="false" resultSets="1" fetchSize="100" timeout="400"  resultSetType="FORWARD_ONLY" statementType="PREPARED">-->
+    <!--        SELECT id, firstName, lastName-->
+    <!--        FROM person-->
+    <!--        WHERE id = #{id}-->
+    <!--    </select>-->
+
     <select id="selectByIdFlush" resultMap="personMap" parameterType="int" flushCache="true">
         SELECT id, firstName, lastName
         FROM person

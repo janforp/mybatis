@@ -196,13 +196,13 @@ public class MapperBuilderAssistant extends BaseBuilder {
      * @param id resultMap 的 id
      * @param type resultMap 的 type
      * @param extend
-     * @param discriminator
+     * @param discriminator 鉴别器
      * @param resultMappings resultMap 的具体映射字段列表
-     * @param autoMapping
-     * @return
+     * @param autoMapping resultMap 上配置的是否自动映射
+     * @return ResultMap
      */
     public ResultMap addResultMap(String id, Class<?> type, String extend, Discriminator discriminator, List<ResultMapping> resultMappings, Boolean autoMapping) {
-
+        //org.apache.ibatis.submitted.force_flush_on_select.PersonMapper.personMap
         id = applyCurrentNamespace(id, false);
         extend = applyCurrentNamespace(extend, true);
 
@@ -298,7 +298,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
             throw new IncompleteElementException("Cache-ref not yet resolved");
         }
 
-        //为id加上namespace前缀
+        //为id加上namespace前缀如：org.apache.ibatis.submitted.force_flush_on_select.PersonMapper.selectByIdFlush
         id = applyCurrentNamespace(id, false);
         //是否是select语句
         boolean isSelect = sqlCommandType == SqlCommandType.SELECT;
@@ -321,7 +321,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
         setStatementParameterMap(parameterMap, parameterType, statementBuilder);
         //2.结果映射
         setStatementResultMap(resultMap, resultType, resultSetType, statementBuilder);
-        setStatementCache(isSelect, flushCache, useCache, currentCache, statementBuilder);
+        setStatementCache(isSelect, flushCache, useCache, currentCache, statementBuilder);//缓存
 
         MappedStatement statement = statementBuilder.build();
         //建造好调用configuration.addMappedStatement
@@ -359,13 +359,14 @@ public class MapperBuilderAssistant extends BaseBuilder {
                     statementBuilder.id() + "-Inline",
                     parameterTypeClass,
                     parameterMappings);
-            statementBuilder.parameterMap(inlineParameterMapBuilder.build());
+            ParameterMap buildParameterMap = inlineParameterMapBuilder.build();
+            statementBuilder.parameterMap(buildParameterMap);
         }
     }
 
     //2.result map
     private void setStatementResultMap(String resultMap, Class<?> resultType, ResultSetType resultSetType, MappedStatement.Builder statementBuilder) {
-        resultMap = applyCurrentNamespace(resultMap, true);
+        resultMap = applyCurrentNamespace(resultMap, true);//org.apache.ibatis.submitted.force_flush_on_select.PersonMapper.personMap
 
         List<ResultMap> resultMaps = new ArrayList<ResultMap>();
         if (resultMap != null) {
@@ -373,7 +374,9 @@ public class MapperBuilderAssistant extends BaseBuilder {
             String[] resultMapNames = resultMap.split(",");
             for (String resultMapName : resultMapNames) {
                 try {
-                    resultMaps.add(configuration.getResultMap(resultMapName.trim()));
+                    String trimResultMapName = resultMapName.trim();
+                    ResultMap configurationResultMap = configuration.getResultMap(trimResultMapName);
+                    resultMaps.add(configurationResultMap);
                 } catch (IllegalArgumentException e) {
                     throw new IncompleteElementException("Could not find result map " + resultMapName, e);
                 }

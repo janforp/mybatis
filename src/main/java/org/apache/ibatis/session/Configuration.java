@@ -610,7 +610,9 @@ public class Configuration {
     }
 
     public void addResultMap(ResultMap rm) {
-        resultMaps.put(rm.getId(), rm);
+        //org.apache.ibatis.submitted.force_flush_on_select.PersonMapper.personMap
+        String id = rm.getId();
+        resultMaps.put(id, rm);
         checkLocallyForDiscriminatedNestedResultMaps(rm);
         checkGloballyForDiscriminatedNestedResultMaps(rm);
     }

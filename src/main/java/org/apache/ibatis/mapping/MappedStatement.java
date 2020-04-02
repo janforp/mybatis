@@ -158,7 +158,8 @@ public final class MappedStatement {
                 logId = configuration.getLogPrefix() + id;
             }
             mappedStatement.statementLog = LogFactory.getLog(logId);
-            mappedStatement.lang = configuration.getDefaultScriptingLanuageInstance();
+            LanguageDriver defaultScriptingLanuageInstance = configuration.getDefaultScriptingLanuageInstance();
+            mappedStatement.lang = defaultScriptingLanuageInstance;
         }
 
         public Builder resource(String resource) {

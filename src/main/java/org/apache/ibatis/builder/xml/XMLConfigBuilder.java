@@ -205,7 +205,7 @@ public class XMLConfigBuilder extends BaseBuilder {
                     //（一）调用TypeAliasRegistry.registerAliases，去包下找所有类,然后注册别名(有@Alias注解则用，没有则取类的simpleName)
                     configuration.getTypeAliasRegistry().registerAliases(typeAliasPackage);
                 } else {
-                    //如果是typeAlias
+                    //如果是typeAlias <typeAlias alias="Person" type="org.apache.ibatis.submitted.force_flush_on_select.Person"/>
                     String alias = child.getStringAttribute("alias");
                     //类名称
                     String typeClassName = child.getStringAttribute("type");
@@ -612,7 +612,7 @@ public class XMLConfigBuilder extends BaseBuilder {
                     String mapperClass = child.getStringAttribute("class");
                     if (resource != null && url == null && mapperClass == null) {
                         //10.1使用类路径
-                        ErrorContext.instance().resource(resource);
+                        ErrorContext.instance().resource(resource);//<mapper resource="org/apache/ibatis/submitted/force_flush_on_select/Person.xml"/>
                         InputStream inputStream = Resources.getResourceAsStream(resource);
                         //映射器比较复杂，调用XMLMapperBuilder
                         //注意在for循环里每个mapper都重新new一个XMLMapperBuilder，来解析

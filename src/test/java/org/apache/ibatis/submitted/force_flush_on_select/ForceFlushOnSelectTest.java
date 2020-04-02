@@ -179,7 +179,8 @@ public class ForceFlushOnSelectTest {
             reader.close();
 
             reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/force_flush_on_select/ibatisConfig.xml");
-            sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+            SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
+            sqlSessionFactory = sqlSessionFactoryBuilder.build(reader);
             reader.close();
         } finally {
             if (conn != null) {

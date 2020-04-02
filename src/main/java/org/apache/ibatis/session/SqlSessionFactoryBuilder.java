@@ -48,7 +48,8 @@ public class SqlSessionFactoryBuilder {
             //解析配置文件
             Configuration configuration = parser.parse();
             //通过 Configuration 构建 SqlSessionFactory
-            return build(configuration);
+            SqlSessionFactory sqlSessionFactory = build(configuration);
+            return sqlSessionFactory;
         } catch (Exception e) {
             //这里是捕获异常，包装成自己的异常并抛出的idiom？，最后还要reset ErrorContext
             throw ExceptionFactory.wrapException("Error building SqlSession.", e);

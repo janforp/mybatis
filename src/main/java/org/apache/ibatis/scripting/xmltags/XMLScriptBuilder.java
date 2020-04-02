@@ -55,12 +55,17 @@ public class XMLScriptBuilder extends BaseBuilder {
      * @return SqlSource
      */
     public SqlSource parseScriptNode() {
+        //<select id="selectByIdNoFlush" resultMap="personMap" parameterType="int">
+        //        SELECT id, firstName, lastName
+        //        FROM person
+        //        WHERE id = #{id}
+        //    </select>
         List<SqlNode> sqlNodeList = parseDynamicTags(xmlNode);
         MixedSqlNode rootSqlNode = new MixedSqlNode(sqlNodeList);
         SqlSource sqlSource;
         if (isDynamic) {
             sqlSource = new DynamicSqlSource(configuration, rootSqlNode);
-        } else {
+        } else {//没有动态标签
             sqlSource = new RawSqlSource(configuration, rootSqlNode, parameterType);
         }
         return sqlSource;

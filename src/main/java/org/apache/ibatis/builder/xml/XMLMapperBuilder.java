@@ -149,7 +149,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     //	</mapper>
     private void configurationElement(XNode mapperNode) {
         try {
-            //1.配置namespace
+            //1.<mapper namespace="org.apache.ibatis.submitted.force_flush_on_select.PersonMapper">
             String namespace = mapperNode.getStringAttribute("namespace");
             if ("".equals(namespace)) {
                 throw new BuilderException("Mapper's namespace cannot be empty");
@@ -157,17 +157,20 @@ public class XMLMapperBuilder extends BaseBuilder {
             builderAssistant.setCurrentNamespace(namespace);
             //2.配置cache-ref
             //<cache-ref namespace="com.someone.application.data.SomeMapper"/>
-            cacheRefElement(mapperNode.evalNode("cache-ref"));
-            //3.配置cache
-            cacheElement(mapperNode.evalNode("cache"));
+            XNode cacheRefNode = mapperNode.evalNode("cache-ref");
+            cacheRefElement(cacheRefNode);
+            //3.<cache flushInterval="3600000"/>
+            XNode cacheNode = mapperNode.evalNode("cache");
+            cacheElement(cacheNode);
             //4.配置parameterMap(已经废弃,老式风格的参数映射)
-            parameterMapElement(mapperNode.evalNodes("/mapper/parameterMap"));
+            List<XNode> parameterMapNode = mapperNode.evalNodes("/mapper/parameterMap");
+            parameterMapElement(parameterMapNode);
             //5.配置resultMap(高级功能)
             List<XNode> resultMapNodeList = mapperNode.evalNodes("/mapper/resultMap");
             resultMapElements(resultMapNodeList);
             //6.配置sql(定义可重用的 SQL 代码段)
-            List<XNode> sqlXNodes = mapperNode.evalNodes("/mapper/sql");
-            sqlElement(sqlXNodes);
+            List<XNode> sqlNodeList = mapperNode.evalNodes("/mapper/sql");
+            sqlElement(sqlNodeList);
             //7.配置select|insert|update|delete TODO
             List<XNode> xNodeList = mapperNode.evalNodes("select|insert|update|delete");
             buildStatementFromContext(xNodeList);
@@ -179,13 +182,14 @@ public class XMLMapperBuilder extends BaseBuilder {
     //7.配置select|insert|update|delete
     private void buildStatementFromContext(List<XNode> list) {
         //调用7.1构建语句
-        if (configuration.getDatabaseId() != null) {
-            buildStatementFromContext(list, configuration.getDatabaseId());
+        String databaseId = configuration.getDatabaseId();
+        if (databaseId != null) {
+            buildStatementFromContext(list, databaseId);
         }
         buildStatementFromContext(list, null);
     }
 
-    //7.1构建语句
+    //8.配置select|insert|update|delete
     private void buildStatementFromContext(List<XNode> list, String requiredDatabaseId) {
         for (XNode context : list) {
             //构建所有语句,一个mapper下可以有很多select
@@ -328,12 +332,12 @@ public class XMLMapperBuilder extends BaseBuilder {
      * <result column="dept_id" property="deptId" jdbcType="INTEGER"/>
      * </resultMap>
      *
-     * @param list 一个mapper多个resultMap
+     * @param resultMapList 一个mapper多个resultMap
      * @throws Exception
      */
-    private void resultMapElements(List<XNode> list) throws Exception {
+    private void resultMapElements(List<XNode> resultMapList) throws Exception {
         //基本上就是循环把resultMap加入到Configuration里去,保持2份，一份缩略，一分全名
-        for (XNode resultMapNode : list) {
+        for (XNode resultMapNode : resultMapList) {
             try {
                 //循环调resultMapElement
                 resultMapElement(resultMapNode);
@@ -375,24 +379,25 @@ public class XMLMapperBuilder extends BaseBuilder {
         // 鉴别器；辨别者
         Discriminator discriminator = null;
         List<ResultMapping> resultMappings = new ArrayList<ResultMapping>(additionalResultMappings);
-        List<XNode> resultNodeList = resultMapNode.getChildren();
+        List<XNode> resultMapItemNodeList = resultMapNode.getChildren();
         //<id property="id" column="user_id" />
         //<result property="username" column="username"/>
         //<result property="password" column="password"/>
-        for (XNode resultChild : resultNodeList) {
-            if ("constructor".equals(resultChild.getName())) {
+        for (XNode resultMapItemNode : resultMapItemNodeList) {
+            if ("constructor".equals(resultMapItemNode.getName())) {
                 //解析result map的constructor
-                processConstructorElement(resultChild, typeClass, resultMappings);
-            } else if ("discriminator".equals(resultChild.getName())) {
+                processConstructorElement(resultMapItemNode, typeClass, resultMappings);
+            } else if ("discriminator".equals(resultMapItemNode.getName())) {
                 //解析result map的discriminator
-                discriminator = processDiscriminatorElement(resultChild, typeClass, resultMappings);
+                discriminator = processDiscriminatorElement(resultMapItemNode, typeClass, resultMappings);
             } else {
                 List<ResultFlag> flags = new ArrayList<ResultFlag>();
-                if ("id".equals(resultChild.getName())) {
+                if ("id".equals(resultMapItemNode.getName())) {
                     flags.add(ResultFlag.ID);
                 }
                 //调5.1.1 buildResultMappingFromContext,得到ResultMapping
-                ResultMapping resultMapping = buildResultMappingFromContext(resultChild, typeClass, flags);
+                //<result property="firstName" column="firstName"/> 或者 <id property="id" column="id"/>
+                ResultMapping resultMapping = buildResultMappingFromContext(resultMapItemNode, typeClass, flags);
                 resultMappings.add(resultMapping);
             }
         }
@@ -450,6 +455,9 @@ public class XMLMapperBuilder extends BaseBuilder {
         if (configuration.getDatabaseId() != null) {
             sqlElement(list, configuration.getDatabaseId());
         }
+        //<sql id="selectAll">
+        //        SELECT id, firstName, lastName
+        //    </sql>
         sqlElement(list, null);
     }
 
@@ -459,10 +467,11 @@ public class XMLMapperBuilder extends BaseBuilder {
         for (XNode sqlNode : list) {
             String databaseId = sqlNode.getStringAttribute("databaseId");
             String id = sqlNode.getStringAttribute("id");
-            //id ------>   currentNamespace + "." + id;
+            //id ------>   currentNamespace + "." + id;如：org.apache.ibatis.submitted.force_flush_on_select.PersonMapper.selectAll
             id = builderAssistant.applyCurrentNamespace(id, false);
-            //比较简单，就是将sql片段放入hashmap,不过此时还没有解析sql片段
-            if (databaseIdMatchesCurrent(id, databaseId, requiredDatabaseId)) {
+            //比较简单，就是将sql片段放入hashMap,不过此时还没有解析sql片段
+            boolean databaseIdMatchesCurrent = databaseIdMatchesCurrent(id, databaseId, requiredDatabaseId);
+            if (databaseIdMatchesCurrent) {
                 sqlFragments.put(id, sqlNode);
             }
         }

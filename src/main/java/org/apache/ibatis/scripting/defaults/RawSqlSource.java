@@ -59,11 +59,20 @@ public class RawSqlSource implements SqlSource {
         sqlSource = sqlSourceParser.parse(sql, clazz, new HashMap<String, Object>());
     }
 
+    /**
+     * rootSqlNode：
+     * SELECT id, firstName, lastName
+     * FROM person
+     * WHERE id = #{id}
+     */
     private static String getSql(Configuration configuration, SqlNode rootSqlNode) {
         DynamicContext context = new DynamicContext(configuration, null);
         rootSqlNode.apply(context);
-        //select * from author
-        return context.getSql();
+        //SELECT id, firstName, lastName
+        //        FROM person
+        //        WHERE id = #{id}
+        String sql = context.getSql();
+        return sql;
     }
 
     @Override

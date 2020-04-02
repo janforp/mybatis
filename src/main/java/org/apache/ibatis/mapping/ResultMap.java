@@ -38,16 +38,16 @@ public class ResultMap {
     @Getter
     private List<ResultMapping> resultMappings;
 
-    @Getter
+    @Getter // <id property="id" column="id"/>
     private List<ResultMapping> idResultMappings;
 
-    @Getter
+    @Getter //通过构造器构造的 resultMap
     private List<ResultMapping> constructorResultMappings;
 
-    @Getter
+    @Getter // 通过 getter/setter 构造的 resultMap
     private List<ResultMapping> propertyResultMappings;
 
-    @Getter
+    @Getter //resultMap 下的所有的 column 的大写形式的列表
     private Set<String> mappedColumns;
 
     @Getter
@@ -100,20 +100,32 @@ public class ResultMap {
             return resultMap.type;
         }
 
+        /**
+         * 构造 ResultMap
+         *
+         * @return ResultMap
+         */
         public ResultMap build() {
-            if (resultMap.id == null) {
+            if (resultMap.id == null) {//org.apache.ibatis.submitted.force_flush_on_select.PersonMapper.personMap
                 throw new IllegalArgumentException("ResultMaps must have an id");
             }
+            //resultMap 下的所有的 column 的大写形式的列表
             resultMap.mappedColumns = new HashSet<String>();
+            // <id property="id" column="id"/>
             resultMap.idResultMappings = new ArrayList<ResultMapping>();
+            //通过构造器构造的 resultMap
             resultMap.constructorResultMappings = new ArrayList<ResultMapping>();
+            // 通过 getter/setter 构造的 resultMap
             resultMap.propertyResultMappings = new ArrayList<ResultMapping>();
-            for (ResultMapping resultMapping : resultMap.resultMappings) {
+            //该resultMap下的所有项如：<id property="id" column="id"/> <result property="firstName" column="firstName"/>
+            List<ResultMapping> resultMappingList = resultMap.resultMappings;
+            for (ResultMapping resultMapping : resultMappingList) {
                 resultMap.hasNestedQueries = resultMap.hasNestedQueries || resultMapping.getNestedQueryId() != null;
                 resultMap.hasNestedResultMaps = resultMap.hasNestedResultMaps || (resultMapping.getNestedResultMapId() != null && resultMapping.getResultSet() == null);
                 final String column = resultMapping.getColumn();
                 if (column != null) {
-                    resultMap.mappedColumns.add(column.toUpperCase(Locale.ENGLISH));
+                    String upperColumn = column.toUpperCase(Locale.ENGLISH);
+                    resultMap.mappedColumns.add(upperColumn);
                 } else if (resultMapping.isCompositeResult()) {
                     for (ResultMapping compositeResultMapping : resultMapping.getComposites()) {
                         final String compositeColumn = compositeResultMapping.getColumn();
@@ -131,7 +143,7 @@ public class ResultMap {
                     resultMap.idResultMappings.add(resultMapping);
                 }
             }
-            if (resultMap.idResultMappings.isEmpty()) {
+            if (resultMap.idResultMappings.isEmpty()) {//TODO ？
                 resultMap.idResultMappings.addAll(resultMap.resultMappings);
             }
             // lock down collections
