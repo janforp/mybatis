@@ -82,8 +82,6 @@ public class Configuration {
 
     protected final InterceptorChain interceptorChain = new InterceptorChain();
 
-    //---------以下都是<settings>节点-------
-
     //类型处理器注册机
     @Getter
     protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry();
@@ -103,19 +101,34 @@ public class Configuration {
     protected final Map<String, MappedStatement> mappedStatements = new StrictMap<MappedStatement>("Mapped Statements collection");
 
     /**
+     * 二级缓存
+     *
      * key:namespace
      * value:缓存实例
      */
     protected final Map<String, Cache> caches = new StrictMap<Cache>("Caches collection");
 
-    //结果映射,存在Map里
+    /**
+     * 结果映射,存在Map里
+     * key：resultMap 的id
+     * value：ResultMap
+     */
     protected final Map<String, ResultMap> resultMaps = new StrictMap<ResultMap>("Result Maps collection");
 
     protected final Map<String, ParameterMap> parameterMaps = new StrictMap<ParameterMap>("Parameter Maps collection");
 
-    //默认启用缓存
-
     protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<KeyGenerator>("Key Generators collection");
+
+    /**
+     * A map holds cache-ref relationship. The key is the namespace that
+     * references a cache bound to another namespace and the value is the
+     * namespace which the actual cache is bound to.
+     *
+     * cache=ref 缓存
+     * key:当前mapper文件的 namespace
+     * value:当前mapper文件的 cache-ref的namespace
+     */
+    protected final Map<String, String> cacheRefMap = new HashMap<String, String>();
 
     //加载过的资源，避免重复加载
     protected final Set<String> loadedResources = new HashSet<String>();
@@ -137,21 +150,12 @@ public class Configuration {
     @Getter
     protected final Collection<MethodResolver> incompleteMethods = new LinkedList<MethodResolver>();
 
-    /**
-     * A map holds cache-ref relationship. The key is the namespace that
-     * references a cache bound to another namespace and the value is the
-     * namespace which the actual cache is bound to.
-     *
-     * cache=ref 缓存
-     * key:当前mapper文件的 namespace
-     * value:当前mapper文件的 cache-ref的namespace
-     */
-    protected final Map<String, String> cacheRefMap = new HashMap<String, String>();
-
     //环境
     @Getter
     @Setter
     protected Environment environment;
+
+    //---------以下都是<settings>节点-------
 
     /**
      * 是否允许在嵌套语句中使用分页（RowBounds）。如果允许使用则设置为 false。
@@ -275,6 +279,8 @@ public class Configuration {
      * 配置默认的执行器。SIMPLE 就是普通的执行器；
      * REUSE 执行器会重用预处理语句（PreparedStatement）；
      * BATCH 执行器不仅重用语句还会执行批量更新。
+     *
+     * @see Executor
      */
     @Getter
     @Setter
@@ -380,6 +386,8 @@ public class Configuration {
     /**
      * 创建参数处理器，返回一个 org.apache.ibatis.scripting.defaults.DefaultParameterHandler 默认的参数处理器
      *
+     * 可以通过 typeHandler.setParameter(preparedStatement, parameterIndex, value, jdbcType);设置参数
+     *
      * @param mappedStatement 映射语句对象
      * @param parameterObject 参数
      * @param boundSql 绑定的sql
@@ -396,6 +404,9 @@ public class Configuration {
 
     /**
      * 创建结果集处理器，返回一个 org.apache.ibatis.executor.resultset.DefaultResultSetHandler
+     *
+     * <E> List<E> handleResultSets(Statement statement) throws SQLException;
+     * void handleOutputParameters(CallableStatement callableStatement) throws SQLException;
      *
      * @param executor 执行器
      * @param mappedStatement 映射语句对象
@@ -427,6 +438,26 @@ public class Configuration {
      * * 存储过程
      * CALLABLE
      *
+     * public RoutingStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
+     *
+     * //根据语句类型，委派到不同的语句处理器(STATEMENT|PREPARED|CALLABLE)
+     * StatementType statementType = mappedStatement.getStatementType();
+     * switch (statementType) {
+     * case STATEMENT:
+     * delegate = new SimpleStatementHandler(executor, mappedStatement, parameter, rowBounds, resultHandler, boundSql);
+     * break;
+     * case PREPARED:
+     * delegate = new PreparedStatementHandler(executor, mappedStatement, parameter, rowBounds, resultHandler, boundSql);
+     * break;
+     * case CALLABLE:
+     * delegate = new CallableStatementHandler(executor, mappedStatement, parameter, rowBounds, resultHandler, boundSql);
+     * break;
+     * default:
+     * throw new ExecutorException("Unknown statement type: " + statementType);
+     * }
+     *
+     * }
+     *
      * @param executor 执行器
      * @param mappedStatement 映射语句
      * @param parameterObject 参数
@@ -447,6 +478,8 @@ public class Configuration {
     }
 
     /**
+     * 在这是二级缓存的入口
+     *
      * 产生执行器，执行器有3种类型：
      *
      * * 这个执行器类型不做特殊的事情。它为每个语句的执行创建一个新的预处理语句。
@@ -469,7 +502,7 @@ public class Configuration {
         executorType = (executorType == null ? defaultExecutorType : executorType);
         //这句再做一下保护,囧,防止粗心大意的人将defaultExecutorType设成null?
         executorType = (executorType == null ? ExecutorType.SIMPLE : executorType);
-        //保证 executorType 不能空
+        //上面的目的保证 executorType 不能空，如果用户没指定就用 ExecutorType.SIMPLE
 
         Executor executor;
         //然后就是简单的3个分支，产生3种执行器BatchExecutor/ReuseExecutor/SimpleExecutor
@@ -480,7 +513,7 @@ public class Configuration {
         } else {
             executor = new SimpleExecutor(this, transaction);
         }
-        //如果要求缓存，生成另一种CachingExecutor(默认就是有缓存),装饰者模式,所以默认都是返回CachingExecutor
+        //如果要使用二级缓存，生成另一种CachingExecutor,装饰者模式
         if (cacheEnabled) {
             //一级缓存中，其最大的共享范围就是一个SqlSession内部，如果多个SqlSession之间需要共享缓存，则需要使用到二级缓存。
             // 开启二级缓存后，会使用CachingExecutor装饰Executor，进入一级缓存的查询流程前，先在CachingExecutor进行二级缓存的查询

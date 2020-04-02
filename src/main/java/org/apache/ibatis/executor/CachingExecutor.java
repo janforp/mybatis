@@ -33,42 +33,39 @@ import java.util.List;
 public class CachingExecutor implements Executor {
 
     /**
-     * 装饰者模式
+     * 被装饰的对象，其中大部分功能由该对象实现
+     *
+     * CachingExecutor 通过添加一些逻辑实现了比 delegateExecutor 更多的一些功能而已
      */
-    private Executor delegate;
+    private Executor delegateExecutor;
 
     /**
      * 事务缓存管理器，被CachingExecutor使用
      */
     private TransactionalCacheManager transactionalCacheManager = new TransactionalCacheManager();
 
-    public CachingExecutor(Executor delegate) {
-        this.delegate = delegate;
-        delegate.setExecutorWrapper(this);
+    public CachingExecutor(Executor delegateExecutor) {
+        this.delegateExecutor = delegateExecutor;
+        delegateExecutor.setExecutorWrapper(this);
     }
 
     @Override
     public Transaction getTransaction() {
-        return delegate.getTransaction();
+        return delegateExecutor.getTransaction();
     }
 
-    @Override
-    public void close(boolean forceRollback) {
-        try {
-            //issues #499, #524 and #573
-            if (forceRollback) {
-                transactionalCacheManager.rollback();
-            } else {
-                transactionalCacheManager.commit();
-            }
-        } finally {
-            delegate.close(forceRollback);
+    /**
+     * 通过该 映射sql的配置决定是否需要清除缓存
+     * 这是用户在配置sql的地方指定是否需要刷新，是否使用缓存
+     *
+     * @param mappedStatement 具体的映射语句
+     */
+    private void flushCacheIfRequired(MappedStatement mappedStatement) {
+        Cache cache = mappedStatement.getCache();
+        if (cache != null && mappedStatement.isFlushCacheRequired()) {
+            //如果该 statement 要要刷新缓存，则一级，二级缓存都会傻笑
+            transactionalCacheManager.clear(cache);
         }
-    }
-
-    @Override
-    public boolean isClosed() {
-        return delegate.isClosed();
     }
 
     @Override
@@ -76,7 +73,7 @@ public class CachingExecutor implements Executor {
         //根据配置决定是否刷新缓存完再update
         flushCacheIfRequired(ms);
         //被装饰者去做事情
-        return delegate.update(ms, parameterObject);
+        return delegateExecutor.update(ms, parameterObject);
     }
 
     @Override
@@ -108,33 +105,53 @@ public class CachingExecutor implements Executor {
                 //先从二级缓存拿
                 @SuppressWarnings("unchecked")
                 List<E> list = (List<E>) transactionalCacheManager.getObject(cache, cacheKey);
-                if (list == null) {
+                if (list == null) {//二级缓存没命中
                     //二级缓存没命中，去被代理的执行器，在哪里会进行一级缓存查询
-                    list = delegate.query(mappedStatement, parameterObject, rowBounds, resultHandler, cacheKey, boundSql);
-                    //缓存结果
+                    list = delegateExecutor.query(mappedStatement, parameterObject, rowBounds, null, cacheKey, boundSql);
+                    //查询结果存入二级缓存
                     transactionalCacheManager.putObject(cache, cacheKey, list); // issue #578 and #116
                 }
                 return list;
             }
         }
-        return delegate.query(mappedStatement, parameterObject, rowBounds, resultHandler, cacheKey, boundSql);
+        //该sql没有配置使用二级缓存，则直接去数据库查询
+        return delegateExecutor.query(mappedStatement, parameterObject, rowBounds, resultHandler, cacheKey, boundSql);
+    }
+
+    @Override
+    public void close(boolean forceRollback) {
+        try {
+            //issues #499, #524 and #573
+            if (forceRollback) {
+                transactionalCacheManager.rollback();
+            } else {
+                transactionalCacheManager.commit();
+            }
+        } finally {
+            delegateExecutor.close(forceRollback);
+        }
+    }
+
+    @Override
+    public boolean isClosed() {
+        return delegateExecutor.isClosed();
     }
 
     @Override
     public List<BatchResult> flushStatements() throws SQLException {
-        return delegate.flushStatements();
+        return delegateExecutor.flushStatements();
     }
 
     @Override
     public void commit(boolean required) throws SQLException {
-        delegate.commit(required);
+        delegateExecutor.commit(required);
         transactionalCacheManager.commit();
     }
 
     @Override
     public void rollback(boolean required) throws SQLException {
         try {
-            delegate.rollback(required);
+            delegateExecutor.rollback(required);
         } finally {
             if (required) {
                 transactionalCacheManager.rollback();
@@ -157,35 +174,22 @@ public class CachingExecutor implements Executor {
 
     @Override
     public CacheKey createCacheKey(MappedStatement ms, Object parameterObject, RowBounds rowBounds, BoundSql boundSql) {
-        return delegate.createCacheKey(ms, parameterObject, rowBounds, boundSql);
+        return delegateExecutor.createCacheKey(ms, parameterObject, rowBounds, boundSql);
     }
 
     @Override
     public boolean isCached(MappedStatement ms, CacheKey key) {
-        return delegate.isCached(ms, key);
+        return delegateExecutor.isCached(ms, key);
     }
 
     @Override
     public void deferLoad(MappedStatement ms, MetaObject resultObject, String property, CacheKey key, Class<?> targetType) {
-        delegate.deferLoad(ms, resultObject, property, key, targetType);
+        delegateExecutor.deferLoad(ms, resultObject, property, key, targetType);
     }
 
     @Override
     public void clearLocalCache() {
-        delegate.clearLocalCache();
-    }
-
-    /**
-     * 通过该 映射sql的配置决定是否需要清除缓存
-     *
-     * @param mappedStatement 具体的映射语句
-     */
-    private void flushCacheIfRequired(MappedStatement mappedStatement) {
-        Cache cache = mappedStatement.getCache();
-        if (cache != null && mappedStatement.isFlushCacheRequired()) {
-            //如果该 statement 要要刷新缓存，则一级，二级缓存都会傻笑
-            transactionalCacheManager.clear(cache);
-        }
+        delegateExecutor.clearLocalCache();
     }
 
     @Override

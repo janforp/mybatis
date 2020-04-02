@@ -107,7 +107,7 @@ public class BindingTest {
     }
 
     @Test
-    public void shouldfindThreeSpecificPosts() throws Exception {
+    public void shouldFindThreeSpecificPosts() throws Exception {
         SqlSession session = sqlSessionFactory.openSession();
         try {
             BoundAuthorMapper mapper = session.getMapper(BoundAuthorMapper.class);

@@ -7,6 +7,7 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
@@ -71,27 +72,41 @@ public class MapperMethod {
         SqlCommandType sqlCommandType = command.getType();
         String commandName = command.getName();
         if (SqlCommandType.INSERT == sqlCommandType) {
+
             //sql 执行的参数
             Object param = method.convertArgsToSqlCommandParam(args);
             int affectedRowCount = sqlSession.insert(commandName, param);
+            //没什么逻辑
             result = rowCountResult(affectedRowCount);
+
         } else if (SqlCommandType.UPDATE == sqlCommandType) {
+
             Object param = method.convertArgsToSqlCommandParam(args);
-            result = rowCountResult(sqlSession.update(commandName, param));
+            int update = sqlSession.update(commandName, param);
+            //没什么逻辑
+            result = rowCountResult(update);
+
         } else if (SqlCommandType.DELETE == sqlCommandType) {
+
             Object param = method.convertArgsToSqlCommandParam(args);
-            result = rowCountResult(sqlSession.delete(commandName, param));
+            int delete = sqlSession.delete(commandName, param);
+            result = rowCountResult(delete);
+
         } else if (SqlCommandType.SELECT == sqlCommandType) {
+
             if (method.returnsVoid() && method.hasResultHandler()) {
                 //如果有结果处理器
                 executeWithResultHandler(sqlSession, args);
                 result = null;
+
             } else if (method.returnsMany()) {
                 //如果结果有多条记录
                 result = executeForMany(sqlSession, args);
+
             } else if (method.returnsMap()) {
                 //如果结果是map
                 result = executeForMap(sqlSession, args);
+
             } else {
                 //否则就是一条记录
 
@@ -99,6 +114,7 @@ public class MapperMethod {
                 Object param = method.convertArgsToSqlCommandParam(args);
                 result = sqlSession.selectOne(commandName, param);
             }
+
         } else {
             throw new BindingException("Unknown execution method for: " + commandName);
         }
@@ -137,14 +153,20 @@ public class MapperMethod {
         return result;
     }
 
-    //结果处理器
+    /**
+     * 结果处理器
+     */
     private void executeWithResultHandler(SqlSession sqlSession, Object[] args) {
+        //如：org.apache.ibatis.submitted.sptests.SPMapper.adderAsSelect
         String statement = command.getName();
+        //从映射中拿到，拿不到则报错
         MappedStatement mappedStatement = sqlSession.getConfiguration().getMappedStatement(statement);
         List<ResultMap> resultMapList = mappedStatement.getResultMaps();
         ResultMap resultMap = resultMapList.get(0);
+        //resultMap的映射类型
         Class<?> type = resultMap.getType();
         //TODO ？
+        //resultMap的映射类型不能为空，就是必须要配置 type
         if (void.class.equals(type)) {
             throw new BindingException("method " + statement
                     + " needs either a @ResultMap annotation, a @ResultType annotation,"
@@ -153,23 +175,24 @@ public class MapperMethod {
         Object param = method.convertArgsToSqlCommandParam(args);
 
         //根据入参数下标找到结果处理器，这个参数是接口传进去的参数，跟分页参数类似的获取方式
-        ResultHandler resultHandler = method.extractResultHandler(args);
+        ResultHandler paramOfResultHandler = method.extractResultHandler(args);
         if (method.hasRowBounds()) {
             //根据入参数看是否需要分页，如果需要则返回分页参数，否则返回null
-            RowBounds rowBounds = method.extractRowBounds(args);
+            RowBounds paramOfRowBounds = method.extractRowBounds(args);
             //调用分页接口
-            sqlSession.select(statement, param, rowBounds, resultHandler);
+            sqlSession.select(statement, param, paramOfRowBounds, paramOfResultHandler);
         } else {
             //不分页
-            sqlSession.select(statement, param, resultHandler);
+            sqlSession.select(statement, param, paramOfResultHandler);
         }
     }
 
     //多条记录
     private <E> Object executeForMany(SqlSession sqlSession, Object[] args) {
         List<E> result;
+        //如：org.apache.ibatis.submitted.sptests.SPMapper.adderAsSelect
         Object param = method.convertArgsToSqlCommandParam(args);
-        //代入RowBounds
+        //如：org.apache.ibatis.submitted.sptests.SPMapper.adderAsSelect
         String commandName = command.getName();
         if (method.hasRowBounds()) {
             RowBounds rowBounds = method.extractRowBounds(args);
@@ -178,18 +201,21 @@ public class MapperMethod {
             result = sqlSession.selectList(commandName, param);
         }
         // issue #510 Collections & arrays support
+        //如果查询结果类型跟方法返回类型不一样
         if (!method.getReturnType().isAssignableFrom(result.getClass())) {
-            if (method.getReturnType().isArray()) {
+            if (method.getReturnType().isArray()) {//数组
                 return convertToArray(result);
             } else {
-                return convertToDeclaredCollection(sqlSession.getConfiguration(), result);
+                return convertToDeclaredCollection(sqlSession.getConfiguration(), result);//集合
             }
         }
         return result;
     }
 
     private <E> Object convertToDeclaredCollection(Configuration config, List<E> list) {
-        Object collection = config.getObjectFactory().create(method.getReturnType());
+        ObjectFactory objectFactory = config.getObjectFactory();
+        Class<?> returnType = method.getReturnType();
+        Object collection = objectFactory.create(returnType);
         MetaObject metaObject = config.newMetaObject(collection);
         metaObject.addAll(list);
         return collection;
@@ -197,6 +223,7 @@ public class MapperMethod {
 
     @SuppressWarnings("unchecked")
     private <E> E[] convertToArray(List<E> list) {
+        //method.getReturnType().isArray() 的时候进来这里
         E[] array = (E[]) Array.newInstance(method.getReturnType().getComponentType(), list.size());
         array = list.toArray(array);
         return array;
@@ -234,6 +261,7 @@ public class MapperMethod {
         /**
          * 如：org.apache.ibatis.submitted.sptests.SPMapper.adderAsSelect
          * 大部分情况就是 statement，
+         * 具体到 namespace + methodName 是唯一的
          */
         @Getter
         private final String name;
@@ -336,6 +364,8 @@ public class MapperMethod {
          * 其核心功能就是convertArgsToSqlCommandParam(Object[] args)方法，用于将方法中的参数转换成为SQL脚本命令中的参数形式，
          * 其实就是将参数位置作为键，具体的参数作为值保存到一个Map集合中，这样在SQL脚本命令中用键#{1}通过集合就能得到具体的参数。
          *
+         * 返回：null/一个具体的值如：1或者字符串张三/一个map如：{"subjectQuery":"%a%","bodyQuery":"%a%","param1":"%a%","param2":"%a%"}
+         *
          * @param args 入参数
          * @return 多个参数返回
          */
@@ -354,7 +384,7 @@ public class MapperMethod {
                 //否则，返回一个ParamMap，修改参数名，参数名就是其位置
 
                 //根据 key get 不到值就会抛出异常
-                final Map<String, Object> param = new ParamMap<Object>();
+                final Map<String, Object> finalParamMap = new ParamMap<Object>();
                 int i = 0;
                 Set<Map.Entry<Integer, String>> entries = paramsIndexMap.entrySet();
                 for (Map.Entry<Integer, String> entry : entries) {
@@ -364,23 +394,25 @@ public class MapperMethod {
                     String paramIndexOrParamName = entry.getValue();
 
                     //真正的参数值
-                    Object arg = args[paramIndex];
+                    Object argValue = args[paramIndex];
                     //1.先加一个#{0},#{1},#{2}...参数
-                    param.put(paramIndexOrParamName, arg);
-                    // issue #71, add param names as param1, param2...but ensure backward compatibility
-                    final String genericParamName = "param" + (i + 1);
-                    if (!param.containsKey(genericParamName)) {
+                    finalParamMap.put(paramIndexOrParamName, argValue);
+                    // issue #71, add finalParamMap names as param1, param2...but ensure backward compatibility
+
+                    //下面的逻辑已经不用了
+                    final String genericParamName = "finalParamMap" + (i + 1);
+                    if (!finalParamMap.containsKey(genericParamName)) {
                         //2.再加一个#{param1},#{param2}...参数
                         //你可以传递多个参数给一个映射器方法。如果你这样做了,
                         //默认情况下它们将会以它们在参数列表中的位置来命名,比如:#{param1},#{param2}等。
                         //如果你想改变参数的名称(只在多参数情况下) ,那么你可以在参数上使用@Param(“paramName”)注解。
                         //此处为了向老版本兼容，故在map中保存着两份参数，一份是老版的与#{0}为键的参数另一种为以#{param1}为键的参数。
-                        param.put(genericParamName, arg);
+                        finalParamMap.put(genericParamName, argValue);
                     }
                     i++;
                 }
                 //{"subjectQuery":"%a%","bodyQuery":"%a%","param1":"%a%","param2":"%a%"}
-                return param;
+                return finalParamMap;
             }
         }
 

@@ -29,7 +29,7 @@ public class PerpetualCache implements Cache {
      * key:一般情况下是 cacheKey 实例
      * value：该cacheKey对应的值
      */
-    private Map<Object, Object> cache = new HashMap<Object, Object>();
+    private Map<Object, Object> cacheMap = new HashMap<Object, Object>();
 
     public PerpetualCache(String id) {
         this.id = id;
@@ -37,27 +37,27 @@ public class PerpetualCache implements Cache {
 
     @Override
     public int getSize() {
-        return cache.size();
+        return cacheMap.size();
     }
 
     @Override
     public void putObject(Object key, Object value) {
-        cache.put(key, value);
+        cacheMap.put(key, value);
     }
 
     @Override
     public Object getObject(Object key) {
-        return cache.get(key);
+        return cacheMap.get(key);
     }
 
     @Override
     public Object removeObject(Object key) {
-        return cache.remove(key);
+        return cacheMap.remove(key);
     }
 
     @Override
     public void clear() {
-        cache.clear();
+        cacheMap.clear();
     }
 
     @Override

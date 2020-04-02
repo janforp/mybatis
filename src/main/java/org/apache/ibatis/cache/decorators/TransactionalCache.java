@@ -140,12 +140,15 @@ public class TransactionalCache implements Cache {
      * 把map中的缓存刷到代理缓存中去，实现垮 sqlSession 的缓存
      */
     private void flushPendingEntries() {
+        //提交的时候需要放到缓存中的数据
         Set<Map.Entry<Object, Object>> entrySet = entriesToAddOnCommit.entrySet();
         for (Map.Entry<Object, Object> entry : entrySet) {
             Object key = entry.getKey();
             Object value = entry.getValue();
             delegate.putObject(key, value);
         }
+
+        //没有命中的缓存 key
         for (Object entry : entriesMissedInCache) {
             if (!entriesToAddOnCommit.containsKey(entry)) {
                 delegate.putObject(entry, null);

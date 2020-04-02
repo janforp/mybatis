@@ -17,11 +17,16 @@ import java.util.Map;
  */
 public class TransactionalCacheManager {
 
-    //管理了许多TransactionalCache
-    private Map<Cache, TransactionalCache> transactionalCaches = new HashMap<Cache, TransactionalCache>();
+    /**
+     * 管理了许多TransactionalCache
+     * key:?
+     * value:?
+     */
+    private Map<Cache, TransactionalCache> transactionalCacheMap = new HashMap<Cache, TransactionalCache>();
 
     public void clear(Cache cache) {
-        getTransactionalCache(cache).clear();
+        TransactionalCache transactionalCache = getTransactionalCache(cache);
+        transactionalCache.clear();
     }
 
     //得到某个TransactionalCache的值
@@ -42,23 +47,23 @@ public class TransactionalCacheManager {
 
     //提交时全部提交
     public void commit() {
-        for (TransactionalCache txCache : transactionalCaches.values()) {
-            txCache.commit();
+        for (TransactionalCache transactionalCache : transactionalCacheMap.values()) {
+            transactionalCache.commit();
         }
     }
 
     //回滚时全部回滚
     public void rollback() {
-        for (TransactionalCache txCache : transactionalCaches.values()) {
+        for (TransactionalCache txCache : transactionalCacheMap.values()) {
             txCache.rollback();
         }
     }
 
     private TransactionalCache getTransactionalCache(Cache cache) {
-        TransactionalCache transactionalCache = transactionalCaches.get(cache);
+        TransactionalCache transactionalCache = transactionalCacheMap.get(cache);
         if (transactionalCache == null) {
             transactionalCache = new TransactionalCache(cache);
-            transactionalCaches.put(cache, transactionalCache);
+            transactionalCacheMap.put(cache, transactionalCache);
         }
         return transactionalCache;
     }

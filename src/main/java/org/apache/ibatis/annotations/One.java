@@ -17,5 +17,4 @@ public @interface One {
     String select() default "";
 
     FetchType fetchType() default FetchType.DEFAULT;
-
 }

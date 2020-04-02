@@ -94,6 +94,24 @@ public abstract class BaseExecutor implements Executor {
         this.wrapper = this;
     }
 
+    protected abstract int doUpdate(MappedStatement ms, Object parameter) throws SQLException;
+
+    protected abstract List<BatchResult> doFlushStatements(boolean isRollback) throws SQLException;
+
+    /**
+     * query-->queryFromDatabase-->doQuery
+     *
+     * @param mappedStatement 映射查询
+     * @param parameter 参数
+     * @param rowBounds 分页参数
+     * @param resultHandler 结果处理器
+     * @param boundSql sql
+     * @param <E> 结果类型
+     * @return 查询结果
+     * @throws SQLException sql异常
+     */
+    protected abstract <E> List<E> doQuery(MappedStatement mappedStatement, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException;
+
     @Override
     public Transaction getTransaction() {
         if (closed) {
@@ -343,24 +361,6 @@ public abstract class BaseExecutor implements Executor {
             localOutputParameterCache.clear();
         }
     }
-
-    protected abstract int doUpdate(MappedStatement ms, Object parameter) throws SQLException;
-
-    protected abstract List<BatchResult> doFlushStatements(boolean isRollback) throws SQLException;
-
-    /**
-     * query-->queryFromDatabase-->doQuery
-     *
-     * @param mappedStatement 映射查询
-     * @param parameter 参数
-     * @param rowBounds 分页参数
-     * @param resultHandler 结果处理器
-     * @param boundSql sql
-     * @param <E> 结果类型
-     * @return 查询结果
-     * @throws SQLException sql异常
-     */
-    protected abstract <E> List<E> doQuery(MappedStatement mappedStatement, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException;
 
     protected void closeStatement(Statement statement) {
         if (statement != null) {

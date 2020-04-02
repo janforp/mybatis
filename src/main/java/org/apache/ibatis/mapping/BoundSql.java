@@ -23,7 +23,7 @@ import java.util.Map;
 public class BoundSql {
 
     /**
-     * xml中的sql
+     * 可以直接给 statement 使用的sql
      */
     @Getter
     private String sql;
@@ -42,6 +42,9 @@ public class BoundSql {
     @Getter
     private Object parameterObject;
 
+    /**
+     * 参数
+     */
     private MetaObject metaParameters;
 
     public BoundSql(Configuration configuration, String sql, List<ParameterMapping> parameterMappings, Object parameterObject) {
