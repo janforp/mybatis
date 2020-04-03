@@ -47,6 +47,8 @@ public final class MappedStatement {
 
     /**
      * namespace下的缓存，SqlSession缓存
+     *
+     * 其实他与二级缓存也就是 mapper.xml 对应的缓存是同一个实例
      */
     @Getter
     private Cache cache;
@@ -59,10 +61,15 @@ public final class MappedStatement {
 
     /**
      * 该条sql执行的时候是否需要清楚缓存
+     *
+     * 如果没有指定，则查询不刷新，飞查询刷新
      */
     @Getter
     private boolean flushCacheRequired;
 
+    /**
+     * 如果sql没指定，则查询默认使用缓存，非查询不用缓存
+     */
     @Getter
     private boolean useCache;
 
@@ -72,6 +79,11 @@ public final class MappedStatement {
     @Getter
     private SqlCommandType sqlCommandType;
 
+    /**
+     * 该sql如果有自动获取主键的sql，则指定一个确定的主键生成器
+     *
+     * canUseKeyGenerator ? new Jdbc3KeyGenerator() : new NoKeyGenerator();
+     */
     @Getter
     private KeyGenerator keyGenerator;
 
@@ -86,6 +98,9 @@ public final class MappedStatement {
     @Getter
     private String databaseId;
 
+    /**
+     * 日志
+     */
     @Getter
     private Log statementLog;
 
@@ -147,19 +162,27 @@ public final class MappedStatement {
             mappedStatement.configuration = configuration;
             mappedStatement.id = id;
             mappedStatement.sqlSource = sqlSource;
+            //TODO  此处为何直接指定？
             mappedStatement.statementType = StatementType.PREPARED;
             mappedStatement.parameterMap = new ParameterMap.Builder(configuration, "defaultParameterMap", null, new ArrayList<ParameterMapping>()).build();
             mappedStatement.resultMaps = new ArrayList<ResultMap>();
             mappedStatement.timeout = configuration.getDefaultStatementTimeout();
             mappedStatement.sqlCommandType = sqlCommandType;
-            mappedStatement.keyGenerator = configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType) ? new Jdbc3KeyGenerator() : new NoKeyGenerator();
+
+            //决定使用什么主键生成器
+            boolean useGeneratedKeys = configuration.isUseGeneratedKeys();
+            boolean isInsert = SqlCommandType.INSERT.equals(sqlCommandType);
+            boolean canUseKeyGenerator = useGeneratedKeys && isInsert;
+            //TODO 只能使用 Jdbc3KeyGenerator 生成主键吗？
+            mappedStatement.keyGenerator = canUseKeyGenerator ? new Jdbc3KeyGenerator() : new NoKeyGenerator();
+
             String logId = id;
             if (configuration.getLogPrefix() != null) {
                 logId = configuration.getLogPrefix() + id;
             }
             mappedStatement.statementLog = LogFactory.getLog(logId);
-            LanguageDriver defaultScriptingLanuageInstance = configuration.getDefaultScriptingLanuageInstance();
-            mappedStatement.lang = defaultScriptingLanuageInstance;
+            LanguageDriver defaultScriptingLanguageInstance = configuration.getDefaultScriptingLanuageInstance();
+            mappedStatement.lang = defaultScriptingLanguageInstance;
         }
 
         public Builder resource(String resource) {

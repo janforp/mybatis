@@ -7,6 +7,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.transaction.Transaction;
 
 import java.sql.Statement;
 import java.util.List;
@@ -42,40 +43,43 @@ public class SelectKeyGenerator implements KeyGenerator {
         }
     }
 
-    private void processGeneratedKeys(Executor executor, MappedStatement ms, Object parameter) {
+    private void processGeneratedKeys(Executor executor, MappedStatement mappedStatement, Object parameter) {
         try {
-            if (parameter != null && keyStatement != null && keyStatement.getKeyProperties() != null) {
-                String[] keyProperties = keyStatement.getKeyProperties();
-                final Configuration configuration = ms.getConfiguration();
-                final MetaObject metaParam = configuration.newMetaObject(parameter);
-                if (keyProperties != null) {
-                    // Do not close keyExecutor.
-                    // The transaction will be closed by parent executor.
-                    Executor keyExecutor = configuration.newExecutor(executor.getTransaction(), ExecutorType.SIMPLE);
-                    //插入的时候对象带主键的原理：其实是mybatis去查询了一次
-                    List<Object> values = keyExecutor.query(keyStatement, parameter, RowBounds.DEFAULT, Executor.NO_RESULT_HANDLER);
-                    if (values.size() == 0) {
-                        //没有返回数据-报错
-                        throw new ExecutorException("SelectKey returned no data.");
-                    } else if (values.size() > 1) {
-                        //返回数组多余1条-报错
-                        throw new ExecutorException("SelectKey returned more than one value.");
+            if (parameter == null || keyStatement == null || keyStatement.getKeyProperties() == null) {
+                return;
+            }
+            String[] keyProperties = keyStatement.getKeyProperties();
+            if (keyProperties == null) {
+                return;
+            }
+            final Configuration configuration = mappedStatement.getConfiguration();
+            final MetaObject metaParam = configuration.newMetaObject(parameter);
+            // Do not close keyExecutor.
+            // The transaction will be closed by parent executor.
+            Transaction transaction = executor.getTransaction();
+            Executor keyExecutor = configuration.newExecutor(transaction, ExecutorType.SIMPLE);
+            //插入的时候对象带主键的原理：其实是mybatis去查询了一次
+            List<Object> values = keyExecutor.query(keyStatement, parameter, RowBounds.DEFAULT, Executor.NO_RESULT_HANDLER);
+            if (values.size() == 0) {
+                //没有返回数据-报错
+                throw new ExecutorException("SelectKey returned no data.");
+            } else if (values.size() > 1) {
+                //返回数组多余1条-报错
+                throw new ExecutorException("SelectKey returned more than one value.");
+            } else {
+                MetaObject metaResult = configuration.newMetaObject(values.get(0));
+                //单个的情况
+                if (keyProperties.length == 1) {
+                    if (metaResult.hasGetter(keyProperties[0])) {
+                        setValue(metaParam, keyProperties[0], metaResult.getValue(keyProperties[0]));
                     } else {
-                        MetaObject metaResult = configuration.newMetaObject(values.get(0));
-                        //单个的情况
-                        if (keyProperties.length == 1) {
-                            if (metaResult.hasGetter(keyProperties[0])) {
-                                setValue(metaParam, keyProperties[0], metaResult.getValue(keyProperties[0]));
-                            } else {
-                                // no getter for the property - maybe just a single value object
-                                // so try that
-                                setValue(metaParam, keyProperties[0], values.get(0));
-                            }
-                        } else {
-                            //处理多个的情况
-                            handleMultipleProperties(keyProperties, metaParam, metaResult);
-                        }
+                        // no getter for the property - maybe just a single value object
+                        // so try that
+                        setValue(metaParam, keyProperties[0], values.get(0));
                     }
+                } else {
+                    //处理多个的情况
+                    handleMultipleProperties(keyProperties, metaParam, metaResult);
                 }
             }
         } catch (ExecutorException e) {

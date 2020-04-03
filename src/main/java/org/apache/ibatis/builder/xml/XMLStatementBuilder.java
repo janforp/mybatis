@@ -210,22 +210,23 @@ public class XMLStatementBuilder extends BaseBuilder {
      *   </selectKey>
      *
      * @param id sql的id + "!selectKey"如：insertOne!selectKey
-     * @param nodeToHandle <selectKey/>
+     * @param keyNode <selectKey/>
      * @param parameterTypeClass sql的入参数，也就是主键自动生成之后需要回写到参数的某个属性
      * @param langDriver 语音驱动
      * @param databaseId 数据库id
      */
-    private void parseSelectKeyNode(String id, XNode nodeToHandle, Class<?> parameterTypeClass, LanguageDriver langDriver, String databaseId) {
+    private void parseSelectKeyNode(String id, XNode keyNode, Class<?> parameterTypeClass, LanguageDriver langDriver, String databaseId) {
         //返回主键类型
-        String resultType = nodeToHandle.getStringAttribute("resultType");
-        Class<?> resultTypeClass = resolveClass(resultType);
-        StatementType statementType = StatementType.valueOf(nodeToHandle.getStringAttribute("statementType", StatementType.PREPARED.toString()));
+        String keyResultType = keyNode.getStringAttribute("resultType");
+        Class<?> keyResultTypeClass = resolveClass(keyResultType);
+        //生成主键sql也可以指定 statementType
+        StatementType statementType = StatementType.valueOf(keyNode.getStringAttribute("statementType", StatementType.PREPARED.toString()));
         //主键的属性名称
-        String keyProperty = nodeToHandle.getStringAttribute("keyProperty");
+        String keyProperty = keyNode.getStringAttribute("keyProperty");
         //主键列
-        String keyColumn = nodeToHandle.getStringAttribute("keyColumn");
-        //order="AFTER"，默认为after
-        boolean executeBefore = "BEFORE".equals(nodeToHandle.getStringAttribute("order", "AFTER"));
+        String keyColumn = keyNode.getStringAttribute("keyColumn");
+        //order="AFTER"，默认为after,是指在执行sql之前还是之后获取主键
+        boolean executeBefore = "BEFORE".equals(keyNode.getStringAttribute("order", "AFTER"));
         //defaults
         boolean useCache = false;
         boolean resultOrdered = false;
@@ -237,17 +238,20 @@ public class XMLStatementBuilder extends BaseBuilder {
         String resultMap = null;
         ResultSetType resultSetTypeEnum = null;
         //langDriver是一个接口
-        SqlSource sqlSource = langDriver.createSqlSource(configuration, nodeToHandle, parameterTypeClass);
+        //TODO ？ langDriver 实例如何来？
+        SqlSource sqlSource = langDriver.createSqlSource(configuration, keyNode, parameterTypeClass);
+        //主键相关为查询类型
         SqlCommandType sqlCommandType = SqlCommandType.SELECT;
         builderAssistant.addMappedStatement(id, sqlSource, statementType, sqlCommandType,
-                fetchSize, timeout, parameterMap, parameterTypeClass, resultMap, resultTypeClass,
+                fetchSize, timeout, parameterMap, parameterTypeClass, resultMap, keyResultTypeClass,
                 resultSetTypeEnum, flushCache, useCache, resultOrdered,
                 keyGenerator, keyProperty, keyColumn, databaseId, langDriver, null);
 
         id = builderAssistant.applyCurrentNamespace(id, false);
 
         MappedStatement keyStatement = configuration.getMappedStatement(id, false);
-        configuration.addKeyGenerator(id, new SelectKeyGenerator(keyStatement, executeBefore));
+        SelectKeyGenerator selectKeyGenerator = new SelectKeyGenerator(keyStatement, executeBefore);
+        configuration.addKeyGenerator(id, selectKeyGenerator);
     }
 
     private void removeSelectKeyNodes(List<XNode> selectKeyNodes) {

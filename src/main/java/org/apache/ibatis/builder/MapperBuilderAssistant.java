@@ -49,7 +49,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
     private String resource;
 
     /**
-     * 对应 namespace 的二级缓存，如果该 mapper.xml 配置了 cache-ref,则该实例就是引用的缓存实例
+     * 对应 namespace 的二级缓存，如果该 mapper.xml 配置了 cache-ref,则该实例就是引用的缓存实例，一级缓存也是这个实例
      */
     private Cache currentCache;
 
@@ -279,28 +279,36 @@ public class MapperBuilderAssistant extends BaseBuilder {
         return discriminatorBuilder.build();
     }
 
-    //增加映射语句
-    public MappedStatement addMappedStatement(
-            String id,
-            SqlSource sqlSource,
-            StatementType statementType,
-            SqlCommandType sqlCommandType,
-            Integer fetchSize,
-            Integer timeout,
-            String parameterMap,
-            Class<?> parameterType,
-            String resultMap,
-            Class<?> resultType,
-            ResultSetType resultSetType,
-            boolean flushCache,
-            boolean useCache,
-            boolean resultOrdered,
-            KeyGenerator keyGenerator,
-            String keyProperty,
-            String keyColumn,
-            String databaseId,
-            LanguageDriver lang,
-            String resultSets) {
+    /**
+     * 增加映射语句
+     *
+     * @param id 如果是主键，则 sql的id + "!selectKey"如：insertOne!selectKey
+     * @param sqlSource
+     * @param statementType
+     * @param sqlCommandType
+     * @param fetchSize
+     * @param timeout
+     * @param parameterMap
+     * @param parameterType
+     * @param resultMap
+     * @param resultType
+     * @param resultSetType
+     * @param flushCache
+     * @param useCache
+     * @param resultOrdered
+     * @param keyGenerator
+     * @param keyProperty
+     * @param keyColumn
+     * @param databaseId
+     * @param lang
+     * @param resultSets
+     * @return MappedStatement
+     */
+    public MappedStatement addMappedStatement(String id, SqlSource sqlSource, StatementType statementType,
+            SqlCommandType sqlCommandType, Integer fetchSize, Integer timeout, String parameterMap,
+            Class<?> parameterType, String resultMap, Class<?> resultType, ResultSetType resultSetType,
+            boolean flushCache, boolean useCache, boolean resultOrdered, KeyGenerator keyGenerator,
+            String keyProperty, String keyColumn, String databaseId, LanguageDriver lang, String resultSets) {
 
         if (unresolvedCacheRef) {
             throw new IncompleteElementException("Cache-ref not yet resolved");
@@ -309,28 +317,35 @@ public class MapperBuilderAssistant extends BaseBuilder {
         //为id加上namespace前缀如：org.apache.ibatis.submitted.force_flush_on_select.PersonMapper.selectByIdFlush
         id = applyCurrentNamespace(id, false);
         //是否是select语句
-        boolean isSelect = sqlCommandType == SqlCommandType.SELECT;
+        boolean isSelect = (sqlCommandType == SqlCommandType.SELECT);
 
         //又是建造者模式
         MappedStatement.Builder statementBuilder = new MappedStatement.Builder(configuration, id, sqlSource, sqlCommandType);
         statementBuilder.resource(resource);
         statementBuilder.fetchSize(fetchSize);
         statementBuilder.statementType(statementType);
+        //TODO 在new MappedStatement.Builder(configuration, id, sqlSource, sqlCommandType); 中不是已经指定 keyGenerator 啦，这里又重复指定？
         statementBuilder.keyGenerator(keyGenerator);
         statementBuilder.keyProperty(keyProperty);
         statementBuilder.keyColumn(keyColumn);
         statementBuilder.databaseId(databaseId);
+        //TODO 在new MappedStatement.Builder(configuration, id, sqlSource, sqlCommandType); 中不是已经指定 lang 啦，这里又重复指定？
         statementBuilder.lang(lang);
         statementBuilder.resultOrdered(resultOrdered);
         statementBuilder.resultSets(resultSets);
+
+        //设置超时时间，如果该sql没有单独指定超时时间，在是默认的配置
         setStatementTimeout(timeout, statementBuilder);
 
         //1.参数映射
         setStatementParameterMap(parameterMap, parameterType, statementBuilder);
         //2.结果映射
         setStatementResultMap(resultMap, resultType, resultSetType, statementBuilder);
-        setStatementCache(isSelect, flushCache, useCache, currentCache, statementBuilder);//缓存
 
+        //缓存
+        setStatementCache(isSelect, flushCache, useCache, currentCache, statementBuilder);
+
+        //构造 MappedStatement
         MappedStatement statement = statementBuilder.build();
         //建造好调用configuration.addMappedStatement
         configuration.addMappedStatement(statement);
@@ -341,8 +356,19 @@ public class MapperBuilderAssistant extends BaseBuilder {
         return value == null ? defaultValue : value;
     }
 
+    /**
+     * 针对某个Sql的缓存
+     *
+     * @param isSelect 是否查询
+     * @param flushCache 是否刷新
+     * @param useCache 是否使用缓存
+     * @param cache mapper对应的缓存实例，二级缓存实例
+     * @param statementBuilder 该sql的构造器
+     */
     private void setStatementCache(boolean isSelect, boolean flushCache, boolean useCache, Cache cache, MappedStatement.Builder statementBuilder) {
+        //如果没有指定，则查询不刷新
         flushCache = valueOrDefault(flushCache, !isSelect);
+        //如果没指定，则查询默认使用缓存，非查询不用缓存
         useCache = valueOrDefault(useCache, isSelect);
 
         //下面是build模式
