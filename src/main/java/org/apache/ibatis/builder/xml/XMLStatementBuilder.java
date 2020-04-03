@@ -14,6 +14,7 @@ import org.apache.ibatis.mapping.StatementType;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
+import org.w3c.dom.Node;
 
 import java.util.List;
 import java.util.Locale;
@@ -118,7 +119,8 @@ public class XMLStatementBuilder extends BaseBuilder {
         StatementType statementType = StatementType.valueOf(statementTypeConfig);
 
         //获取命令类型(select|insert|update|delete)
-        String nodeName = context.getNode().getNodeName();
+        Node contextNode = context.getNode();
+        String nodeName = contextNode.getNodeName();
         SqlCommandType sqlCommandType = SqlCommandType.valueOf(nodeName.toUpperCase(Locale.ENGLISH));
         //是否是查询函数
         boolean isSelect = (sqlCommandType == SqlCommandType.SELECT);
@@ -133,7 +135,7 @@ public class XMLStatementBuilder extends BaseBuilder {
         // Include Fragments before parsing
         //解析之前先解析<include>SQL片段
         XMLIncludeTransformer includeParser = new XMLIncludeTransformer(configuration, builderAssistant);
-        includeParser.applyIncludes(context.getNode());
+        includeParser.applyIncludes(contextNode);
 
         // Parse selectKey after includes and remove them.
         //解析之前先解析<selectKey>
@@ -185,14 +187,34 @@ public class XMLStatementBuilder extends BaseBuilder {
 
     private void parseSelectKeyNodes(String parentId, List<XNode> list, Class<?> parameterTypeClass, LanguageDriver langDriver, String skRequiredDatabaseId) {
         for (XNode nodeToHandle : list) {
+            //sql的id + "!selectKey"如：insertOne!selectKey
             String id = parentId + SelectKeyGenerator.SELECT_KEY_SUFFIX;
             String databaseId = nodeToHandle.getStringAttribute("databaseId");
-            if (databaseIdMatchesCurrent(id, databaseId, skRequiredDatabaseId)) {
+            boolean databaseIdMatchesCurrent = databaseIdMatchesCurrent(id, databaseId, skRequiredDatabaseId);
+            if (databaseIdMatchesCurrent) {
                 parseSelectKeyNode(id, nodeToHandle, parameterTypeClass, langDriver, databaseId);
             }
         }
     }
 
+    /**
+     * 解析 <selectKey/>如：
+     *
+     * <selectKey keyProperty="id" resultType="int" order="BEFORE">
+     *     <if test="_databaseId == 'oracle'">
+     *       select seq_users.nextval from dual
+     *     </if>
+     *     <if test="_databaseId == 'db2'">
+     *       select nextval for seq_users from sysibm.sysdummy1"
+     *     </if>
+     *   </selectKey>
+     *
+     * @param id sql的id + "!selectKey"如：insertOne!selectKey
+     * @param nodeToHandle <selectKey/>
+     * @param parameterTypeClass sql的入参数，也就是主键自动生成之后需要回写到参数的某个属性
+     * @param langDriver 语音驱动
+     * @param databaseId 数据库id
+     */
     private void parseSelectKeyNode(String id, XNode nodeToHandle, Class<?> parameterTypeClass, LanguageDriver langDriver, String databaseId) {
         //返回主键类型
         String resultType = nodeToHandle.getStringAttribute("resultType");
