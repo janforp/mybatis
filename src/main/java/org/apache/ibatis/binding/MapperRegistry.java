@@ -24,7 +24,7 @@ public class MapperRegistry {
     /**
      * 将已经添加的映射都放入HashMap
      * 注册的 mapperClass
-     * value:通过这个工厂类可以获取到对应的映射器代理类MapperProxy，这里只需要保存一个映射器的代理工厂，根据工厂就可以获取到对应的映射器。
+     * value:MapperProxyFactory，通过这个工厂类可以获取到对应的映射器代理类MapperProxy，这里只需要保存一个映射器的代理工厂，根据工厂就可以获取到对应的映射器。
      *
      * 即使是在一般的项目中也会存在很多的映射器，这些映射器都要注册到注册器中，
      * 注册器集合中的每个映射器中都保存着一个独有的映射器代理工厂实例，
@@ -60,7 +60,7 @@ public class MapperRegistry {
     /**
      * 将指定的类型的映射器添加到注册器中
      *
-     * @param mapperClass 映射类
+     * @param mapperClass 映射接口
      * @param <T> 任何类型
      */
     public <T> void addMapper(Class<T> mapperClass) {

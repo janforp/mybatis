@@ -39,6 +39,7 @@ public class CacheBuilder {
         // issue #352, do not apply decorators to custom caches
         //其实实现只支持这一个缓存才支持淘汰策略
         if (PerpetualCache.class.equals(cache.getClass())) {
+            //利用反射进行层层包装
             for (Class<? extends Cache> decorator : decorators) {
                 //为了让该缓存实例具备这些淘汰策略，使用装饰者模式，把该缓存实例设置到装饰者中
                 cache = newCacheDecoratorInstance(decorator, cache);

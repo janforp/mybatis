@@ -6,6 +6,7 @@ import org.apache.ibatis.builder.CacheRefResolver;
 import org.apache.ibatis.builder.IncompleteElementException;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.builder.ResultMapResolver;
+import org.apache.ibatis.builder.annotation.MapperAnnotationBuilder;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.io.Resources;
@@ -75,40 +76,25 @@ import java.util.Properties;
  */
 public class XMLMapperBuilder extends BaseBuilder {
 
+    /**
+     * mapper.xml
+     */
     private XPathParser parser;
 
-    //映射器构建助手
+    /**
+     * 映射器构建助手
+     */
     private MapperBuilderAssistant builderAssistant;
 
-    //用来存放sql片段的哈希表
+    /**
+     * 用来存放sql片段的哈希表
+     */
     private Map<String, XNode> sqlFragments;
 
     /**
      * 资源地址，只加载一次
      */
     private String resource;
-
-    @Deprecated
-    public XMLMapperBuilder(Reader reader, Configuration configuration, String resource, Map<String, XNode> sqlFragments, String namespace) {
-        this(reader, configuration, resource, sqlFragments);
-        this.builderAssistant.setCurrentNamespace(namespace);
-    }
-
-    @Deprecated
-    public XMLMapperBuilder(Reader reader, Configuration configuration, String resource, Map<String, XNode> sqlFragments) {
-        this(new XPathParser(reader, true, configuration.getVariables(), new XMLMapperEntityResolver()),
-                configuration, resource, sqlFragments);
-    }
-
-    public XMLMapperBuilder(InputStream inputStream, Configuration configuration, String resource, Map<String, XNode> sqlFragments, String namespace) {
-        this(inputStream, configuration, resource, sqlFragments);
-        this.builderAssistant.setCurrentNamespace(namespace);
-    }
-
-    public XMLMapperBuilder(InputStream inputStream, Configuration configuration, String resource, Map<String, XNode> sqlFragments) {
-        this(new XPathParser(inputStream, true, configuration.getVariables(), new XMLMapperEntityResolver()),
-                configuration, resource, sqlFragments);
-    }
 
     private XMLMapperBuilder(XPathParser parser, Configuration configuration, String resource, Map<String, XNode> sqlFragments) {
         super(configuration);
@@ -121,9 +107,10 @@ public class XMLMapperBuilder extends BaseBuilder {
     //解析
     public void parse() {
         //如果没有加载过再加载，防止重复加载
-        if (!configuration.isResourceLoaded(resource)) {
-            //配置mapper
+        boolean resourceLoaded = configuration.isResourceLoaded(resource);
+        if (!resourceLoaded) {
             XNode mapperNode = parser.evalNode("/mapper");
+            //解析配置mapper
             configurationElement(mapperNode);
             //标记一下，已经加载过了
             configuration.addLoadedResource(resource);
@@ -155,11 +142,11 @@ public class XMLMapperBuilder extends BaseBuilder {
                 throw new BuilderException("Mapper's namespace cannot be empty");
             }
             builderAssistant.setCurrentNamespace(namespace);
-            //2.配置cache-ref
+            //2.配置cache-ref，二级缓存
             //<cache-ref namespace="com.someone.application.data.SomeMapper"/>
             XNode cacheRefNode = mapperNode.evalNode("cache-ref");
             cacheRefElement(cacheRefNode);
-            //3.<cache flushInterval="3600000"/>
+            //3.<cache flushInterval="3600000"/> ，二级缓存
             XNode cacheNode = mapperNode.evalNode("cache");
             cacheElement(cacheNode);
             //4.配置parameterMap(已经废弃,老式风格的参数映射)
@@ -256,7 +243,8 @@ public class XMLMapperBuilder extends BaseBuilder {
         if (cacheRefNote != null) {
             //增加cache-ref
             String cacheRefNamespace = cacheRefNote.getStringAttribute("namespace");
-            configuration.addCacheRef(builderAssistant.getCurrentNamespace(), cacheRefNamespace);
+            String currentNamespace = builderAssistant.getCurrentNamespace();
+            configuration.addCacheRef(currentNamespace, cacheRefNamespace);
             CacheRefResolver cacheRefResolver = new CacheRefResolver(builderAssistant, cacheRefNamespace);
             try {
                 cacheRefResolver.resolveCacheRef();
@@ -273,25 +261,27 @@ public class XMLMapperBuilder extends BaseBuilder {
     //  size="512"
     //  readOnly="true"/>
     private void cacheElement(XNode cacheNode) throws Exception {
-        if (cacheNode != null) {
-            //默认类型：永久
-            String type = cacheNode.getStringAttribute("type", "PERPETUAL");
-            Class<? extends Cache> typeClass = typeAliasRegistry.resolveAlias(type);
-            //回收策略
-            String eviction = cacheNode.getStringAttribute("eviction", "LRU");
-            Class<? extends Cache> evictionClass = typeAliasRegistry.resolveAlias(eviction);
-            Long flushInterval = cacheNode.getLongAttribute("flushInterval");
-            Integer size = cacheNode.getIntAttribute("size");
-            boolean readWrite = !cacheNode.getBooleanAttribute("readOnly", false);
-            boolean blocking = cacheNode.getBooleanAttribute("blocking", false);
-            //读入额外的配置信息，易于第三方的缓存扩展,例:
-            //    <cache type="com.domain.something.MyCustomCache">
-            //      <property name="cacheFile" value="/tmp/my-custom-cache.tmp"/>
-            //    </cache>
-            Properties props = cacheNode.getChildrenAsProperties();
-            //调用builderAssistant.useNewCache
-            builderAssistant.useNewCache(typeClass, evictionClass, flushInterval, size, readWrite, blocking, props);
+        if (cacheNode == null) {
+            //没有配置，则该 mapper.xml 肯定没有二级缓存
+            return;
         }
+        //默认类型：永久
+        String type = cacheNode.getStringAttribute("type", "PERPETUAL");
+        Class<? extends Cache> typeClass = typeAliasRegistry.resolveAlias(type);
+        //回收策略
+        String eviction = cacheNode.getStringAttribute("eviction", "LRU");
+        Class<? extends Cache> evictionClass = typeAliasRegistry.resolveAlias(eviction);
+        Long flushInterval = cacheNode.getLongAttribute("flushInterval");
+        Integer size = cacheNode.getIntAttribute("size");
+        boolean readWrite = !cacheNode.getBooleanAttribute("readOnly", false);
+        boolean blocking = cacheNode.getBooleanAttribute("blocking", false);
+        //读入额外的配置信息，易于第三方的缓存扩展,例:
+        //    <cache type="com.domain.something.MyCustomCache">
+        //      <property name="cacheFile" value="/tmp/my-custom-cache.tmp"/>
+        //    </cache>
+        Properties props = cacheNode.getChildrenAsProperties();
+        //调用builderAssistant.useNewCache
+        builderAssistant.useNewCache(typeClass, evictionClass, flushInterval, size, readWrite, blocking, props);
     }
 
     //4.配置parameterMap
@@ -557,28 +547,55 @@ public class XMLMapperBuilder extends BaseBuilder {
         return null;
     }
 
+    /**
+     * @see MapperAnnotationBuilder#loadXmlResource()
+     */
     private void bindMapperForNamespace() {
-        String namespace = builderAssistant.getCurrentNamespace();//org.apache.ibatis.submitted.force_flush_on_select.PersonMapper
-        if (namespace != null) {
-            Class<?> boundType = null;
-            try {
-                //命名空间类
-                boundType = Resources.classForName(namespace);
-            } catch (ClassNotFoundException e) {
-                //ignore, bound type is not required
-            }
-            if (boundType != null) {
-                boolean hasMapper = configuration.hasMapper(boundType);
-                //避免重复添加
-                if (!hasMapper) {
-                    // Spring may not know the real resource name so we set a flag
-                    // to prevent loading again this resource from the mapper interface
-                    // look at MapperAnnotationBuilder#loadXmlResource
-                    configuration.addLoadedResource("namespace:" + namespace);
-                    configuration.addMapper(boundType);
-                }
+        //org.apache.ibatis.submitted.force_flush_on_select.PersonMapper
+        String namespace = builderAssistant.getCurrentNamespace();
+        if (namespace == null) {
+            return;
+        }
+        //对应的映射接口
+        Class<?> boundType = null;
+        try {
+            //命名空间类：对应的映射接口
+            boundType = Resources.classForName(namespace);
+        } catch (ClassNotFoundException e) {
+            //ignore, bound type is not required
+        }
+        if (boundType != null) {
+            boolean hasMapper = configuration.hasMapper(boundType);
+            //避免重复添加
+            if (!hasMapper) {
+                // Spring may not know the real resource name so we set a flag
+                // to prevent loading again this resource from the mapper interface
+                // look at MapperAnnotationBuilder#loadXmlResource
+                configuration.addLoadedResource("namespace:" + namespace);
+                configuration.addMapper(boundType);
             }
         }
     }
 
+    @Deprecated
+    public XMLMapperBuilder(Reader reader, Configuration configuration, String resource, Map<String, XNode> sqlFragments, String namespace) {
+        this(reader, configuration, resource, sqlFragments);
+        this.builderAssistant.setCurrentNamespace(namespace);
+    }
+
+    @Deprecated
+    public XMLMapperBuilder(Reader reader, Configuration configuration, String resource, Map<String, XNode> sqlFragments) {
+        this(new XPathParser(reader, true, configuration.getVariables(), new XMLMapperEntityResolver()),
+                configuration, resource, sqlFragments);
+    }
+
+    public XMLMapperBuilder(InputStream inputStream, Configuration configuration, String resource, Map<String, XNode> sqlFragments, String namespace) {
+        this(inputStream, configuration, resource, sqlFragments);
+        this.builderAssistant.setCurrentNamespace(namespace);
+    }
+
+    public XMLMapperBuilder(InputStream inputStream, Configuration configuration, String resource, Map<String, XNode> sqlFragments) {
+        this(new XPathParser(inputStream, true, configuration.getVariables(), new XMLMapperEntityResolver()),
+                configuration, resource, sqlFragments);
+    }
 }

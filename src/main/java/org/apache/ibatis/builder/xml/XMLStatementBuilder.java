@@ -78,9 +78,6 @@ public class XMLStatementBuilder extends BaseBuilder {
     //        </selectKey>
     //        insert into t_user (username,password,create_date) values(#{username},#{password},#{createDate})
     //    </insert>
-    //————————————————
-    //版权声明：本文为CSDN博主「第一小菜鸟」的原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接及本声明。
-    //原文链接：https://blog.csdn.net/xu1916659422/article/details/77921912
     public void parseStatementNode() {
         //<delete id="deleteAuthor" parameterType="int">
         String id = context.getStringAttribute("id");
@@ -100,7 +97,7 @@ public class XMLStatementBuilder extends BaseBuilder {
         //参数类型
         //<update id="updateAuthor" parameterType="org.apache.ibatis.domain.blog.Author">
         String parameterType = context.getStringAttribute("parameterType");
-        //参数
+        //参数类型
         Class<?> parameterTypeClass = resolveClass(parameterType);
         //引用外部的 resultMap(高级功能)
         String resultMap = context.getStringAttribute("resultMap");
@@ -114,18 +111,20 @@ public class XMLStatementBuilder extends BaseBuilder {
         Class<?> resultTypeClass = resolveClass(resultType);
         //结果集类型，FORWARD_ONLY|SCROLL_SENSITIVE|SCROLL_INSENSITIVE 中的一种
         String resultSetType = context.getStringAttribute("resultSetType");
+        ResultSetType resultSetTypeEnum = resolveResultSetType(resultSetType);
         //语句类型, STATEMENT|PREPARED|CALLABLE 的一种
         //默认 PREPARED
-        StatementType statementType = StatementType.valueOf(context.getStringAttribute("statementType", StatementType.PREPARED.toString()));
-        ResultSetType resultSetTypeEnum = resolveResultSetType(resultSetType);
+        String statementTypeConfig = context.getStringAttribute("statementType", StatementType.PREPARED.toString());
+        StatementType statementType = StatementType.valueOf(statementTypeConfig);
 
         //获取命令类型(select|insert|update|delete)
         String nodeName = context.getNode().getNodeName();
         SqlCommandType sqlCommandType = SqlCommandType.valueOf(nodeName.toUpperCase(Locale.ENGLISH));
+        //是否是查询函数
         boolean isSelect = (sqlCommandType == SqlCommandType.SELECT);
-        //如果是查询，默认不刷新缓存
+        //如果是查询，默认不刷新缓存，当然也可以指定刷新
         boolean flushCache = context.getBooleanAttribute("flushCache", !isSelect);
-        //是否要缓存select结果,如果是查询，默认使用缓存
+        //是否要缓存select结果,如果是查询，默认使用缓存，当然可以指定不用缓存
         boolean useCache = context.getBooleanAttribute("useCache", isSelect);
         //仅针对嵌套结果 select 语句适用：如果为 true，就是假设包含了嵌套结果集或是分组了，这样的话当返回一个主结果行的时候，就不会发生有对前面结果集的引用的情况。
         //这就使得在获取嵌套的结果集的时候不至于导致内存不够用。默认值：false。

@@ -21,26 +21,27 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
 
     private static final long serialVersionUID = -6424540398559729838L;
 
+    /**
+     * 构造器初始化
+     */
     private final SqlSession sqlSession;
 
     /**
      * mapper/DAO接口类型
+     * 构造器初始化
      */
     private final Class<T> mapperInterface;
 
+    /**
+     * 构造器初始化
+     */
     private final Map<Method, MapperMethod> methodCache;
-
-    public MapperProxy(SqlSession sqlSession, Class<T> mapperInterface, Map<Method, MapperMethod> methodCache) {
-        this.sqlSession = sqlSession;
-        this.mapperInterface = mapperInterface;
-        this.methodCache = methodCache;
-    }
 
     /**
      * java动态代理，如果sqlSession.getMapper(Mapper.class)获取到的映射接口去操作的话，就会通过该动态代理生成mapper接口的实例
      *
      * @param proxy MapperProxy 实例
-     * @param method mapper接口的某一个方法
+     * @param method mapper接口的某一个方法对象
      * @param args mapper接口的某一个方法的入参数
      * @return 函数执行结果
      * @throws Throwable 异常
@@ -63,7 +64,7 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
         }
         //这里优化了，去缓存中找MapperMethod
         final MapperMethod mapperMethod = cachedMapperMethod(method);
-        //执行
+        //通过 org.apache.ibatis.binding.MapperMethod.execute 执行数据库操作，最终还是通过 sqlSession 的
         return mapperMethod.execute(sqlSession, args);
     }
 
@@ -82,5 +83,11 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
             methodCache.put(method, mapperMethod);
         }
         return mapperMethod;
+    }
+
+    public MapperProxy(SqlSession sqlSession, Class<T> mapperInterface, Map<Method, MapperMethod> methodCache) {
+        this.sqlSession = sqlSession;
+        this.mapperInterface = mapperInterface;
+        this.methodCache = methodCache;
     }
 }

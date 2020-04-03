@@ -1,5 +1,6 @@
 package org.apache.ibatis.binding;
 
+import lombok.Getter;
 import org.apache.ibatis.session.SqlSession;
 
 import java.lang.reflect.Method;
@@ -17,7 +18,10 @@ public class MapperProxyFactory<T> {
 
     /**
      * DAO.class
+     * mapper.xml 文件的 namespace 对应的 接口类型
+     * 构造器中初始化
      */
+    @Getter
     private final Class<T> mapperInterfaceClass;
 
     /**
@@ -30,18 +34,18 @@ public class MapperProxyFactory<T> {
      * 避免每次调用相同的方法的时候都需要重新进行方法的生成。很明显，方法的生成比较复杂，会消耗一定的时间，
      * 将其保存在缓存集合中备用，可以极大的解决这种时耗问题。
      */
+    @Getter
     private Map<Method, MapperMethod> methodCache = new ConcurrentHashMap<Method, MapperMethod>();
 
-    public MapperProxyFactory(Class<T> mapperInterface) {
-        this.mapperInterfaceClass = mapperInterface;
-    }
-
-    public Class<T> getMapperInterface() {
-        return mapperInterfaceClass;
-    }
-
-    public Map<Method, MapperMethod> getMethodCache() {
-        return methodCache;
+    /**
+     * 一般通过该方法获取代理的mapper对象
+     *
+     * @param sqlSession 对话
+     * @return mapper代理实例对象
+     */
+    public T newInstance(SqlSession sqlSession) {
+        final MapperProxy<T> mapperProxy = new MapperProxy<T>(sqlSession, mapperInterfaceClass, methodCache);
+        return newInstance(mapperProxy);
     }
 
     @SuppressWarnings("unchecked")
@@ -52,8 +56,7 @@ public class MapperProxyFactory<T> {
         return (T) Proxy.newProxyInstance(classLoader, classes, mapperProxy);
     }
 
-    public T newInstance(SqlSession sqlSession) {
-        final MapperProxy<T> mapperProxy = new MapperProxy<T>(sqlSession, mapperInterfaceClass, methodCache);
-        return newInstance(mapperProxy);
+    public MapperProxyFactory(Class<T> mapperInterface) {
+        this.mapperInterfaceClass = mapperInterface;
     }
 }

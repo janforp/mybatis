@@ -49,7 +49,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
     private String resource;
 
     /**
-     * 该 statement 语句对应的缓存
+     * 对应 namespace 的二级缓存，如果该 mapper.xml 配置了 cache-ref,则该实例就是引用的缓存实例
      */
     private Cache currentCache;
 
@@ -105,6 +105,12 @@ public class MapperBuilderAssistant extends BaseBuilder {
         return currentNamespace + "." + base;
     }
 
+    /**
+     * 二级缓存引用
+     *
+     * @param namespace 命名空间
+     * @return 一个缓存实例
+     */
     public Cache useCacheRef(String namespace) {
         if (namespace == null) {
             throw new BuilderException("cache-ref element requires a namespace attribute.");
@@ -119,12 +125,14 @@ public class MapperBuilderAssistant extends BaseBuilder {
             unresolvedCacheRef = false;
             return cache;
         } catch (IllegalArgumentException e) {
+            //该异常会被 org.apache.ibatis.builder.xml.XMLMapperBuilder.cacheRefElement 捕获，
+            //然后该 namespace 会被 configuration.addIncompleteCacheRef(cacheRefResolver);
             throw new IncompleteElementException("No cache for namespace '" + namespace + "' could be found.", e);
         }
     }
 
     /**
-     * 生成cache
+     * 生成 namespace 的二级 cache 实例
      *
      * @param typeClass 缓存类型
      * @param evictionClass 回收策略类

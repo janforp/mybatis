@@ -27,6 +27,8 @@ import java.util.TreeMap;
 /**
  * DAO/MAPPER.class 中定义的函数
  *
+ * 这些函数最终还是通过 sqlSession 来执行数据库操作
+ *
  * @author Clinton Begin
  * @author Eduardo Macarron
  * @author Lasse Voss
