@@ -19,9 +19,11 @@ package org.apache.ibatis.submitted.selectkey;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectKey;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.List;
 import java.util.Map;
 
 public interface AnnotatedMapper {
@@ -47,6 +49,9 @@ public interface AnnotatedMapper {
      * 主键有2个字段
      */
     int insertTable2WithSelectKeyWithKeyMapXml(Name name);
+
+    int insertTable2WithGeneratedKeyXmlBatch(@Param("nameList") List<Name> nameList);
+
 
     @Insert("insert into table2 (name) values(#{name})")
     @SelectKey(statement = "select id as nameId, name_fred as generatedName from table2 where id = identity()", keyProperty = "nameId,generatedName", before = false, resultType = Name.class)

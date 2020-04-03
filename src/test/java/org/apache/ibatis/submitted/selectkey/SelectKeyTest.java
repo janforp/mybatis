@@ -13,7 +13,9 @@ import org.junit.Test;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -217,6 +219,34 @@ public class SelectKeyTest {
             AnnotatedMapper mapper = sqlSession.getMapper(AnnotatedMapper.class);
             int rows = mapper.insertTable2WithGeneratedKeyXml(name);
             assertEquals(1, rows);
+            assertEquals(22, name.getNameId());
+            assertEquals("barney_fred", name.getGeneratedName());
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    /**
+     * 没有指定 selectKey 的主键填充
+     */
+    @Test
+    public void testAnnotatedInsertTable2WithGeneratedKeyXml2() {
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+
+        try {
+            Name name = new Name();
+            name.setName("barney");
+            AnnotatedMapper mapper = sqlSession.getMapper(AnnotatedMapper.class);
+            List<Name> nameList = new ArrayList<Name>(2);
+            nameList.add(name);
+
+            Name name2 = new Name();
+            name2.setName("janita");
+            nameList.add(name2);
+
+            //TODO 如何使用 ？
+            int rows = mapper.insertTable2WithGeneratedKeyXmlBatch(nameList);
+            assertEquals(2, rows);
             assertEquals(22, name.getNameId());
             assertEquals("barney_fred", name.getGeneratedName());
         } finally {

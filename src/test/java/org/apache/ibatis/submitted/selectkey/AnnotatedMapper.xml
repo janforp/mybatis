@@ -21,6 +21,14 @@
         values (#{name})
     </insert>
 
+    <insert id="insertTable2WithGeneratedKeyXmlBatch" useGeneratedKeys="true" keyProperty="nameId,generatedName" keyColumn="ID,NAME_FRED" parameterType="arraylist">
+        insert into table2 (name) values
+        <foreach collection="nameList" item="name" open="(" close=")" separator=",">
+            (#{name.name})
+        </foreach>
+    </insert>
+
+
     <update id="updateTable2WithSelectKeyWithKeyMapXml">
         <selectKey keyProperty="generatedName" keyColumn="NAME_FRED" order="AFTER" resultType="java.lang.String">
             select name_fred from table2 where id = #{nameId}

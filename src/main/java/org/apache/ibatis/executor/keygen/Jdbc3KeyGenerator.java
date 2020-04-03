@@ -95,13 +95,19 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
     }
 
     private TypeHandler<?>[] getTypeHandlers(TypeHandlerRegistry typeHandlerRegistry, MetaObject metaParam, String[] keyProperties) {
+
         TypeHandler<?>[] typeHandlers = new TypeHandler<?>[keyProperties.length];
+
         for (int i = 0; i < keyProperties.length; i++) {
-            if (metaParam.hasSetter(keyProperties[i])) {
-                Class<?> keyPropertyType = metaParam.getSetterType(keyProperties[i]);
-                TypeHandler<?> th = typeHandlerRegistry.getTypeHandler(keyPropertyType);
-                typeHandlers[i] = th;
+
+            String keyProperty = keyProperties[i];
+            boolean hasSetter = metaParam.hasSetter(keyProperty);
+            if (!hasSetter) {
+                continue;
             }
+            Class<?> keyPropertyType = metaParam.getSetterType(keyProperty);
+            TypeHandler<?> th = typeHandlerRegistry.getTypeHandler(keyPropertyType);
+            typeHandlers[i] = th;
         }
         return typeHandlers;
     }
