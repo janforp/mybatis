@@ -314,7 +314,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
             throw new IncompleteElementException("Cache-ref not yet resolved");
         }
 
-        //为id加上namespace前缀如：org.apache.ibatis.submitted.force_flush_on_select.PersonMapper.selectByIdFlush
+        //为id加上namespace前缀如：org.apache.ibatis.submitted.force_flush_on_select.PersonMapper.selectByIdFlush或者org.apache.ibatis.submitted.selectkey.Table1.insert!selectKey
         id = applyCurrentNamespace(id, false);
         //是否是select语句
         boolean isSelect = (sqlCommandType == SqlCommandType.SELECT);

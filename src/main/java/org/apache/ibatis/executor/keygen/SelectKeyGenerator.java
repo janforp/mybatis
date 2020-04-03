@@ -13,6 +13,14 @@ import java.sql.Statement;
 import java.util.List;
 
 /**
+ * <selectKey keyProperty="nameId,generatedName" order="AFTER" resultType="org.apache.ibatis.submitted.selectkey.Name">
+ * select id as nameId, name_fred as generatedName from table2 where id = identity()
+ * </selectKey>
+ * 的情况使用该方法
+ *
+ * 而 sql:<insert id="insertTable2WithGeneratedKeyXml" useGeneratedKeys="true" keyProperty="nameId,generatedName" keyColumn="ID,NAME_FRED"> 的情况使用该方法
+ * 使用 Jdbc3KeyGenerator
+ *
  * @author Clinton Begin
  * @author Jeff Butler
  */

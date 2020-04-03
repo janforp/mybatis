@@ -117,6 +117,10 @@ public class Configuration {
 
     protected final Map<String, ParameterMap> parameterMaps = new StrictMap<ParameterMap>("Parameter Maps collection");
 
+    /**
+     * key:org.apache.ibatis.submitted.selectkey.Table1.insert!selectKey
+     * value:主键生成器
+     */
     protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<KeyGenerator>("Key Generators collection");
 
     /**

@@ -151,13 +151,22 @@ public class XMLStatementBuilder extends BaseBuilder {
         String keyColumn = context.getStringAttribute("keyColumn");
         KeyGenerator keyGenerator;
         String keyStatementId = id + SelectKeyGenerator.SELECT_KEY_SUFFIX;
+        //org.apache.ibatis.submitted.selectkey.Table1.insert!selectKey
         keyStatementId = builderAssistant.applyCurrentNamespace(keyStatementId, true);
-        if (configuration.hasKeyGenerator(keyStatementId)) {
+        boolean hasKeyGenerator = configuration.hasKeyGenerator(keyStatementId);
+        if (hasKeyGenerator) {
+            //通过 <selectKey>
             keyGenerator = configuration.getKeyGenerator(keyStatementId);
         } else {
-            keyGenerator = context.getBooleanAttribute("useGeneratedKeys",
-                    configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType))
-                    ? new Jdbc3KeyGenerator() : new NoKeyGenerator();
+            //直接在sql上指定 <insert id="insertTable2WithGeneratedKeyXml" useGeneratedKeys="true" keyProperty="nameId,generatedName" keyColumn="ID,NAME_FRED">
+            //则使用 Jdbc3KeyGenerator 自增
+
+            //setting中配置了能够使用自增主键，并且该sql是插入类型，则默认使用自增主键，否则还是以该sql的具体配置为准
+            boolean defaultUseKeyGenerator = configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType);
+            //该sql的具体配置，如果没配置，则取 defaultUseKeyGenerator
+            Boolean useGeneratedKeys = context.getBooleanAttribute("useGeneratedKeys", defaultUseKeyGenerator);
+            //如果要使用主键，则用 Jdbc3KeyGenerator，否则传一个自增主键的空实现实例
+            keyGenerator = useGeneratedKeys ? new Jdbc3KeyGenerator() : new NoKeyGenerator();
         }
 
         //又去调助手类
@@ -201,13 +210,13 @@ public class XMLStatementBuilder extends BaseBuilder {
      * 解析 <selectKey/>如：
      *
      * <selectKey keyProperty="id" resultType="int" order="BEFORE">
-     *     <if test="_databaseId == 'oracle'">
-     *       select seq_users.nextval from dual
-     *     </if>
-     *     <if test="_databaseId == 'db2'">
-     *       select nextval for seq_users from sysibm.sysdummy1"
-     *     </if>
-     *   </selectKey>
+     * <if test="_databaseId == 'oracle'">
+     * select seq_users.nextval from dual
+     * </if>
+     * <if test="_databaseId == 'db2'">
+     * select nextval for seq_users from sysibm.sysdummy1"
+     * </if>
+     * </selectKey>
      *
      * @param id sql的id + "!selectKey"如：insertOne!selectKey
      * @param keyNode <selectKey/>
@@ -246,11 +255,12 @@ public class XMLStatementBuilder extends BaseBuilder {
                 fetchSize, timeout, parameterMap, parameterTypeClass, resultMap, keyResultTypeClass,
                 resultSetTypeEnum, flushCache, useCache, resultOrdered,
                 keyGenerator, keyProperty, keyColumn, databaseId, langDriver, null);
-
+        //org.apache.ibatis.submitted.selectkey.Table1.insert!selectKey
         id = builderAssistant.applyCurrentNamespace(id, false);
 
         MappedStatement keyStatement = configuration.getMappedStatement(id, false);
         SelectKeyGenerator selectKeyGenerator = new SelectKeyGenerator(keyStatement, executeBefore);
+        //丢进map
         configuration.addKeyGenerator(id, selectKeyGenerator);
     }
 

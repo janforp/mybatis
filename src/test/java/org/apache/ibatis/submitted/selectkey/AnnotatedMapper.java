@@ -34,12 +34,18 @@ public interface AnnotatedMapper {
     @Options(useGeneratedKeys = true, keyProperty = "nameId,generatedName", keyColumn = "ID,NAME_FRED")
     int insertTable2WithGeneratedKey(Name name);
 
+    /**
+     * 没有指定 selectKey 的主键填充
+     */
     int insertTable2WithGeneratedKeyXml(Name name);
 
     @Insert("insert into table2 (name) values(#{name})")
     @SelectKey(statement = "select id, name_fred from table2 where id = identity()", keyProperty = "nameId,generatedName", keyColumn = "ID,NAME_FRED", before = false, resultType = Map.class)
     int insertTable2WithSelectKeyWithKeyMap(Name name);
 
+    /**
+     * 主键有2个字段
+     */
     int insertTable2WithSelectKeyWithKeyMapXml(Name name);
 
     @Insert("insert into table2 (name) values(#{name})")
