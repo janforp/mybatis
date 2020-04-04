@@ -33,8 +33,8 @@ import org.apache.ibatis.session.Configuration;
 public class RawLanguageDriver extends XMLLanguageDriver {
 
     @Override
-    public SqlSource createSqlSource(Configuration configuration, XNode script, Class<?> parameterType) {
-        SqlSource source = super.createSqlSource(configuration, script, parameterType);
+    public SqlSource createSqlSource(Configuration configuration, XNode methodNode, Class<?> parameterType) {
+        SqlSource source = super.createSqlSource(configuration, methodNode, parameterType);
         checkIsNotDynamic(source);
         return source;
     }

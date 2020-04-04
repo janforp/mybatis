@@ -30,10 +30,16 @@ public class XMLLanguageDriver implements LanguageDriver {
         return new DefaultParameterHandler(mappedStatement, parameterObject, boundSql);
     }
 
+    /**
+     * @param configuration The MyBatis configuration
+     * @param methodNode mapper.xml 中的每一个方法如：select * from users where id = #{id}，此处的参数还没有被 ? 替换
+     * @param parameterType input parameter type got from a mapper method or specified in the parameterType xml attribute. Can be null.
+     * @return mapper.xml 文件中的一个方法对应的sql
+     */
     @Override
-    public SqlSource createSqlSource(Configuration configuration, XNode script, Class<?> parameterType) {
+    public SqlSource createSqlSource(Configuration configuration, XNode methodNode, Class<?> parameterType) {
         //用XML脚本构建器解析
-        XMLScriptBuilder builder = new XMLScriptBuilder(configuration, script, parameterType);
+        XMLScriptBuilder builder = new XMLScriptBuilder(configuration, methodNode, parameterType);
         return builder.parseScriptNode();
     }
 

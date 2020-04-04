@@ -59,7 +59,7 @@ public class XMLScriptBuilder extends BaseBuilder {
         //        SELECT id, firstName, lastName
         //        FROM person
         //        WHERE id = #{id}
-        //    </select>
+        //</select>
         List<SqlNode> sqlNodeList = parseDynamicTags(xmlNode);
         MixedSqlNode rootSqlNode = new MixedSqlNode(sqlNodeList);
         SqlSource sqlSource;
@@ -71,54 +71,86 @@ public class XMLScriptBuilder extends BaseBuilder {
         return sqlSource;
     }
 
-    //<update parameterType="org.apache.ibatis.domain.blog.Author" id="updateAuthorIfNecessary">
-    //<set>
-    //<if test="username != null">username=#{username},</if>
-    //<if test="password != null">password=#{password},</if>
-    //<if test="email != null">email=#{email},</if>
-    //<if test="bio != null">bio=#{bio}</if>
-    //</set>
-    //</update>
-
     /**
      * 解析动态标签
      *
-     * @param node 被解析的node
+     * //<update parameterType="org.apache.ibatis.domain.blog.Author" id="updateAuthorIfNecessary">
+     * //<set>
+     * //<if test="username != null">username=#{username},</if>
+     * //<if test="password != null">password=#{password},</if>
+     * //<if test="email != null">email=#{email},</if>
+     * //<if test="bio != null">bio=#{bio}</if>
+     * //</set>
+     * //</update>
+     *
+     * @param methodXNode 被解析的node，一般情况是一个 mapper.xml 文件中的一个方法
      * @return 标签列表
      */
-    List<SqlNode> parseDynamicTags(XNode node) {
-        List<SqlNode> contents = new ArrayList<SqlNode>();
-        NodeList children = node.getNode().getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
+    List<SqlNode> parseDynamicTags(XNode methodXNode) {
+        //返回
+        List<SqlNode> sqlNodeList = new ArrayList<SqlNode>();
+
+        Node methodNode = methodXNode.getNode();
+        NodeList children = methodNode.getChildNodes();
+        int childrenLength = children.getLength();
+
+        //试图解析sql中的各种标签，动态标签
+        for (int i = 0; i < childrenLength; i++) {
+
             Node item = children.item(i);
+
             //<if test="username != null">username=#{username},</if>
-            XNode child = node.newXNode(item);
-            short childNodeType = child.getNode().getNodeType();
+            XNode child = methodXNode.newXNode(item);
+
+            Node node = child.getNode();
+
+            short childNodeType = node.getNodeType();
             //CDATASection || Text
             boolean isTextOrCdata = (childNodeType == Node.CDATA_SECTION_NODE || childNodeType == Node.TEXT_NODE);
+
             if (isTextOrCdata) {
                 String data = child.getStringBody("");
                 TextSqlNode textSqlNode = new TextSqlNode(data);
-                if (textSqlNode.isDynamic()) {
-                    contents.add(textSqlNode);
+
+                //先计算，再返回，如果文本有占位符，则为动态的，否则，静态
+                boolean dynamic = textSqlNode.isDynamic();
+                if (dynamic) {
+                    sqlNodeList.add(textSqlNode);
                     isDynamic = true;
                 } else {
-                    contents.add(new StaticTextSqlNode(data));
+                    StaticTextSqlNode staticTextSqlNode = new StaticTextSqlNode(data);
+                    sqlNodeList.add(staticTextSqlNode);
                 }
-            } else if (childNodeType == Node.ELEMENT_NODE) { // issue #628
+            }
+
+            //子类型还是 一个元素如：<if>
+            if (childNodeType == Node.ELEMENT_NODE) {
                 //Element
-                String nodeName = child.getNode().getNodeName();
+                String nodeName = node.getNodeName();
+
+                //获取具体动态标签处理器
+                //Map<String, NodeHandler> map = new HashMap<String, NodeHandler>();
+                //        map.put("trim", new TrimHandler());
+                //        map.put("where", new WhereHandler());
+                //        map.put("set", new SetHandler());
+                //        map.put("foreach", new ForEachHandler());
+                //        map.put("if", new IfHandler());
+                //        map.put("choose", new ChooseHandler());
+                //        map.put("when", new IfHandler());
+                //        map.put("otherwise", new OtherwiseHandler());
+                //        map.put("bind", new BindHandler());
+                //        return map.get(nodeName);
                 NodeHandler handler = nodeHandlers(nodeName);
-                //瞎几把写的nodeName,报错
+                //瞎几把写的 动态标签,报错
                 if (handler == null) {
                     throw new BuilderException("Unknown element <" + nodeName + "> in SQL statement.");
                 }
-                handler.handleNode(child, contents);
+                handler.handleNode(child, sqlNodeList);
                 //有这些元素，必须是动态sql
                 isDynamic = true;
             }
         }
-        return contents;
+        return sqlNodeList;
     }
 
     /**
@@ -144,13 +176,19 @@ public class XMLScriptBuilder extends BaseBuilder {
 
     private interface NodeHandler {
 
+        /**
+         * 被该处理器处理的node，处理之后放进该集合，后面直接使用
+         *
+         * @param nodeToHandle 被该处理器处理的node
+         * @param targetContents 处理之后放进该集合，后面直接使用
+         */
         void handleNode(XNode nodeToHandle, List<SqlNode> targetContents);
     }
 
     /**
      * <bind name="pattern" value="'%' + _parameter + '%'" />
      */
-    private class BindHandler implements NodeHandler {
+    private static class BindHandler implements NodeHandler {
 
         public BindHandler() {
             // Prevent Synthetic Access
