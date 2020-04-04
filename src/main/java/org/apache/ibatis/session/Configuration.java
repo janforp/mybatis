@@ -295,8 +295,14 @@ public class Configuration {
     protected AutoMappingBehavior autoMappingBehavior = AutoMappingBehavior.PARTIAL;
 
     /**
-     * 配置的变量
-     * 主配置文件中配置的
+     * // this property value should be replaced on all mapper files
+     * Properties properties = new Properties();
+     * properties.put("property", "id");
+     *
+     * // create a SqlSessionFactory
+     * Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/propertiesinmapperfiles/mybatis-config.xml");
+     * SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+     * sqlSessionFactory = builder.build(reader, properties);
      */
     @Getter
     @Setter

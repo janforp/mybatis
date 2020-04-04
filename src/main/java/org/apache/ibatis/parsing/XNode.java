@@ -21,14 +21,32 @@ import java.util.Properties;
  */
 public class XNode {
 
-    //org.w3c.dom.Node
+    /**
+     * org.w3c.dom.Node
+     * 原生 xml 节点
+     */
     @Getter
     private Node node;
 
-    //以下都是预先把信息都解析好，放到map等数据结构中（内存中）
+    /**
+     * 标签名称，如：select|insert 等
+     */
     @Getter
     private String name;
 
+    /**
+     * 标签内的具体字符串
+     * 占位符已经被替换之后的，如：
+     * body 中如果是：
+     * select *
+     * from users
+     * where ${property} = #{id}
+     * 如果占位符 ${property} 对应 id 则返回：
+     * select *
+     * from users
+     * where ${property} = #{id}
+     * 否则，原样返回
+     */
     private String body;
 
     /**
@@ -38,12 +56,24 @@ public class XNode {
      */
     private Properties attributes;
 
+    /**
+     * 配置文件中的键值对
+     */
     private Properties variables;
 
-    //XPathParser方便xpath解析
+    /**
+     * XPathParser方便xpath解析
+     */
     private XPathParser xpathParser;
 
-    //在构造时就把一些信息（属性，body）全部解析好，以便我们直接通过getter函数取得
+    /**
+     * 在构造时就把一些信息（属性，body）全部解析好，以便我们直接通过getter函数取得
+     * 构造出直接可以使用的 xNode 对象
+     *
+     * @param xpathParser 解析器
+     * @param node 被解析的node
+     * @param variables 配置
+     */
     public XNode(XPathParser xpathParser, Node node, Properties variables) {
         this.xpathParser = xpathParser;
         this.node = node;
@@ -51,6 +81,98 @@ public class XNode {
         this.variables = variables;
         this.attributes = parseAttributes(node);
         this.body = parseBody(node);
+    }
+
+    /**
+     * <select id="getUser" resultType="org.apache.ibatis.submitted.propertiesinmapperfiles.User">
+     * 就就得到:id : getUser 以及 resultType:org.apache.ibatis.submitted.propertiesinmapperfiles.User 2个键值对
+     * {"resultType":"org.apache.ibatis.submitted.propertiesinmapperfiles.User","id":"getUser"}
+     */
+    private Properties parseAttributes(Node node) {
+        Properties attributes = new Properties();
+        NamedNodeMap attributeNodes = node.getAttributes();
+        if (attributeNodes == null) {
+            return attributes;
+        }
+
+        int attributeNodesLength = attributeNodes.getLength();
+        for (int i = 0; i < attributeNodesLength; i++) {
+            Node attribute = attributeNodes.item(i);
+            String nodeValue = attribute.getNodeValue();
+            //输入字符串 (name = ${username}),可能会输出(name = 张三)，当然映射中要有 key=username,value=张三
+            String value = PropertyParser.parse(nodeValue, variables);
+            String attributeNodeName = attribute.getNodeName();
+            attributes.put(attributeNodeName, value);
+        }
+        return attributes;
+    }
+
+    /**
+     * 标签内的具体字符串
+     * 占位符已经被替换之后的，如：
+     * body 中如果是：
+     * select *
+     * from users
+     * where ${property} = #{id}
+     * 如果占位符 ${property} 对应 id 则返回：
+     * select *
+     * from users
+     * where ${property} = #{id}
+     * 否则，原样返回
+     */
+    private String parseBody(Node node) {
+        //取不到body，循环取孩子的body，只要取到第一个，立即返回
+        String data = getBodyData(node);
+        if (data == null) {
+            NodeList children = node.getChildNodes();
+            int childrenLength = children.getLength();
+            for (int i = 0; i < childrenLength; i++) {
+                Node child = children.item(i);
+                /**
+                 * 得到 select|insert|update|delete 标签中的具体内容对象
+                 * [#text:
+                 *         select *
+                 *         from users
+                 *         where ${property} = #{id}
+                 *     ]
+                 */
+                data = getBodyData(child);
+                if (data != null) {
+                    break;
+                }
+            }
+        }
+        return data;
+    }
+
+    /**
+     * /**
+     * * 得到 select|insert|update|delete 标签中的具体内容对象
+     * * [#text:
+     * *         select *
+     * *         from users
+     * *         where ${property} = #{id}
+     * *     ]
+     * *
+     *
+     * @param child select|insert|update|delete 标签中的具体内容对象
+     * @return 解析，替换占位符之后的字符串
+     */
+    private String getBodyData(Node child) {
+        short nodeType = child.getNodeType();
+        if (nodeType != Node.CDATA_SECTION_NODE && nodeType != Node.TEXT_NODE) {
+            return null;
+        }
+        /**
+         *
+         select *
+         from users
+         where ${property} = #{id}
+         */
+        String data = ((CharacterData) child).getData();
+        //输入字符串 (name = ${username}),可能会输出(name = 张三)，当然映射中要有 key=username,value=张三
+        data = PropertyParser.parse(data, variables);
+        return data;
     }
 
     public XNode newXNode(Node node) {
@@ -382,53 +504,4 @@ public class XNode {
         builder.append("\n");
         return builder.toString();
     }
-
-    //以下2个方法在构造时就解析
-    private Properties parseAttributes(Node node) {
-        Properties attributes = new Properties();
-        NamedNodeMap attributeNodes = node.getAttributes();
-        if (attributeNodes == null) {
-            return attributes;
-        }
-
-        int attributeNodesLength = attributeNodes.getLength();
-        for (int i = 0; i < attributeNodesLength; i++) {
-            Node attribute = attributeNodes.item(i);
-            String nodeValue = attribute.getNodeValue();
-            //输入字符串 (name = ${username}),可能会输出(name = 张三)，当然映射中要有 key=username,value=张三
-            String value = PropertyParser.parse(nodeValue, variables);
-            String attributeNodeName = attribute.getNodeName();
-            attributes.put(attributeNodeName, value);
-        }
-        return attributes;
-    }
-
-    private String parseBody(Node node) {
-        //取不到body，循环取孩子的body，只要取到第一个，立即返回
-        String data = getBodyData(node);
-        if (data == null) {
-            NodeList children = node.getChildNodes();
-            int childrenLength = children.getLength();
-            for (int i = 0; i < childrenLength; i++) {
-                Node child = children.item(i);
-                data = getBodyData(child);
-                if (data != null) {
-                    break;
-                }
-            }
-        }
-        return data;
-    }
-
-    private String getBodyData(Node child) {
-        short nodeType = child.getNodeType();
-        if (nodeType != Node.CDATA_SECTION_NODE && nodeType != Node.TEXT_NODE) {
-            return null;
-        }
-        String data = ((CharacterData) child).getData();
-        //输入字符串 (name = ${username}),可能会输出(name = 张三)，当然映射中要有 key=username,value=张三
-        data = PropertyParser.parse(data, variables);
-        return data;
-    }
-
 }
