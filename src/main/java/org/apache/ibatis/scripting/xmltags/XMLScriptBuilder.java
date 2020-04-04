@@ -50,7 +50,7 @@ public class XMLScriptBuilder extends BaseBuilder {
     }
 
     /**
-     * 通过xml node 获取一个动态或者静态的 SqlSource
+     * TODO 通过xml node 获取一个动态或者静态的 SqlSource
      *
      * @return SqlSource
      */

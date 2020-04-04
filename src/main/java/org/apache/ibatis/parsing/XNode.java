@@ -1,5 +1,6 @@
 package org.apache.ibatis.parsing;
 
+import lombok.Getter;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -21,13 +22,20 @@ import java.util.Properties;
 public class XNode {
 
     //org.w3c.dom.Node
+    @Getter
     private Node node;
 
     //以下都是预先把信息都解析好，放到map等数据结构中（内存中）
+    @Getter
     private String name;
 
     private String body;
 
+    /**
+     * <select id="getUser" resultType="org.apache.ibatis.submitted.propertiesinmapperfiles.User">
+     * 就就得到:id : getUser 以及 resultType:org.apache.ibatis.submitted.propertiesinmapperfiles.User 2个键值对
+     * {"resultType":"org.apache.ibatis.submitted.propertiesinmapperfiles.User","id":"getUser"}
+     */
     private Properties attributes;
 
     private Properties variables;
@@ -89,6 +97,7 @@ public class XNode {
     //	  <result property="bio" column="author_bio"/>
     //	</resultMap>
     public String getValueBasedIdentifier() {
+        //TODO
         StringBuilder builder = new StringBuilder();
         XNode current = this;
         while (current != null) {
@@ -132,14 +141,6 @@ public class XNode {
 
     public XNode evalNode(String expression) {
         return xpathParser.evalNode(node, expression);
-    }
-
-    public Node getNode() {
-        return node;
-    }
-
-    public String getName() {
-        return name;
     }
 
     //以下是一些getBody的方法
@@ -319,12 +320,15 @@ public class XNode {
     public List<XNode> getChildren() {
         List<XNode> children = new ArrayList<XNode>();
         NodeList nodeList = node.getChildNodes();
-        if (nodeList != null) {
-            for (int i = 0, n = nodeList.getLength(); i < n; i++) {
-                Node node = nodeList.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    children.add(new XNode(xpathParser, node, variables));
-                }
+        if (nodeList == null) {
+            return children;
+        }
+
+        int nodeListLength = nodeList.getLength();
+        for (int i = 0, n = nodeListLength; i < n; i++) {
+            Node node = nodeList.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                children.add(new XNode(xpathParser, node, variables));
             }
         }
         return children;
@@ -380,17 +384,21 @@ public class XNode {
     }
 
     //以下2个方法在构造时就解析
-    private Properties parseAttributes(Node n) {
+    private Properties parseAttributes(Node node) {
         Properties attributes = new Properties();
-        NamedNodeMap attributeNodes = n.getAttributes();
-        if (attributeNodes != null) {
-            for (int i = 0; i < attributeNodes.getLength(); i++) {
-                Node attribute = attributeNodes.item(i);
-                String nodeValue = attribute.getNodeValue();
-                //输入字符串 (name = ${username}),可能会输出(name = 张三)，当然映射中要有 key=username,value=张三
-                String value = PropertyParser.parse(nodeValue, variables);
-                attributes.put(attribute.getNodeName(), value);
-            }
+        NamedNodeMap attributeNodes = node.getAttributes();
+        if (attributeNodes == null) {
+            return attributes;
+        }
+
+        int attributeNodesLength = attributeNodes.getLength();
+        for (int i = 0; i < attributeNodesLength; i++) {
+            Node attribute = attributeNodes.item(i);
+            String nodeValue = attribute.getNodeValue();
+            //输入字符串 (name = ${username}),可能会输出(name = 张三)，当然映射中要有 key=username,value=张三
+            String value = PropertyParser.parse(nodeValue, variables);
+            String attributeNodeName = attribute.getNodeName();
+            attributes.put(attributeNodeName, value);
         }
         return attributes;
     }
@@ -400,7 +408,8 @@ public class XNode {
         String data = getBodyData(node);
         if (data == null) {
             NodeList children = node.getChildNodes();
-            for (int i = 0; i < children.getLength(); i++) {
+            int childrenLength = children.getLength();
+            for (int i = 0; i < childrenLength; i++) {
                 Node child = children.item(i);
                 data = getBodyData(child);
                 if (data != null) {
@@ -412,14 +421,14 @@ public class XNode {
     }
 
     private String getBodyData(Node child) {
-        if (child.getNodeType() == Node.CDATA_SECTION_NODE
-                || child.getNodeType() == Node.TEXT_NODE) {
-            String data = ((CharacterData) child).getData();
-            //输入字符串 (name = ${username}),可能会输出(name = 张三)，当然映射中要有 key=username,value=张三
-            data = PropertyParser.parse(data, variables);
-            return data;
+        short nodeType = child.getNodeType();
+        if (nodeType != Node.CDATA_SECTION_NODE && nodeType != Node.TEXT_NODE) {
+            return null;
         }
-        return null;
+        String data = ((CharacterData) child).getData();
+        //输入字符串 (name = ${username}),可能会输出(name = 张三)，当然映射中要有 key=username,value=张三
+        data = PropertyParser.parse(data, variables);
+        return data;
     }
 
 }

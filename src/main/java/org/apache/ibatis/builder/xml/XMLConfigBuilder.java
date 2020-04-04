@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -595,47 +596,60 @@ public class XMLConfigBuilder extends BaseBuilder {
     //	  <package name="org.mybatis.builder"/>
     //	</mappers>
     private void mapperElement(XNode mappersNode) throws Exception {
-        if (mappersNode != null) {
-            List<XNode> children = mappersNode.getChildren();
-            for (XNode child : children) {
-                if ("package".equals(child.getName())) {
-                    //10.4自动扫描包下所有映射器
-                    String mapperPackage = child.getStringAttribute("name");
-                    //TODO
-                    configuration.addMappers(mapperPackage);
-                } else {
-                    //<mapper resource="org/mybatis/builder/AuthorMapper.xml"/>
-                    String resource = child.getStringAttribute("resource");
-                    //<mapper url="file:///var/mappers/AuthorMapper.xml"/>
-                    String url = child.getStringAttribute("url");
-                    //<mapper class="org.mybatis.builder.AuthorMapper"/>
-                    String mapperClass = child.getStringAttribute("class");
-                    if (resource != null && url == null && mapperClass == null) {
-                        //10.1使用类路径
-                        ErrorContext.instance().resource(resource);//<mapper resource="org/apache/ibatis/submitted/force_flush_on_select/Person.xml"/>
-                        InputStream inputStream = Resources.getResourceAsStream(resource);
-                        //映射器比较复杂，调用XMLMapperBuilder
-                        //注意在for循环里每个mapper都重新new一个XMLMapperBuilder，来解析
-                        XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
-                        //解析mapper文件
-                        mapperParser.parse();
-                    } else if (resource == null && url != null && mapperClass == null) {
-                        //10.2使用绝对url路径
-                        ErrorContext.instance().resource(url);
-                        InputStream inputStream = Resources.getUrlAsStream(url);
-                        //映射器比较复杂，调用XMLMapperBuilder
-                        XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, url, configuration.getSqlFragments());
-                        mapperParser.parse();
-                    } else if (resource == null && url == null && mapperClass != null) {
-                        //10.3使用java类名
-                        Class<?> mapperInterface = Resources.classForName(mapperClass);
-                        //直接把这个映射加入配置
-                        configuration.addMapper(mapperInterface);
-                    } else {
-                        throw new BuilderException("A mapper element may only specify a url, resource or class, but not more than one.");
-                    }
-                }
+        if (mappersNode == null) {
+            return;
+        }
+        List<XNode> children = mappersNode.getChildren();
+        for (XNode child : children) {
+            if ("package".equals(child.getName())) {
+                //10.4自动扫描包下所有映射器
+                String mapperPackage = child.getStringAttribute("name");
+                //TODO
+                configuration.addMappers(mapperPackage);
+                continue;
             }
+
+
+            //<mapper resource="org/mybatis/builder/AuthorMapper.xml"/>
+            String resource = child.getStringAttribute("resource");
+            //<mapper url="file:///var/mappers/AuthorMapper.xml"/>
+            String url = child.getStringAttribute("url");
+            //<mapper class="org.mybatis.builder.AuthorMapper"/>
+            String mapperClass = child.getStringAttribute("class");
+            Map<String, XNode> sqlFragments = configuration.getSqlFragments();
+
+            if (resource != null && url == null && mapperClass == null) {
+                //10.1使用类路径
+                //<mapper resource="org/apache/ibatis/submitted/force_flush_on_select/Person.xml"/>
+                ErrorContext.instance().resource(resource);
+                InputStream inputStream = Resources.getResourceAsStream(resource);
+                //映射器比较复杂，调用XMLMapperBuilder
+                //注意在for循环里每个mapper都重新new一个XMLMapperBuilder，来解析
+                XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, sqlFragments);
+                //解析mapper文件
+                mapperParser.parse();
+                return;
+            }
+
+            if (resource == null && url != null && mapperClass == null) {
+                //10.2使用绝对url路径
+                ErrorContext.instance().resource(url);
+                InputStream inputStream = Resources.getUrlAsStream(url);
+                //映射器比较复杂，调用XMLMapperBuilder
+                XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, url, sqlFragments);
+                mapperParser.parse();
+                return;
+            }
+
+            if (resource == null && url == null && mapperClass != null) {
+                //10.3使用java类名
+                Class<?> mapperInterface = Resources.classForName(mapperClass);
+                //直接把这个映射加入配置
+                configuration.addMapper(mapperInterface);
+                return;
+            }
+
+            throw new BuilderException("A mapper element may only specify a url, resource or class, but not more than one.");
         }
     }
 

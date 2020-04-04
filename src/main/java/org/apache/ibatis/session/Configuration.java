@@ -296,6 +296,7 @@ public class Configuration {
 
     /**
      * 配置的变量
+     * 主配置文件中配置的
      */
     @Getter
     @Setter

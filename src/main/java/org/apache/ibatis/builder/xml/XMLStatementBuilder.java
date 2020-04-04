@@ -22,32 +22,37 @@ import java.util.Locale;
 /**
  * XML语句构建器，建造者模式,继承BaseBuilder
  *
+ * 解析mapper文件的每一个方法 配置select|insert|update|delete，每一个方法sql都是一个statement
+ *
  * @author Clinton Begin
  */
 public class XMLStatementBuilder extends BaseBuilder {
 
     private MapperBuilderAssistant builderAssistant;
 
-    private XNode context;
+    /**
+     * 一个 insert/delete/update/select 方法sql中的所有内容，包括动态标签
+     */
+    private XNode methodSqlNode;
 
     private String requiredDatabaseId;
 
-    public XMLStatementBuilder(Configuration configuration, MapperBuilderAssistant builderAssistant, XNode context) {
-        this(configuration, builderAssistant, context, null);
+    public XMLStatementBuilder(Configuration configuration, MapperBuilderAssistant builderAssistant, XNode methodSqlNode) {
+        this(configuration, builderAssistant, methodSqlNode, null);
     }
 
     /**
      * sql语句构造器
      *
-     * @param configuration
-     * @param builderAssistant
-     * @param context update|insert|update|select
-     * @param databaseId
+     * @param configuration 配置
+     * @param builderAssistant 辅助
+     * @param methodSqlNode 一个 insert/delete/update/select 方法sql中的所有内容，包括动态标签
+     * @param databaseId 数据库id
      */
-    public XMLStatementBuilder(Configuration configuration, MapperBuilderAssistant builderAssistant, XNode context, String databaseId) {
+    public XMLStatementBuilder(Configuration configuration, MapperBuilderAssistant builderAssistant, XNode methodSqlNode, String databaseId) {
         super(configuration);
         this.builderAssistant = builderAssistant;
-        this.context = context;
+        this.methodSqlNode = methodSqlNode;
         this.requiredDatabaseId = databaseId;
     }
 
@@ -81,8 +86,8 @@ public class XMLStatementBuilder extends BaseBuilder {
     //    </insert>
     public void parseStatementNode() {
         //<delete id="deleteAuthor" parameterType="int">
-        String id = context.getStringAttribute("id");
-        String databaseId = context.getStringAttribute("databaseId");
+        String id = methodSqlNode.getStringAttribute("id");
+        String databaseId = methodSqlNode.getStringAttribute("databaseId");
 
         //如果databaseId不匹配，退出
         if (!databaseIdMatchesCurrent(id, databaseId, this.requiredDatabaseId)) {
@@ -90,47 +95,47 @@ public class XMLStatementBuilder extends BaseBuilder {
         }
 
         //暗示驱动程序每次批量返回的结果行数
-        Integer fetchSize = context.getIntAttribute("fetchSize");
+        Integer fetchSize = methodSqlNode.getIntAttribute("fetchSize");
         //超时时间
-        Integer timeout = context.getIntAttribute("timeout");
+        Integer timeout = methodSqlNode.getIntAttribute("timeout");
         //引用外部 parameterMap,已废弃
-        String parameterMap = context.getStringAttribute("parameterMap");
+        String parameterMap = methodSqlNode.getStringAttribute("parameterMap");
         //参数类型
         //<update id="updateAuthor" parameterType="org.apache.ibatis.domain.blog.Author">
-        String parameterType = context.getStringAttribute("parameterType");
+        String parameterType = methodSqlNode.getStringAttribute("parameterType");
         //参数类型
         Class<?> parameterTypeClass = resolveClass(parameterType);
         //引用外部的 resultMap(高级功能)
-        String resultMap = context.getStringAttribute("resultMap");
+        String resultMap = methodSqlNode.getStringAttribute("resultMap");
         //结果类型
-        String resultType = context.getStringAttribute("resultType");
+        String resultType = methodSqlNode.getStringAttribute("resultType");
         //脚本语言,mybatis3.2的新功能
-        String lang = context.getStringAttribute("lang");
+        String lang = methodSqlNode.getStringAttribute("lang");
         //得到语言驱动
         LanguageDriver langDriver = getLanguageDriver(lang);
 
         Class<?> resultTypeClass = resolveClass(resultType);
         //结果集类型，FORWARD_ONLY|SCROLL_SENSITIVE|SCROLL_INSENSITIVE 中的一种
-        String resultSetType = context.getStringAttribute("resultSetType");
+        String resultSetType = methodSqlNode.getStringAttribute("resultSetType");
         ResultSetType resultSetTypeEnum = resolveResultSetType(resultSetType);
         //语句类型, STATEMENT|PREPARED|CALLABLE 的一种
         //默认 PREPARED
-        String statementTypeConfig = context.getStringAttribute("statementType", StatementType.PREPARED.toString());
+        String statementTypeConfig = methodSqlNode.getStringAttribute("statementType", StatementType.PREPARED.toString());
         StatementType statementType = StatementType.valueOf(statementTypeConfig);
 
         //获取命令类型(select|insert|update|delete)
-        Node contextNode = context.getNode();
+        Node contextNode = methodSqlNode.getNode();
         String nodeName = contextNode.getNodeName();
         SqlCommandType sqlCommandType = SqlCommandType.valueOf(nodeName.toUpperCase(Locale.ENGLISH));
         //是否是查询函数
         boolean isSelect = (sqlCommandType == SqlCommandType.SELECT);
         //如果是查询，默认不刷新缓存，当然也可以指定刷新
-        boolean flushCache = context.getBooleanAttribute("flushCache", !isSelect);
+        boolean flushCache = methodSqlNode.getBooleanAttribute("flushCache", !isSelect);
         //是否要缓存select结果,如果是查询，默认使用缓存，当然可以指定不用缓存
-        boolean useCache = context.getBooleanAttribute("useCache", isSelect);
+        boolean useCache = methodSqlNode.getBooleanAttribute("useCache", isSelect);
         //仅针对嵌套结果 select 语句适用：如果为 true，就是假设包含了嵌套结果集或是分组了，这样的话当返回一个主结果行的时候，就不会发生有对前面结果集的引用的情况。
         //这就使得在获取嵌套的结果集的时候不至于导致内存不够用。默认值：false。
-        boolean resultOrdered = context.getBooleanAttribute("resultOrdered", false);
+        boolean resultOrdered = methodSqlNode.getBooleanAttribute("resultOrdered", false);
 
         // Include Fragments before parsing
         //解析之前先解析<include>SQL片段
@@ -143,12 +148,12 @@ public class XMLStatementBuilder extends BaseBuilder {
 
         // Parse the SQL (pre: <selectKey> and <include> were parsed and removed)
         //解析成SqlSource，一般是DynamicSqlSource
-        SqlSource sqlSource = langDriver.createSqlSource(configuration, context, parameterTypeClass);
-        String resultSets = context.getStringAttribute("resultSets");
+        SqlSource sqlSource = langDriver.createSqlSource(configuration, methodSqlNode, parameterTypeClass);
+        String resultSets = methodSqlNode.getStringAttribute("resultSets");
         //(仅对 insert 有用) 标记一个属性, MyBatis 会通过 getGeneratedKeys 或者通过 insert 语句的 selectKey 子元素设置它的值
-        String keyProperty = context.getStringAttribute("keyProperty");
+        String keyProperty = methodSqlNode.getStringAttribute("keyProperty");
         //(仅对 insert 有用) 标记一个属性, MyBatis 会通过 getGeneratedKeys 或者通过 insert 语句的 selectKey 子元素设置它的值
-        String keyColumn = context.getStringAttribute("keyColumn");
+        String keyColumn = methodSqlNode.getStringAttribute("keyColumn");
         KeyGenerator keyGenerator;
         String keyStatementId = id + SelectKeyGenerator.SELECT_KEY_SUFFIX;
         //org.apache.ibatis.submitted.selectkey.Table1.insert!selectKey
@@ -164,7 +169,7 @@ public class XMLStatementBuilder extends BaseBuilder {
             //setting中配置了能够使用自增主键，并且该sql是插入类型，则默认使用自增主键，否则还是以该sql的具体配置为准
             boolean defaultUseKeyGenerator = configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType);
             //该sql的具体配置，如果没配置，则取 defaultUseKeyGenerator
-            Boolean useGeneratedKeys = context.getBooleanAttribute("useGeneratedKeys", defaultUseKeyGenerator);
+            Boolean useGeneratedKeys = methodSqlNode.getBooleanAttribute("useGeneratedKeys", defaultUseKeyGenerator);
             //如果要使用主键，则用 Jdbc3KeyGenerator，否则传一个自增主键的空实现实例
             keyGenerator = useGeneratedKeys ? new Jdbc3KeyGenerator() : new NoKeyGenerator();
         }
@@ -186,7 +191,7 @@ public class XMLStatementBuilder extends BaseBuilder {
      * @param langDriver
      */
     private void processSelectKeyNodes(String id, Class<?> parameterTypeClass, LanguageDriver langDriver) {
-        List<XNode> selectKeyNodes = context.evalNodes("selectKey");
+        List<XNode> selectKeyNodes = methodSqlNode.evalNodes("selectKey");
         if (configuration.getDatabaseId() != null) {
             parseSelectKeyNodes(id, selectKeyNodes, parameterTypeClass, langDriver, configuration.getDatabaseId());
         }

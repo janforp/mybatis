@@ -196,14 +196,27 @@ public class XPathParser {
         return evalNodes(document, expression);
     }
 
-    //返回节点List
+    /**
+     * select *
+     * from users
+     * where ${property} = #{id}
+     *
+     * @param root 一个node
+     * @param expression 从该node提取的node名称
+     * @return 处理过之后封装的 XNodeList
+     */
     public List<XNode> evalNodes(Object root, String expression) {
-        List<XNode> xnodes = new ArrayList<XNode>();
+        List<XNode> xNodeList = new ArrayList<XNode>();
         NodeList nodes = (NodeList) evaluate(expression, root, XPathConstants.NODESET);
-        for (int i = 0; i < nodes.getLength(); i++) {
-            xnodes.add(new XNode(this, nodes.item(i), variables));
+        int nodesLength = nodes.getLength();
+        for (int i = 0; i < nodesLength; i++) {
+            //doc Node
+            Node node = nodes.item(i);
+            //替换占位符，然后封装返回
+            XNode xNode = new XNode(this, node, variables);
+            xNodeList.add(xNode);
         }
-        return xnodes;
+        return xNodeList;
     }
 
     public XNode evalNode(String expression) {

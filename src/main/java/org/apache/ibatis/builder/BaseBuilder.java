@@ -29,11 +29,13 @@ public abstract class BaseBuilder {
 
     /**
      * 别名注册机
+     * this.configuration.getTypeAliasRegistry();
      */
     protected final TypeAliasRegistry typeAliasRegistry;
 
     /**
      * 类型处理器注册机
+     * this.configuration.getTypeHandlerRegistry();
      */
     protected final TypeHandlerRegistry typeHandlerRegistry;
 

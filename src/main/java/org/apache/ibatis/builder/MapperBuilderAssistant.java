@@ -21,6 +21,7 @@ import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.mapping.StatementType;
 import org.apache.ibatis.reflection.MetaClass;
 import org.apache.ibatis.scripting.LanguageDriver;
+import org.apache.ibatis.scripting.LanguageDriverRegistry;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
@@ -578,17 +579,24 @@ public class MapperBuilderAssistant extends BaseBuilder {
                 nestedResultMap, notNullColumn, columnPrefix, typeHandler, flags, null, null, configuration.isLazyLoadingEnabled());
     }
 
-    //取得语言驱动
+    /**
+     * 取得语言驱动
+     *
+     * @param langClass 如果对应的方法指定了就不为空，否则返回默认的
+     * @return 取得语言驱动
+     */
     public LanguageDriver getLanguageDriver(Class<?> langClass) {
+        LanguageDriverRegistry languageRegistry = configuration.getLanguageRegistry();
         if (langClass != null) {
             //注册语言驱动
-            configuration.getLanguageRegistry().register(langClass);
+            languageRegistry.register(langClass);
         } else {
             //如果为null，则取得默认驱动（mybatis3.2以前大家一直用的方法）
-            langClass = configuration.getLanguageRegistry().getDefaultDriverClass();
+            //XMLLanguageDriver
+            langClass = languageRegistry.getDefaultDriverClass();
         }
         //再去调configuration
-        return configuration.getLanguageRegistry().getDriver(langClass);
+        return languageRegistry.getDriver(langClass);
     }
 
     /**

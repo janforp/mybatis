@@ -128,11 +128,14 @@ public class XMLMapperBuilder extends BaseBuilder {
         return sqlFragments.get(refid);
     }
 
-    //配置mapper元素
+    //配置mapper文件的核心方法
+
     //	<mapper namespace="org.mybatis.example.BlogMapper">
+
     //	  <select id="selectBlog" parameterType="int" resultType="Blog">
     //	    select * from Blog where id = #{id}
     //	  </select>
+
     //	</mapper>
     private void configurationElement(XNode mapperNode) {
         try {
@@ -159,29 +162,38 @@ public class XMLMapperBuilder extends BaseBuilder {
             List<XNode> sqlNodeList = mapperNode.evalNodes("/mapper/sql");
             sqlElement(sqlNodeList);
             //7.配置select|insert|update|delete TODO
-            List<XNode> xNodeList = mapperNode.evalNodes("select|insert|update|delete");
-            buildStatementFromContext(xNodeList);
+            List<XNode> methodNodeList = mapperNode.evalNodes("select|insert|update|delete");
+            buildStatementFromContext(methodNodeList);//解析mapper文件的每一个方法
         } catch (Exception e) {
             throw new BuilderException("Error parsing Mapper XML. Cause: " + e, e);
         }
     }
 
-    //7.配置select|insert|update|delete
-    private void buildStatementFromContext(List<XNode> list) {
+    /**
+     * 解析mapper文件的每一个方法 配置select|insert|update|delete
+     *
+     * @param methodNodeList 一个mapper.xml文件中的所有方法列表
+     */
+    private void buildStatementFromContext(List<XNode> methodNodeList) {
         //调用7.1构建语句
         String databaseId = configuration.getDatabaseId();
         if (databaseId != null) {
-            buildStatementFromContext(list, databaseId);
+            buildStatementFromContext(methodNodeList, databaseId);
         }
-        buildStatementFromContext(list, null);
+        buildStatementFromContext(methodNodeList, null);
     }
 
-    //8.配置select|insert|update|delete
+    /**
+     * 解析mapper文件的每一个方法 配置select|insert|update|delete
+     *
+     * @param methodNodeList 一个mapper.xml文件中的所有方法列表
+     */
     private void buildStatementFromContext(List<XNode> list, String requiredDatabaseId) {
-        for (XNode context : list) {
+        //循环解析每一个方法
+        for (XNode methodNode : list) {
             //构建所有语句,一个mapper下可以有很多select
             //语句比较复杂，核心都在这里面，所以调用XMLStatementBuilder
-            final XMLStatementBuilder statementParser = new XMLStatementBuilder(configuration, builderAssistant, context, requiredDatabaseId);
+            final XMLStatementBuilder statementParser = new XMLStatementBuilder(configuration, builderAssistant, methodNode, requiredDatabaseId);
             try {
                 //核心XMLStatementBuilder.parseStatementNode
                 statementParser.parseStatementNode();
