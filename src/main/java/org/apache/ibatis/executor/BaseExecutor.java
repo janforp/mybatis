@@ -203,12 +203,14 @@ public abstract class BaseExecutor implements Executor {
         if (closed) {
             throw new ExecutorException("Executor was closed.");
         }
-        //先清局部缓存，再查询.但仅查询堆栈为0，才清。为了处理递归调用 ，            //如果该 statement 要要刷新缓存，则一级，二级缓存都会刷新
+        //先清局部缓存，再查询.但仅查询堆栈为0，才清。为了处理递归调用
+        //如果该 statement 要要刷新缓存，则一级，二级缓存都会刷新
         boolean isThisStatementFlushCache = mappedStatement.isFlushCacheRequired();
         if (queryStack == 0 && isThisStatementFlushCache) {
             //刷新二级缓存，开始查询前，并且该statement配置是要刷新缓存，则刷新缓存
             clearLocalCache();
         }
+
         //用来装查询结果
         List<E> list;
         try {
@@ -288,16 +290,24 @@ public abstract class BaseExecutor implements Executor {
         }
         CacheKey cacheKey = new CacheKey();
         //MyBatis 对于其 Key 的生成采取规则为：[mappedStatementId + offset + limit + SQL + queryParams + environment]生成一个哈希码
-        cacheKey.update(mappedStatement.getId());
-        cacheKey.update(rowBounds.getOffset());
-        cacheKey.update(rowBounds.getLimit());
-        cacheKey.update(boundSql.getSql());
+
+        String mappedStatementId = mappedStatement.getId();
+        cacheKey.update(mappedStatementId);
+
+        int rowBoundsOffset = rowBounds.getOffset();
+        cacheKey.update(rowBoundsOffset);
+
+        int rowBoundsLimit = rowBounds.getLimit();
+        cacheKey.update(rowBoundsLimit);
+
+        String sql = boundSql.getSql();
+        cacheKey.update(sql);
+
         List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
         TypeHandlerRegistry typeHandlerRegistry = mappedStatement.getConfiguration().getTypeHandlerRegistry();
         // mimic DefaultParameterHandler logic
         //模仿DefaultParameterHandler的逻辑,不再重复，请参考DefaultParameterHandler
-        for (int i = 0; i < parameterMappingList.size(); i++) {
-            ParameterMapping parameterMapping = parameterMappingList.get(i);
+        for (ParameterMapping parameterMapping : parameterMappingList) {
             ParameterMode parameterMode = parameterMapping.getMode();
             if (parameterMode == ParameterMode.OUT) {
                 continue;
@@ -378,7 +388,10 @@ public abstract class BaseExecutor implements Executor {
         if (statementType != StatementType.CALLABLE) {
             return;
         }
+
+        //存储过程的出参数也需要缓存
         final Object cachedParameter = localOutputParameterCache.getObject(cacheKey);
+
         if (cachedParameter != null && parameter != null) {
             final MetaObject metaCachedParameter = configuration.newMetaObject(cachedParameter);
             final MetaObject metaParameter = configuration.newMetaObject(parameter);
@@ -389,22 +402,34 @@ public abstract class BaseExecutor implements Executor {
                 if (parameterMapping.getMode() != ParameterMode.IN) {
                     final String parameterName = parameterMapping.getProperty();
                     final Object cachedValue = metaCachedParameter.getValue(parameterName);
-                    //TODO ?
+                    //把存储过程的出参数存入 parameter 对象
                     metaParameter.setValue(parameterName, cachedValue);
                 }
             }
         }
     }
 
-    //从数据库查
+    /**
+     * 从数据库查
+     *
+     * @param mappedStatement sql相关
+     * @param parameter 入参数
+     * @param rowBounds 分页
+     * @param resultHandler 结果处理器
+     * @param cacheKey 缓存Key
+     * @param boundSql sql
+     * @param <E> 范型
+     * @return 查询结果
+     * @throws SQLException 异常
+     */
     private <E> List<E> queryFromDatabase(MappedStatement mappedStatement, Object parameter, RowBounds rowBounds,
             ResultHandler resultHandler, CacheKey cacheKey, BoundSql boundSql) throws SQLException {
 
         List<E> list;
-        //先向缓存中放入占位符？？？
+        //TODO 先向缓存中放入占位符？？？
         localCache.putObject(cacheKey, EXECUTION_PLACEHOLDER);
         try {
-            //模版方法
+            //模版方法，交给 SimpleExecutor等其他执行器执行
             list = doQuery(mappedStatement, parameter, rowBounds, resultHandler, boundSql);
         } finally {
             //最后删除占位符

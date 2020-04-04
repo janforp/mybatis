@@ -100,18 +100,25 @@ public class CachingExecutor implements Executor {
         //TODO <cache flushInterval="3600000"/> 则true?
         boolean isThisNamespaceUseCache = (cache != null);
         if (isThisNamespaceUseCache) {
-            flushCacheIfRequired(mappedStatement);// <select id="selectByIdFlush" resultMap="personMap" parameterType="int" flushCache="true">
+
+            // <select id="selectByIdFlush" resultMap="personMap" parameterType="int" flushCache="true">
+            flushCacheIfRequired(mappedStatement);
+
             //当该namespace开启了二级缓存，则里面的statement默认使用缓存，除非指定 useCache="false"
             boolean isThisStatementUseCache = mappedStatement.isUseCache();
-            if (isThisStatementUseCache && resultHandler == null) {//resultHandler 什么缓存都无法使用
+
+            //resultHandler 什么缓存都无法使用
+            if (isThisStatementUseCache && resultHandler == null) {
                 //Caching stored procedures with OUT params is not supported，所有参数的模式必须是 IN，否则不支持二级缓存
                 ensureNoOutParams(mappedStatement, parameterObject, boundSql);
                 //先从二级缓存拿
                 @SuppressWarnings("unchecked")
                 List<E> list = (List<E>) transactionalCacheManager.getObject(cache, cacheKey);
-                if (list == null) {//二级缓存没命中
+                if (list == null) {
+
                     //二级缓存没命中，去被代理的执行器，在哪里会进行一级缓存查询
                     list = delegateExecutor.query(mappedStatement, parameterObject, rowBounds, null, cacheKey, boundSql);
+
                     //查询结果存入二级缓存
                     transactionalCacheManager.putObject(cache, cacheKey, list); // issue #578 and #116
                 }
@@ -177,8 +184,8 @@ public class CachingExecutor implements Executor {
     }
 
     @Override
-    public CacheKey createCacheKey(MappedStatement ms, Object parameterObject, RowBounds rowBounds, BoundSql boundSql) {
-        return delegateExecutor.createCacheKey(ms, parameterObject, rowBounds, boundSql);
+    public CacheKey createCacheKey(MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, BoundSql boundSql) {
+        return delegateExecutor.createCacheKey(mappedStatement, parameterObject, rowBounds, boundSql);
     }
 
     @Override

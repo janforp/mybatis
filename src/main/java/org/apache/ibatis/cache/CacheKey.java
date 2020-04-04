@@ -26,12 +26,21 @@ public class CacheKey implements Cloneable, Serializable {
 
     private int multiplier;
 
+    /**
+     * 缓存key 的 hashcode
+     */
     private int hashcode;
 
     private long checksum;
 
+    /**
+     * doUpdate 的次数
+     */
     private int count;
 
+    /**
+     * 参与计算缓存的所有对象
+     */
     private List<Object> updateList;
 
     public CacheKey() {
@@ -72,8 +81,10 @@ public class CacheKey implements Cloneable, Serializable {
         int baseHashCode = (object == null ? 1 : object.hashCode());
 
         count++;
-        checksum += baseHashCode;
-        baseHashCode *= count;
+
+        checksum = checksum + baseHashCode;
+
+        baseHashCode = baseHashCode * count;
 
         hashcode = multiplier * hashcode + baseHashCode;
 
