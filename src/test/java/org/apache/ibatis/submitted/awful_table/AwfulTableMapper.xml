@@ -46,6 +46,7 @@
                 #{id7,jdbcType=INTEGER}, #{emailaddress,jdbcType=VARCHAR}, #{from,jdbcType=VARCHAR},
                 #{active,jdbcType=BIT})
     </insert>
+
     <insert id="insertSelective" useGeneratedKeys="true" keyProperty="customerId">
         insert into "awful table"
         <trim prefix="(" suffix=")" suffixOverrides=",">

@@ -32,12 +32,12 @@ public class SqlSourceBuilder extends BaseBuilder {
     /**
      * 解析成占位符格式的sql，并且解析出参数对象
      *
-     * @param originalSql xml中的原始sql
+     * @param fullSqlWithPlaceholder xml中的原始sql
      * @param parameterType 参数类型
      * @param additionalParameters 参数
      * @return 占位符sql + 该sql对应的参数列表
      */
-    public SqlSource parse(String originalSql, Class<?> parameterType, Map<String, Object> additionalParameters) {
+    public SqlSource parse(String fullSqlWithPlaceholder, Class<?> parameterType, Map<String, Object> additionalParameters) {
         //字符串标记处理器，一个静态内部类
         ParameterMappingTokenHandler tokenHandler = new ParameterMappingTokenHandler(configuration, parameterType, additionalParameters);
         //替换#{}中间的部分,如何替换，逻辑在ParameterMappingTokenHandler
@@ -46,9 +46,26 @@ public class SqlSourceBuilder extends BaseBuilder {
                 "}",//结束标记
                 tokenHandler);//具体如何处理标记中的字符串还是看这个参数
         //把 #{XXX} 替换成 ?,并且其他sql不变，此处生成的sql是符合preparedStatement的格式的
-        String sql = parser.parse(originalSql);
+        //select *
+        //        from users
+        //        where '1' = '1'
+        //
+        //            and id = ?
+        //
+        //
+        //        select *
+        //        from users
+        //        where '1' = '1'
+        //
+        //            and id = ?
+        //
+        //
+        //            and name = ?
+        String sql = parser.parse(fullSqlWithPlaceholder);
+        //参数占位符对象列表
+        List<ParameterMapping> parameterMappingList = tokenHandler.getParameterMappings();
         //返回静态SQL源码
-        return new StaticSqlSource(configuration, sql, tokenHandler.getParameterMappings());
+        return new StaticSqlSource(configuration, sql, parameterMappingList);
     }
 
     //参数映射记号处理器，静态内部类

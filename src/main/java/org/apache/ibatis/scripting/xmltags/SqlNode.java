@@ -5,7 +5,7 @@ package org.apache.ibatis.scripting.xmltags;
  */
 
 /**
- * SQL节点（choose|foreach|if|）
+ * SQL节点（choose|foreach|if|）中的sql语句，包括参数占位符
  */
 public interface SqlNode {
 

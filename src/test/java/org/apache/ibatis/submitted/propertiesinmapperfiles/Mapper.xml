@@ -11,4 +11,16 @@
         where ${property} = #{id}
     </select>
 
+    <select id="getByCrit" resultType="org.apache.ibatis.submitted.propertiesinmapperfiles.User">
+        select *
+        from users
+        where '1' = '1'
+        <if test="id != null">
+            and id = #{id}
+        </if>
+        <if test="name != null">
+            and name = #{name}
+        </if>
+    </select>
+
 </mapper>

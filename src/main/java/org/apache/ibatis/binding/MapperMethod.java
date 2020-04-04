@@ -65,7 +65,7 @@ public class MapperMethod {
      * 如果是如果mapper操作的数据库，最终都会通过该函数
      *
      * @param sqlSession sqlSession
-     * @param args 参数
+     * @param args 按照顺序排列的参数数组
      * @return 执行结果
      */
     public Object execute(SqlSession sqlSession, Object[] args) {

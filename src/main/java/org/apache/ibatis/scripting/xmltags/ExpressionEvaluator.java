@@ -9,12 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Clinton Begin
- */
-
-/**
  * 表达式求值器
  * 可参考 ExpressionEvaluatorTest
+ *
+ * @author Clinton Begin
  */
 public class ExpressionEvaluator {
 

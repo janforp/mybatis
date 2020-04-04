@@ -18,7 +18,7 @@ public class DynamicSqlSource implements SqlSource {
 
     private Configuration configuration;
 
-    private SqlNode rootSqlNode;
+    private SqlNode rootSqlNode;//被解析出来的所有sql片段，并且带上各种动态标签的计算表达式
 
     /**
      * @param rootSqlNode 由sql语句经过初步解析得到的SqlNodeList
@@ -36,17 +36,27 @@ public class DynamicSqlSource implements SqlSource {
      */
     @Override
     public BoundSql getBoundSql(Object parameterObject) {
-        //生成一个动态上下文
+        //生成一个动态上下文:ognl
+
+        //这里对象很关键，有参数，并且拼接动态sql的结果也在该对象
         DynamicContext context = new DynamicContext(configuration, parameterObject);
+
         //这里SqlNode.apply只是将${}这种参数替换掉，并没有替换#{}这种参数
+        //在动态sql的情况就是进行各标签的表达式计算
+        //该行执行之后在 context 对象中的 sqlBuild 属性就有了拼接之后的带占位符的sql啦
         rootSqlNode.apply(context);
+
         //调用SqlSourceBuilder
         SqlSourceBuilder sqlSourceParser = new SqlSourceBuilder(configuration);
-        Class<?> parameterType = (parameterObject == null ? Object.class : parameterObject.getClass());
-        //SqlSourceBuilder.parse,注意这里返回的是StaticSqlSource,解析完了就把那些参数都替换成?了，也就是最基本的JDBC的SQL写法
-        String contextSql = context.getSql();
+        //SqlSourceBuilder.parse，拼接好的，但是还有占位符 #{} 的sql
+        String fullSqlWithPlaceholder = context.getSql();
+
         Map<String, Object> contextBindings = context.getBindings();
-        SqlSource sqlSource = sqlSourceParser.parse(contextSql, parameterType, contextBindings);
+
+        Class<?> parameterType = (parameterObject == null ? Object.class : parameterObject.getClass());
+
+        SqlSource sqlSource = sqlSourceParser.parse(fullSqlWithPlaceholder, parameterType, contextBindings);
+
         //看似是又去递归调用SqlSource.getBoundSql，其实因为是StaticSqlSource，所以没问题，不是递归调用
         BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
         for (Map.Entry<String, Object> entry : contextBindings.entrySet()) {

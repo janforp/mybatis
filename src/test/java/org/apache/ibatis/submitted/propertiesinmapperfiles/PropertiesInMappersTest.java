@@ -52,4 +52,16 @@ public class PropertiesInMappersTest {
             sqlSession.close();
         }
     }
+
+    @Test
+    public void shouldGetAUser2() {
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            Mapper mapper = sqlSession.getMapper(Mapper.class);
+            User user = mapper.getByCrit(1, "User1");
+            Assert.assertEquals("User1", user.getName());
+        } finally {
+            sqlSession.close();
+        }
+    }
 }

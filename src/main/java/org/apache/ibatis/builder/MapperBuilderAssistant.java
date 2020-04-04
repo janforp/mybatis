@@ -284,7 +284,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
      * 增加映射语句
      *
      * @param id 如果是主键，则 sql的id + "!selectKey"如：insertOne!selectKey
-     * @param sqlSource
+     * @param sqlSource 静态 sqlNode 以及 动态 sqlNode 列表，各自包括标签中的表达式
      * @param statementType
      * @param sqlCommandType
      * @param fetchSize

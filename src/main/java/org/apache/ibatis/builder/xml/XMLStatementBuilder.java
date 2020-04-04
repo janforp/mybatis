@@ -147,7 +147,7 @@ public class XMLStatementBuilder extends BaseBuilder {
         processSelectKeyNodes(id, parameterTypeClass, langDriver);
 
         // Parse the SQL (pre: <selectKey> and <include> were parsed and removed)
-        //解析成SqlSource，一般是DynamicSqlSource
+        //解析成SqlSource，一般是DynamicSqlSource，解析出所有的sql片段，带上动态标签中的表达式
         SqlSource sqlSource = langDriver.createSqlSource(configuration, methodSqlNode, parameterTypeClass);
         String resultSets = methodSqlNode.getStringAttribute("resultSets");
         //(仅对 insert 有用) 标记一个属性, MyBatis 会通过 getGeneratedKeys 或者通过 insert 语句的 selectKey 子元素设置它的值

@@ -62,7 +62,7 @@ public class XMLScriptBuilder extends BaseBuilder {
         //</select>
         List<SqlNode> sqlNodeList = parseDynamicTags(xmlNode);
         MixedSqlNode rootSqlNode = new MixedSqlNode(sqlNodeList);
-        SqlSource sqlSource;
+        SqlSource sqlSource;//准备解析出待 ？ 占位符的sql以及参数对象列表
         if (isDynamic) {
             sqlSource = new DynamicSqlSource(configuration, rootSqlNode);
         } else {//没有动态标签
@@ -83,14 +83,14 @@ public class XMLScriptBuilder extends BaseBuilder {
      * //</set>
      * //</update>
      *
-     * @param methodXNode 被解析的node，一般情况是一个 mapper.xml 文件中的一个方法
+     * @param methodXnode 被解析的node，一般情况是一个 mapper.xml 文件中的一个方法
      * @return 标签列表
      */
-    List<SqlNode> parseDynamicTags(XNode methodXNode) {
+    List<SqlNode> parseDynamicTags(XNode methodXnode) {
         //返回
         List<SqlNode> sqlNodeList = new ArrayList<SqlNode>();
 
-        Node methodNode = methodXNode.getNode();
+        Node methodNode = methodXnode.getNode();
         NodeList children = methodNode.getChildNodes();
         int childrenLength = children.getLength();
 
@@ -100,7 +100,7 @@ public class XMLScriptBuilder extends BaseBuilder {
             Node item = children.item(i);
 
             //<if test="username != null">username=#{username},</if>
-            XNode child = methodXNode.newXNode(item);
+            XNode child = methodXnode.newXNode(item);
 
             Node node = child.getNode();
 
@@ -112,7 +112,7 @@ public class XMLScriptBuilder extends BaseBuilder {
                 String data = child.getStringBody("");
                 TextSqlNode textSqlNode = new TextSqlNode(data);
 
-                //先计算，再返回，如果文本有占位符，则为动态的，否则，静态
+                //先计算，再返回，如果文本有 ${} 占位符，则为动态的，否则，静态
                 boolean dynamic = textSqlNode.isDynamic();
                 if (dynamic) {
                     sqlNodeList.add(textSqlNode);
@@ -322,9 +322,9 @@ public class XMLScriptBuilder extends BaseBuilder {
 
         @Override
         public void handleNode(XNode nodeToHandle, List<SqlNode> targetContents) {
-            List<SqlNode> contents = parseDynamicTags(nodeToHandle);
+            List<SqlNode> contents = parseDynamicTags(nodeToHandle);//动态标签内部还可能会嵌套标签，也可能是一段带占位符的sql
             MixedSqlNode mixedSqlNode = new MixedSqlNode(contents);
-            String test = nodeToHandle.getStringAttribute("test");
+            String test = nodeToHandle.getStringAttribute("test");//<if test="id != null">,此处拿到test表达式
             IfSqlNode ifSqlNode = new IfSqlNode(mixedSqlNode, test);
             targetContents.add(ifSqlNode);
         }

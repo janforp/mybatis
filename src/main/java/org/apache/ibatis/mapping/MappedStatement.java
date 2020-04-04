@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 映射的语句
+ * 映射的语句，mapper.xml 文件的每个方法都有对应的 MappedStatement 对象
  *
  * @author Clinton Begin
  */
@@ -42,6 +42,10 @@ public final class MappedStatement {
     @Getter
     private ResultSetType resultSetType;
 
+    /**
+     * 该对象是 sql，其中维护一个 sqlNode 列表，每一个sqlNode 可能是静态跟动态的，其中动态的可能还带着如 test = "id != null" 这样的表达式
+     * 而这些表达式只有在用户调用该方法的时候，通过传入参数才能进行计算
+     */
     @Getter
     private SqlSource sqlSource;
 
@@ -169,7 +173,7 @@ public final class MappedStatement {
             mappedStatement.timeout = configuration.getDefaultStatementTimeout();
             mappedStatement.sqlCommandType = sqlCommandType;
 
-            //决定使用什么主键生成器
+            //配置
             boolean useGeneratedKeys = configuration.isUseGeneratedKeys();
             boolean isInsert = SqlCommandType.INSERT.equals(sqlCommandType);
             boolean canUseKeyGenerator = useGeneratedKeys && isInsert;

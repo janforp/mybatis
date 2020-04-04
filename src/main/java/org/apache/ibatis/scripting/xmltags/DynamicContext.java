@@ -39,9 +39,14 @@ public class DynamicContext {
      * 2个键值对
      * key _parameter对应入参数 parameterObject
      * key _databaseId 则对应 configuration.getDatabaseId()
+     *
+     * 动态sql中的表达式就是使用这个
      */
     private final ContextMap bindings;
 
+    /**
+     * 当执行一个方法的时候，就会根据用户传入的参数来计算动态标签，然后对所有的sql进行拼接，这个对象就是拼接的结果
+     */
     private final StringBuilder sqlBuilder = new StringBuilder();
 
     private int uniqueNumber = 0;
@@ -66,7 +71,7 @@ public class DynamicContext {
         } else {
             bindings = new ContextMap(null);
         }
-        //上面只是根据传入的测试初始化 bindings 一个 ContextMap
+        //上面只是根据传入的测试初始化 bindings 一个 ContextMap：key:_parameter
         bindings.put(PARAMETER_OBJECT_KEY, parameterObject);
 
         String databaseId = configuration.getDatabaseId();
