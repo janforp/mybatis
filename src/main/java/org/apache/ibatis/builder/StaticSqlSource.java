@@ -12,7 +12,7 @@ import java.util.List;
  */
 
 /**
- * 静态SQL源码
+ * 动态sql经过传入的参数，计算每个动态标签中的表达式之后拼接之后的静态sql（带？占位符）以及使用到的参数对象
  */
 public class StaticSqlSource implements SqlSource {
 

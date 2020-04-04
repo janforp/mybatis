@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 一个 MappedStatement 以及传入的 参数，就可以获得一个 BoundSql 对象
+ * 这个对象：什么都有了，1：完成的带？的sq，2：？对应的参数，3：每个？对应的参数的各种类型，4：meta封装之后的参数，可以与 statement 进行交互啦
+ *
+ *
+ * 一个 MappedStatement 以及传入的 参数，就可以获得一个 BoundSql 对象，也就是没次调用都会生成一个这样的对象
  *
  * 绑定的SQL,是从SqlSource而来，将动态内容都处理完成得到的SQL语句字符串，其中包括?,还有绑定的参数
  *
@@ -45,7 +48,7 @@ public class BoundSql {
     private Object parameterObject;
 
     /**
-     * 参数
+     * 参数:如：{"_parameter":{"finalParamMap1":1,"finalParamMap2":"User1","name":"User1","id":1}}
      */
     private MetaObject metaParameters;
 

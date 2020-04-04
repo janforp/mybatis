@@ -21,20 +21,26 @@ public class ParameterExpression extends HashMap<String, String> {
 
     private static final long serialVersionUID = -2417552199605158680L;
 
-    public ParameterExpression(String expression) {
-        parse(expression);
+    /**
+     * @param propertyEncloseByToken username, jdbcType=VARCHAR, typeHandler= XXX, 。。。
+     */
+    public ParameterExpression(String propertyEncloseByToken) {
+        parse(propertyEncloseByToken);
     }
 
-    private void parse(String expression) {
+    /**
+     * @param propertyEncloseByToken username, jdbcType=VARCHAR, typeHandler= XXX, 。。。
+     */
+    private void parse(String propertyEncloseByToken) {
         //#{property,javaType=int,jdbcType=NUMERIC}
         //首先去除空白,返回的p是第一个不是空白的字符位置
-        int p = skipWS(expression, 0);
-        if (expression.charAt(p) == '(') {
+        int p = skipWS(propertyEncloseByToken, 0);
+        if (propertyEncloseByToken.charAt(p) == '(') {
             //处理表达式
-            expression(expression, p + 1);
+            expression(propertyEncloseByToken, p + 1);
         } else {
             //处理属性
-            property(expression, p);
+            property(propertyEncloseByToken, p);
         }
     }
 

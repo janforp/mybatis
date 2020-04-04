@@ -81,7 +81,7 @@ public class CachingExecutor implements Executor {
 
     @Override
     public <E> List<E> query(MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
-
+        //什么都有了，1：完成的带？的sq，2：？对应的参数，3：每个？对应的参数的各种类型，4：meta封装之后的参数，可以与 statement 进行交互啦
         BoundSql boundSql = mappedStatement.getBoundSql(parameterObject);
         //query时传入一个cacheKey参数
         CacheKey cacheKey = createCacheKey(mappedStatement, parameterObject, rowBounds, boundSql);

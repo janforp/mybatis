@@ -98,14 +98,14 @@ public class SqlSourceBuilder extends BaseBuilder {
          * 把传入的#{username, jdbcType=VARCHAR, typeHandler= XXX, 。。。} 中的 username 转换为 ?
          * 当然，中间的一些信息会组合成一个 ParameterMapping 对象
          *
-         * @param content 输入字符串
+         * @param propertyEncloseByToken 输入字符串如：被 ${username} 中的 username ，或者 #{id,jdbcType=INTEGER} 中的 id, jdbcType=INTEGER,typeHandler=XXX
          * @return ?
          */
         @Override
-        public String handleToken(String content) {
+        public String handleToken(String propertyEncloseByToken) {
             //先构建参数映射
             //#{username, jdbcType=VARCHAR, typeHandler= XXX, 。。。}
-            ParameterMapping parameterMapping = buildParameterMapping(content);
+            ParameterMapping parameterMapping = buildParameterMapping(propertyEncloseByToken);
             parameterMappings.add(parameterMapping);
             //如何替换很简单，永远是一个问号，但是参数的信息要记录在parameterMappings里面供后续使用
             return "?";
@@ -114,13 +114,13 @@ public class SqlSourceBuilder extends BaseBuilder {
         /**
          * 参数对象
          *
-         * @param content #{username, jdbcType=VARCHAR, typeHandler= XXX, 。。。}
+         * @param propertyEncloseByToken 如：id, jdbcType=INTEGER,typeHandler=XXX
          * @return 参数对象
          */
-        private ParameterMapping buildParameterMapping(String content) {
+        private ParameterMapping buildParameterMapping(String propertyEncloseByToken) {
             //#{favouriteSection,jdbcType=VARCHAR}
-            //先解析参数映射,就是转化成一个hashMap
-            Map<String, String> propertiesMap = parseParameterMapping(content);
+            //先解析参数映射,就是转化成一个hashMap,如：{"jdbcType":"INTEGER","property":"id","javaType":"int"}
+            Map<String, String> propertiesMap = parseParameterMapping(propertyEncloseByToken);
             String property = propertiesMap.get("property");
             Class<?> propertyType;
             //这里分支比较多，需要逐个理解
@@ -166,7 +166,7 @@ public class SqlSourceBuilder extends BaseBuilder {
                 } else if ("expression".equals(name)) {
                     throw new BuilderException("Expression based parameters are not supported yet");
                 } else {
-                    throw new BuilderException("An invalid property '" + name + "' was found in mapping #{" + content + "}.  Valid properties are " + PARAMETER_PROPERTIES);
+                    throw new BuilderException("An invalid property '" + name + "' was found in mapping #{" + propertyEncloseByToken + "}.  Valid properties are " + PARAMETER_PROPERTIES);
                 }
             }
             //#{age,javaType=int,jdbcType=NUMERIC,typeHandler=MyTypeHandler}
@@ -179,16 +179,16 @@ public class SqlSourceBuilder extends BaseBuilder {
         /**
          * #{username, jdbcType=VARCHAR, typeHandler= XXX, 。。。}
          *
-         * @param content #{username, jdbcType=VARCHAR, typeHandler= XXX, 。。。}
+         * @param propertyEncloseByToken username, jdbcType=VARCHAR, typeHandler= XXX, 。。。
          * @return map
          */
-        private Map<String, String> parseParameterMapping(String content) {
+        private Map<String, String> parseParameterMapping(String propertyEncloseByToken) {
             try {
-                return new ParameterExpression(content);
+                return new ParameterExpression(propertyEncloseByToken);
             } catch (BuilderException ex) {
                 throw ex;
             } catch (Exception ex) {
-                throw new BuilderException("Parsing error was found in mapping #{" + content + "}.  Check syntax #{property|(expression), var1=value1, var2=value2, ...} ", ex);
+                throw new BuilderException("Parsing error was found in mapping #{" + propertyEncloseByToken + "}.  Check syntax #{property|(expression), var1=value1, var2=value2, ...} ", ex);
             }
         }
     }

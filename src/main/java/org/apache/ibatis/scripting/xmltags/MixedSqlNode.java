@@ -24,6 +24,8 @@ public class MixedSqlNode implements SqlNode {
     public boolean apply(DynamicContext context) {
         //依次调用list里每个元素的apply
         for (SqlNode sqlNode : sqlNodeList) {
+
+            //具体是否要拼接交给具体的类型去判断
             sqlNode.apply(context);
         }
         return true;

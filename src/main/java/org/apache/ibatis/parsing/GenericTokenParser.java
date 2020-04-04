@@ -8,7 +8,7 @@ package org.apache.ibatis.parsing;
 public class GenericTokenParser {
 
     /**
-     * 有一个开始和结束记号，如：${
+     * 有一个开始和结束记号，如：${ 或者 #{
      */
     private final String openToken;
 
@@ -62,7 +62,7 @@ public class GenericTokenParser {
                     offset = start + openToken.length();
                     String content = new String(src, offset, end - offset);
                     //得到一对大括号里的字符串后，调用handler.handleToken,比如替换变量这种功能
-
+                    //这个接口的实现类中有很多逻辑
                     String handledToken = handler.handleToken(content);
                     builder.append(handledToken);
                     offset = end + closeToken.length();//下一次开始找的下标就是结束标志的下一个

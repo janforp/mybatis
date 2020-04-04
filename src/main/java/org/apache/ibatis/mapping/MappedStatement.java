@@ -145,8 +145,8 @@ public final class MappedStatement {
             boundSql = new BoundSql(configuration, boundSql.getSql(), parameterMap.getParameterMappings(), parameterObject);
         }
         // check for nested result maps in parameter mappings (issue #30)
-        for (ParameterMapping pm : boundSql.getParameterMappings()) {
-            String rmId = pm.getResultMapId();
+        for (ParameterMapping parameterMapping : boundSql.getParameterMappings()) {
+            String rmId = parameterMapping.getResultMapId();
             if (rmId != null) {
                 ResultMap rm = configuration.getResultMap(rmId);
                 if (rm != null) {

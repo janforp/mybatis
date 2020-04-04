@@ -47,6 +47,8 @@ public class IfSqlNode implements SqlNode {
         //通过传入的参数计算 if 标签中的 test 是否为 true/false
         boolean aBoolean = evaluator.evaluateBoolean(test, bindings);
         if (aBoolean) {
+
+            //通过 test 表达式计算，然后如果为 true 就要拼接，否则不进来，则不需要有拼接
             contents.apply(context);
             return true;
         }

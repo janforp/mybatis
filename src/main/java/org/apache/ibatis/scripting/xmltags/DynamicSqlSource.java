@@ -54,7 +54,7 @@ public class DynamicSqlSource implements SqlSource {
         Map<String, Object> contextBindings = context.getBindings();
 
         Class<?> parameterType = (parameterObject == null ? Object.class : parameterObject.getClass());
-
+        //动态sql经过传入的参数，计算每个动态标签中的表达式之后拼接之后的静态sql（带？占位符）以及使用到的参数对象
         SqlSource sqlSource = sqlSourceParser.parse(fullSqlWithPlaceholder, parameterType, contextBindings);
 
         //看似是又去递归调用SqlSource.getBoundSql，其实因为是StaticSqlSource，所以没问题，不是递归调用

@@ -16,7 +16,7 @@
         from users
         where '1' = '1'
         <if test="id != null">
-            and id = #{id}
+            and id = #{id,jdbcType=INTEGER, javaType=int}
         </if>
         <if test="name != null">
             and name = #{name}
