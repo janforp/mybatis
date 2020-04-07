@@ -66,8 +66,8 @@ public class XmlConfigBuilderTest {
         }
 
         @Override
-        public void setNonNullParameter(PreparedStatement ps, int i, E parameter, JdbcType jdbcType) throws SQLException {
-            ps.setInt(i, parameter.ordinal() + 1); // 0 means NULL so add +1
+        public void setNonNullParameter(PreparedStatement ps, int parameterIndex, E parameter, JdbcType jdbcType) throws SQLException {
+            ps.setInt(parameterIndex, parameter.ordinal() + 1); // 0 means NULL so add +1
         }
 
         @Override

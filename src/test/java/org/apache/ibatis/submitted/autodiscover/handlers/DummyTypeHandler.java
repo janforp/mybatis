@@ -16,17 +16,21 @@ import java.sql.SQLException;
 @MappedTypes(BigInteger.class)
 public class DummyTypeHandler implements TypeHandler<Object> {
 
+    @Override
     public void setParameter(PreparedStatement preparedStatement, int i, Object parameter, JdbcType jdbcType) throws SQLException {
     }
 
+    @Override
     public Object getResult(ResultSet rs, String columnName) throws SQLException {
         return null;
     }
 
+    @Override
     public Object getResult(CallableStatement cs, int columnIndex) throws SQLException {
         return null;
     }
 
+    @Override
     public Object getResult(ResultSet rs, int columnIndex) throws SQLException {
         return null;
     }

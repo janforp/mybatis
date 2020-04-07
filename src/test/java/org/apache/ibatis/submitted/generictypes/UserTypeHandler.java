@@ -11,7 +11,7 @@ import java.sql.SQLException;
 public class UserTypeHandler extends BaseTypeHandler<User<String>> {
 
     @Override
-    public void setNonNullParameter(PreparedStatement ps, int i, User<String> parameter, JdbcType jdbcType) throws SQLException {
+    public void setNonNullParameter(PreparedStatement ps, int parameterIndex, User<String> parameter, JdbcType jdbcType) throws SQLException {
     }
 
     @Override

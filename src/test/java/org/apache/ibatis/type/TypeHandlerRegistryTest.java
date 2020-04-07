@@ -40,23 +40,27 @@ public class TypeHandlerRegistryTest {
 
         TypeHandler<List<URI>> fakeHandler = new TypeHandler<List<URI>>() {
 
+            @Override
             public void setParameter(PreparedStatement preparedStatement, int i, List<URI> parameter, JdbcType jdbcType)
                     throws SQLException {
                 // do nothing, fake method
             }
 
+            @Override
             public List<URI> getResult(CallableStatement cs, int columnIndex)
                     throws SQLException {
                 // do nothing, fake method
                 return null;
             }
 
+            @Override
             public List<URI> getResult(ResultSet rs, int columnIndex)
                     throws SQLException {
                 // do nothing, fake method
                 return null;
             }
 
+            @Override
             public List<URI> getResult(ResultSet rs, String columnName)
                     throws SQLException {
                 // do nothing, fake method
@@ -77,7 +81,7 @@ public class TypeHandlerRegistryTest {
         TypeHandler<List<URI>> fakeHandler = new BaseTypeHandler<List<URI>>() {
 
             @Override
-            public void setNonNullParameter(PreparedStatement ps, int i, List<URI> parameter, JdbcType jdbcType)
+            public void setNonNullParameter(PreparedStatement ps, int parameterIndex, List<URI> parameter, JdbcType jdbcType)
                     throws SQLException {
                 // do nothing, fake method
             }

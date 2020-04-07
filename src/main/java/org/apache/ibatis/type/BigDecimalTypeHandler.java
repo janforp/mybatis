@@ -12,26 +12,22 @@ import java.sql.SQLException;
 public class BigDecimalTypeHandler extends BaseTypeHandler<BigDecimal> {
 
     @Override
-    public void setNonNullParameter(PreparedStatement ps, int i, BigDecimal parameter, JdbcType jdbcType)
-            throws SQLException {
-        ps.setBigDecimal(i, parameter);
+    public void setNonNullParameter(PreparedStatement ps, int parameterIndex, BigDecimal parameter, JdbcType jdbcType) throws SQLException {
+        ps.setBigDecimal(parameterIndex, parameter);
     }
 
     @Override
-    public BigDecimal getNullableResult(ResultSet rs, String columnName)
-            throws SQLException {
+    public BigDecimal getNullableResult(ResultSet rs, String columnName) throws SQLException {
         return rs.getBigDecimal(columnName);
     }
 
     @Override
-    public BigDecimal getNullableResult(ResultSet rs, int columnIndex)
-            throws SQLException {
+    public BigDecimal getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         return rs.getBigDecimal(columnIndex);
     }
 
     @Override
-    public BigDecimal getNullableResult(CallableStatement cs, int columnIndex)
-            throws SQLException {
+    public BigDecimal getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         return cs.getBigDecimal(columnIndex);
     }
 }
