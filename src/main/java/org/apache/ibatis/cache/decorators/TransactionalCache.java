@@ -35,7 +35,9 @@ public class TransactionalCache implements Cache {
 
     private Cache delegate;
 
-    //commit时要不要清缓存
+    /**
+     * commit时要不要清缓存
+     */
     private boolean clearOnCommit;
 
     /**

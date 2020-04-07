@@ -78,5 +78,4 @@ public class FifoCache implements Cache {
             delegate.removeObject(oldestKey);
         }
     }
-
 }

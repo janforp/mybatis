@@ -22,13 +22,16 @@ public class BlockingCache implements Cache {
 
     private final Cache delegate;
 
-    private final ConcurrentHashMap<Object, ReentrantLock> locks;
+    private final ConcurrentHashMap<Object, ReentrantLock> locksMap;
 
+    /**
+     * 加锁的最长时间(ms)
+     */
     private long timeout;
 
     public BlockingCache(Cache delegate) {
         this.delegate = delegate;
-        this.locks = new ConcurrentHashMap<Object, ReentrantLock>();
+        this.locksMap = new ConcurrentHashMap<Object, ReentrantLock>();
     }
 
     @Override
@@ -77,7 +80,7 @@ public class BlockingCache implements Cache {
 
     private ReentrantLock getLockForKey(Object key) {
         ReentrantLock lock = new ReentrantLock();
-        ReentrantLock previous = locks.putIfAbsent(key, lock);
+        ReentrantLock previous = locksMap.putIfAbsent(key, lock);
         return previous == null ? lock : previous;
     }
 
@@ -98,7 +101,7 @@ public class BlockingCache implements Cache {
     }
 
     private void releaseLock(Object key) {
-        ReentrantLock lock = locks.get(key);
+        ReentrantLock lock = locksMap.get(key);
         if (lock.isHeldByCurrentThread()) {
             lock.unlock();
         }
