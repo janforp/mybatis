@@ -15,7 +15,7 @@ import java.util.Properties;
  */
 
 /**
- * JNDI数据源工厂
+ * JNDI数据源工厂:Java Naming and Directory Interface
  * 这个数据源的实现是为了使用如 Spring 或应用服务器这类的容器, 容器可以集 中或在外部配置数据源,然后放置一个 JNDI 上下文的引用。
  */
 public class JndiDataSourceFactory implements DataSourceFactory {
@@ -51,7 +51,7 @@ public class JndiDataSourceFactory implements DataSourceFactory {
     @Override
     public void setProperties(Properties properties) {
         try {
-            InitialContext initCtx = null;
+            InitialContext initCtx;
             Properties env = getEnvProperties(properties);
             if (env == null) {
                 initCtx = new InitialContext();

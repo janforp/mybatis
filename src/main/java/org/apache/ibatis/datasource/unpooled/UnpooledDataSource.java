@@ -1,5 +1,9 @@
 package org.apache.ibatis.datasource.unpooled;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.ibatis.io.Resources;
 
 import javax.sql.DataSource;
@@ -23,6 +27,7 @@ import java.util.logging.Logger;
 /**
  * 没有池化的数据源
  */
+@NoArgsConstructor
 public class UnpooledDataSource implements DataSource {
 
     /**
@@ -34,36 +39,49 @@ public class UnpooledDataSource implements DataSource {
         Enumeration<Driver> drivers = DriverManager.getDrivers();
         while (drivers.hasMoreElements()) {
             Driver driver = drivers.nextElement();
-            registeredDrivers.put(driver.getClass().getName(), driver);
+
+            String driveClassName = driver.getClass().getName();
+            registeredDrivers.put(driveClassName, driver);
         }
     }
 
     /**
      * 驱动类加载器
      */
+    @Getter
+    @Setter
     private ClassLoader driverClassLoader;
 
     //作为可选项,你可以传递数据库驱动的属性。要这样做,属性的前缀是以“driver.”开 头的,例如
     //driver.encoding=UTF8
+    @Getter
+    @Setter
     private Properties driverProperties;
 
+    @Getter
     private String driver;
 
+    @Getter
+    @Setter
     private String url;
 
+    @Getter
+    @Setter
     private String username;
 
+    @Getter
+    @Setter
     private String password;
 
+    @Setter
     private Boolean autoCommit;
 
     /**
      * 事务级别
      */
+    @Getter
+    @Setter
     private Integer defaultTransactionIsolationLevel;
-
-    public UnpooledDataSource() {
-    }
 
     public UnpooledDataSource(String driver, String url, String username, String password) {
         this.driver = driver;
@@ -123,68 +141,8 @@ public class UnpooledDataSource implements DataSource {
         DriverManager.setLogWriter(logWriter);
     }
 
-    public ClassLoader getDriverClassLoader() {
-        return driverClassLoader;
-    }
-
-    public void setDriverClassLoader(ClassLoader driverClassLoader) {
-        this.driverClassLoader = driverClassLoader;
-    }
-
-    public Properties getDriverProperties() {
-        return driverProperties;
-    }
-
-    public void setDriverProperties(Properties driverProperties) {
-        this.driverProperties = driverProperties;
-    }
-
-    public String getDriver() {
-        return driver;
-    }
-
     public synchronized void setDriver(String driver) {
         this.driver = driver;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Boolean isAutoCommit() {
-        return autoCommit;
-    }
-
-    public void setAutoCommit(Boolean autoCommit) {
-        this.autoCommit = autoCommit;
-    }
-
-    public Integer getDefaultTransactionIsolationLevel() {
-        return defaultTransactionIsolationLevel;
-    }
-
-    public void setDefaultTransactionIsolationLevel(Integer defaultTransactionIsolationLevel) {
-        this.defaultTransactionIsolationLevel = defaultTransactionIsolationLevel;
     }
 
     private Connection doGetConnection(String username, String password) throws SQLException {
@@ -213,7 +171,8 @@ public class UnpooledDataSource implements DataSource {
 
     private synchronized void initializeDriver() throws SQLException {
         //这里便是大家熟悉的初学JDBC时的那几句话了 Class.forName newInstance()
-        if (!registeredDrivers.containsKey(driver)) {
+        boolean containsKey = registeredDrivers.containsKey(driver);
+        if (!containsKey) {
             Class<?> driverType;
             try {
                 if (driverClassLoader != null) {
@@ -224,6 +183,7 @@ public class UnpooledDataSource implements DataSource {
                 // DriverManager requires the driver to be loaded via the system ClassLoader.
                 // http://www.kfu.com/~nsayer/Java/dyn-jdbc.html
                 Driver driverInstance = (Driver) driverType.newInstance();
+                //TODO ？ 为什么注册一个驱动代理对象？
                 DriverManager.registerDriver(new DriverProxy(driverInstance));
                 registeredDrivers.put(driver, driverInstance);
             } catch (Exception e) {
@@ -257,18 +217,19 @@ public class UnpooledDataSource implements DataSource {
         return Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     }
 
+    public boolean isAutoCommit() {
+        return autoCommit;
+    }
+
     /**
      * 驱动代理
      * 不是很懂
      * 代理模型
      */
+    @AllArgsConstructor
     private static class DriverProxy implements Driver {
 
         private Driver driver;
-
-        DriverProxy(Driver d) {
-            this.driver = d;
-        }
 
         @Override
         public boolean acceptsURL(String u) throws SQLException {

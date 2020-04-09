@@ -1,5 +1,6 @@
 package org.apache.ibatis.datasource.unpooled;
 
+import lombok.Getter;
 import org.apache.ibatis.datasource.DataSourceException;
 import org.apache.ibatis.datasource.DataSourceFactory;
 import org.apache.ibatis.reflection.MetaObject;
@@ -21,6 +22,7 @@ public class UnpooledDataSourceFactory implements DataSourceFactory {
 
     private static final int DRIVER_PROPERTY_PREFIX_LENGTH = DRIVER_PROPERTY_PREFIX.length();
 
+    @Getter
     protected DataSource dataSource;
 
     public UnpooledDataSourceFactory() {
@@ -30,6 +32,8 @@ public class UnpooledDataSourceFactory implements DataSourceFactory {
     @Override
     public void setProperties(Properties properties) {
         Properties driverProperties = new Properties();
+
+        //UnpooledDataSource实例
         MetaObject metaDataSource = SystemMetaObject.forObject(dataSource);
         for (Object key : properties.keySet()) {
             String propertyName = (String) key;
@@ -37,7 +41,11 @@ public class UnpooledDataSourceFactory implements DataSourceFactory {
             //driver.encoding=UTF8
             if (propertyName.startsWith(DRIVER_PROPERTY_PREFIX)) {
                 String value = properties.getProperty(propertyName);
-                driverProperties.setProperty(propertyName.substring(DRIVER_PROPERTY_PREFIX_LENGTH), value);
+
+                //driver.encoding ----> driver
+                String subKey = propertyName.substring(DRIVER_PROPERTY_PREFIX_LENGTH);
+                driverProperties.setProperty(subKey, value);
+
             } else if (metaDataSource.hasSetter(propertyName)) {
                 //如果UnpooledDataSource有相应的setter函数，则设置它
                 String value = (String) properties.get(propertyName);
@@ -50,11 +58,6 @@ public class UnpooledDataSourceFactory implements DataSourceFactory {
         if (driverProperties.size() > 0) {
             metaDataSource.setValue("driverProperties", driverProperties);
         }
-    }
-
-    @Override
-    public DataSource getDataSource() {
-        return dataSource;
     }
 
     //根据setter的类型,将配置文件中的值强转成相应的类型

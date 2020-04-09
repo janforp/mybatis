@@ -1,5 +1,7 @@
 package org.apache.ibatis.datasource.pooled;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.ibatis.reflection.ExceptionUtil;
 
 import java.lang.reflect.InvocationHandler;
@@ -25,18 +27,42 @@ class PooledConnection implements InvocationHandler {
 
     private PooledDataSource dataSource;
 
-    //真正的连接
+    /**
+     * the *real* connection that this wraps
+     */
+    @Getter
     private Connection realConnection;
 
     //代理的连接
+    @Getter
     private Connection proxyConnection;
 
+    /**
+     * the timestamp that this connection was checked out
+     */
+    @Getter
+    @Setter
     private long checkoutTimestamp;
 
+    /**
+     * the time that the connection was created
+     */
+    @Getter
+    @Setter
     private long createdTimestamp;
 
+    /**
+     * the time that the connection was last used
+     */
+    @Getter
+    @Setter
     private long lastUsedTimestamp;
 
+    /**
+     * connection type (based on url + user + password)
+     */
+    @Getter
+    @Setter
     private int connectionTypeCode;
 
     private boolean valid;
@@ -74,84 +100,12 @@ class PooledConnection implements InvocationHandler {
     }
 
     /*
-     * Getter for the *real* connection that this wraps
-     *
-     * @return The connection
-     */
-    public Connection getRealConnection() {
-        return realConnection;
-    }
-
-    /*
-     * Getter for the proxy for the connection
-     *
-     * @return The proxy
-     */
-    public Connection getProxyConnection() {
-        return proxyConnection;
-    }
-
-    /*
      * Gets the hashcode of the real connection (or 0 if it is null)
      *
      * @return The hashcode of the real connection (or 0 if it is null)
      */
     public int getRealHashCode() {
         return realConnection == null ? 0 : realConnection.hashCode();
-    }
-
-    /*
-     * Getter for the connection type (based on url + user + password)
-     *
-     * @return The connection type
-     */
-    public int getConnectionTypeCode() {
-        return connectionTypeCode;
-    }
-
-    /*
-     * Setter for the connection type
-     *
-     * @param connectionTypeCode - the connection type
-     */
-    public void setConnectionTypeCode(int connectionTypeCode) {
-        this.connectionTypeCode = connectionTypeCode;
-    }
-
-    /*
-     * Getter for the time that the connection was created
-     *
-     * @return The creation timestamp
-     */
-    public long getCreatedTimestamp() {
-        return createdTimestamp;
-    }
-
-    /*
-     * Setter for the time that the connection was created
-     *
-     * @param createdTimestamp - the timestamp
-     */
-    public void setCreatedTimestamp(long createdTimestamp) {
-        this.createdTimestamp = createdTimestamp;
-    }
-
-    /*
-     * Getter for the time that the connection was last used
-     *
-     * @return - the timestamp
-     */
-    public long getLastUsedTimestamp() {
-        return lastUsedTimestamp;
-    }
-
-    /*
-     * Setter for the time that the connection was last used
-     *
-     * @param lastUsedTimestamp - the timestamp
-     */
-    public void setLastUsedTimestamp(long lastUsedTimestamp) {
-        this.lastUsedTimestamp = lastUsedTimestamp;
     }
 
     /*
@@ -170,24 +124,6 @@ class PooledConnection implements InvocationHandler {
      */
     public long getAge() {
         return System.currentTimeMillis() - createdTimestamp;
-    }
-
-    /*
-     * Getter for the timestamp that this connection was checked out
-     *
-     * @return the timestamp
-     */
-    public long getCheckoutTimestamp() {
-        return checkoutTimestamp;
-    }
-
-    /*
-     * Setter for the timestamp that this connection was checked out
-     *
-     * @param timestamp the timestamp
-     */
-    public void setCheckoutTimestamp(long timestamp) {
-        this.checkoutTimestamp = timestamp;
     }
 
     /*
@@ -221,7 +157,7 @@ class PooledConnection implements InvocationHandler {
         }
     }
 
-    /*
+    /**
      * Required for InvocationHandler implementation.
      *
      * @param proxy  - not used
@@ -238,7 +174,8 @@ class PooledConnection implements InvocationHandler {
             return null;
         } else {
             try {
-                if (!Object.class.equals(method.getDeclaringClass())) {
+                Class<?> declaringClass = method.getDeclaringClass();
+                if (!Object.class.equals(declaringClass)) {
                     // issue #579 toString() should never fail
                     // throw an SQLException instead of a Runtime
                     //除了toString()方法，其他方法调用之前要检查connection是否还是合法的,不合法要抛出SQLException

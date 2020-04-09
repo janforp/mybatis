@@ -1,5 +1,6 @@
 package org.apache.ibatis.datasource.pooled;
 
+import lombok.Getter;
 import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -33,34 +34,44 @@ public class PooledDataSource implements DataSource {
 
     private static final Log log = LogFactory.getLog(PooledDataSource.class);
 
-    //有一个池状态
+    /**
+     * 有一个池状态,一个手动实现的链接池
+     */
+    @Getter
     private final PoolState state = new PoolState(this);
 
     //里面有一个UnpooledDataSource
     private final UnpooledDataSource dataSource;
 
     // OPTIONAL CONFIGURATION FIELDS
-    //正在使用连接的数量
     protected int poolMaximumActiveConnections = 10;
 
     //空闲连接数
     protected int poolMaximumIdleConnections = 5;
 
     //在被强制返回之前,池中连接被检查的时间
+    @Getter
     protected int poolMaximumCheckoutTime = 20000;
 
     //这是给连接池一个打印日志状态机会的低层次设置,还有重新 尝试获得连接, 这些情况下往往需要很长时间 为了避免连接池没有配置时静默失 败)。
+    @Getter
     protected int poolTimeToWait = 20000;
 
     //发送到数据的侦测查询,用来验证连接是否正常工作,并且准备 接受请求。默认是“NO PING QUERY SET” ,这会引起许多数据库驱动连接由一 个错误信息而导致失败
+    @Getter
     protected String poolPingQuery = "NO PING QUERY SET";
 
     //开启或禁用侦测查询
+    @Getter
     protected boolean poolPingEnabled = false;
 
     //用来配置 poolPingQuery 多次时间被用一次
+    @Getter
     protected int poolPingConnectionsNotUsedFor = 0;
 
+    /**
+     * ("" + url + username + password).hashCode()
+     */
     private int expectedConnectionTypeCode;
 
     public PooledDataSource() {
@@ -87,7 +98,7 @@ public class PooledDataSource implements DataSource {
         expectedConnectionTypeCode = assembleConnectionTypeCode(dataSource.getUrl(), dataSource.getUsername(), dataSource.getPassword());
     }
 
-    /*
+    /**
      * Unwraps a pooled connection to get to the 'real' connection
      *
      * @param conn - the pooled connection to unwrap
@@ -106,7 +117,8 @@ public class PooledDataSource implements DataSource {
     @Override
     public Connection getConnection() throws SQLException {
         //覆盖了DataSource.getConnection方法，每次都是pop一个Connection，即从池中取出一个来
-        return popConnection(dataSource.getUsername(), dataSource.getPassword()).getProxyConnection();
+        PooledConnection pooledConnection = popConnection(dataSource.getUsername(), dataSource.getPassword());
+        return pooledConnection.getProxyConnection();
     }
 
     @Override
@@ -225,10 +237,6 @@ public class PooledDataSource implements DataSource {
         forceCloseAll();
     }
 
-    public int getPoolMaximumCheckoutTime() {
-        return poolMaximumCheckoutTime;
-    }
-
     /*
      * The maximum time a connection can be used before it *may* be
      * given away again.
@@ -238,10 +246,6 @@ public class PooledDataSource implements DataSource {
     public void setPoolMaximumCheckoutTime(int poolMaximumCheckoutTime) {
         this.poolMaximumCheckoutTime = poolMaximumCheckoutTime;
         forceCloseAll();
-    }
-
-    public int getPoolTimeToWait() {
-        return poolTimeToWait;
     }
 
     /*
@@ -254,10 +258,6 @@ public class PooledDataSource implements DataSource {
         forceCloseAll();
     }
 
-    public String getPoolPingQuery() {
-        return poolPingQuery;
-    }
-
     /*
      * The query to be used to check a connection
      *
@@ -268,10 +268,6 @@ public class PooledDataSource implements DataSource {
         forceCloseAll();
     }
 
-    public boolean isPoolPingEnabled() {
-        return poolPingEnabled;
-    }
-
     /*
      * Determines if the ping query should be used.
      *
@@ -280,10 +276,6 @@ public class PooledDataSource implements DataSource {
     public void setPoolPingEnabled(boolean poolPingEnabled) {
         this.poolPingEnabled = poolPingEnabled;
         forceCloseAll();
-    }
-
-    public int getPoolPingConnectionsNotUsedFor() {
-        return poolPingConnectionsNotUsedFor;
     }
 
     /*
@@ -336,10 +328,6 @@ public class PooledDataSource implements DataSource {
         if (log.isDebugEnabled()) {
             log.debug("PooledDataSource forcefully closed/removed all connections.");
         }
-    }
-
-    public PoolState getPoolState() {
-        return state;
     }
 
     private int assembleConnectionTypeCode(String url, String username, String password) {
@@ -462,6 +450,7 @@ public class PooledDataSource implements DataSource {
                         }
                     }
                 }
+
                 if (conn != null) {
                     //如果已经拿到connection，则返回
                     if (conn.isValid()) {
@@ -493,8 +482,8 @@ public class PooledDataSource implements DataSource {
                     }
                 }
             }
-
         }
+        //出 while 循环
 
         if (conn == null) {
             if (log.isDebugEnabled()) {
@@ -561,15 +550,18 @@ public class PooledDataSource implements DataSource {
         return result;
     }
 
+    @Override
     protected void finalize() throws Throwable {
         forceCloseAll();
         super.finalize();
     }
 
+    @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
         throw new SQLException(getClass().getName() + " is not a wrapper.");
     }
 
+    @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;
     }
