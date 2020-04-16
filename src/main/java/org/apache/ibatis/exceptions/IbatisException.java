@@ -27,5 +27,4 @@ public class IbatisException extends RuntimeException {
     public IbatisException(Throwable cause) {
         super(cause);
     }
-
 }

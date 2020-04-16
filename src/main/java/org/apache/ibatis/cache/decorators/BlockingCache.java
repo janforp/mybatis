@@ -1,5 +1,7 @@
 package org.apache.ibatis.cache.decorators;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.CacheException;
 
@@ -27,6 +29,8 @@ public class BlockingCache implements Cache {
     /**
      * 加锁的最长时间(ms)
      */
+    @Getter
+    @Setter
     private long timeout;
 
     public BlockingCache(Cache delegate) {
@@ -105,13 +109,5 @@ public class BlockingCache implements Cache {
         if (lock.isHeldByCurrentThread()) {
             lock.unlock();
         }
-    }
-
-    public long getTimeout() {
-        return timeout;
-    }
-
-    public void setTimeout(long timeout) {
-        this.timeout = timeout;
     }
 }
