@@ -31,4 +31,10 @@
         values (#{id}, #{name})
     </insert>
 
+    <update id="updateUser">
+        update users
+        set name = #{name}
+        where id = #{id}
+    </update>
+
 </mapper>

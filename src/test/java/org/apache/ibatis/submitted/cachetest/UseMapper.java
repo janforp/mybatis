@@ -6,4 +6,5 @@ public interface UseMapper {
 
     void insertUser(User user);
 
+    void updateUser(User user);
 }
