@@ -6,7 +6,7 @@ import org.apache.ibatis.mapping.MappedStatement;
 import java.sql.Statement;
 
 /**
- * 键值生成器
+ * 键值生成器：典型的命令模式设计
  *
  * @author Clinton Begin
  */

@@ -19,8 +19,8 @@ public class TransactionalCacheManager {
 
     /**
      * 管理了许多TransactionalCache
-     * key:?
-     * value:?
+     * key:TransactionalCache代理的/装饰的cache对象
+     * value:无非就是把每一个缓存对象放到一个TransactionalCache实例中
      */
     private Map<Cache, TransactionalCache> transactionalCacheMap = new HashMap<Cache, TransactionalCache>();
 

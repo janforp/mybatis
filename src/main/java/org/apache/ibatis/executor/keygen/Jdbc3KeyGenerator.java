@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 典型的命令模式设计
+ *
  * JDBC3键值生成器,核心是使用JDBC3的Statement.getGeneratedKeys
  *
  * sql:<insert id="insertTable2WithGeneratedKeyXml" useGeneratedKeys="true" keyProperty="nameId,generatedName" keyColumn="ID,NAME_FRED"> 的情况使用该方法

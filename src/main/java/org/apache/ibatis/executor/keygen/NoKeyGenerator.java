@@ -6,6 +6,8 @@ import org.apache.ibatis.mapping.MappedStatement;
 import java.sql.Statement;
 
 /**
+ * 典型的命令模式设计
+ *
  * 不用键值生成器
  * MappedStatement有一个keyGenerator属性，默认的就用NoKeyGenerator
  *

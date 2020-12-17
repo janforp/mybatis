@@ -13,6 +13,8 @@ import java.sql.Statement;
 import java.util.List;
 
 /**
+ * 典型的命令模式设计
+ *
  * <selectKey keyProperty="nameId,generatedName" order="AFTER" resultType="org.apache.ibatis.submitted.selectkey.Name">
  * select id as nameId, name_fred as generatedName from table2 where id = identity()
  * </selectKey>

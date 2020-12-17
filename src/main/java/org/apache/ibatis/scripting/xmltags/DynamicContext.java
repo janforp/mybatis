@@ -11,7 +11,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 动态上下文
+ * 动态上下文：主要用于记录解析动态SQL语句之后产生的SQL语句片段，可以认为它是一个用于记录动态SQL语句解析结果的容器
+ * 组合模式：
+ * 抽象构件为 SqlNode 接口，源码如下
+ * public interface SqlNode {
+ * boolean apply(DynamicContext context);
+ * }
+ * 复制代码apply 是 SQLNode 接口中定义的唯一方法，该方法会根据用户传入的实参，参数解析该SQLNode所记录的动态SQL节点，
+ * 并调用 DynamicContext.appendSql() 方法将解析后的SQL片段追加到 DynamicContext.sqlBuilder 中保存，
+ * 当SQL节点下所有的 SqlNode 完成解析后，我们就可以从 DynamicContext 中获取一条动态生产的、完整的SQL语句
  *
  * @author Clinton Begin
  */
