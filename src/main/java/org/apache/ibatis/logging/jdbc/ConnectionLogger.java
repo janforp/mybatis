@@ -60,6 +60,7 @@ public final class ConnectionLogger extends BaseJdbcLogger implements Invocation
             if (Object.class.equals(method.getDeclaringClass())) {
                 return method.invoke(this, params);
             }
+            //日志打印，需要配置 log4j.properties
             if ("prepareStatement".equals(method.getName())) {
                 if (isDebugEnabled()) {
                     debug(" Preparing: " + removeBreakingWhitespace((String) params[0]), true);
