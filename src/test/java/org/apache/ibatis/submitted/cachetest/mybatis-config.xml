@@ -6,7 +6,7 @@
 <configuration>
 
     <settings>
-        <setting name="logImpl" value="LOG4J"/><!-- 开启日志 -->
+        <setting name="logImpl" value="LOG4J"/>
     </settings>
 
     <environments default="development">
