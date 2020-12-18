@@ -38,8 +38,6 @@ public class LevelTwoCacheTest {
         runner.runScript(reader);
         reader.close();
         session.close();
-
-        insertATeacher(1, "张彬");
     }
 
     private void insertATeacher(int id, String name) {
@@ -56,6 +54,12 @@ public class LevelTwoCacheTest {
 
     @Test
     public void test() {
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        TeacherMapper teacherMapper = sqlSession.getMapper(TeacherMapper.class);
+        Teacher teacherFromDb = teacherMapper.getUser(1);
+        Assert.assertEquals("邓俊辉", teacherFromDb.getName());
 
+        Teacher teacher = teacherMapper.getUser(1);
+        Assert.assertEquals("邓俊辉", teacher.getName());
     }
 }

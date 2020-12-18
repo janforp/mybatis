@@ -68,11 +68,14 @@ public class LevelOneCacheTest {
         SqlSession sqlSession = sqlSessionFactory.openSession();
         try {
             UseMapper mapper = sqlSession.getMapper(UseMapper.class);
-            User user = mapper.getUser(1);
-            Assert.assertEquals("User1", user.getName());
+            User user1 = mapper.getUser(1);
+            Assert.assertEquals("User1", user1.getName());
 
-            user = mapper.getUser(1);
-            Assert.assertEquals("User1", user.getName());
+            User user2 = mapper.getUser(1);
+            Assert.assertEquals("User1", user2.getName());
+
+            //并且他们是同一个引用
+            Assert.assertEquals(user1, user2);
         } finally {
             sqlSession.close();
         }
