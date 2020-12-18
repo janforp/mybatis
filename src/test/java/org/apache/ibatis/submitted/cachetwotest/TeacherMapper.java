@@ -6,7 +6,7 @@ package org.apache.ibatis.submitted.cachetwotest;
  */
 public interface TeacherMapper {
 
-    Teacher getUser(Integer id);
+    Teacher get(Integer id);
 
     void insert(Teacher teacher);
 

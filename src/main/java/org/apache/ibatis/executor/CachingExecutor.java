@@ -125,7 +125,7 @@ public class CachingExecutor implements Executor {
                 return list;
             }
         }
-        //该sql没有配置使用二级缓存，则直接去数据库查询
+        //该sql没有配置使用二级缓存
         return delegateExecutor.query(mappedStatement, parameterObject, rowBounds, resultHandler, cacheKey, boundSql);
     }
 
