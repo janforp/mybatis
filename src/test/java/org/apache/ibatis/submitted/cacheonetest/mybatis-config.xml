@@ -23,7 +23,7 @@
     </environments>
 
     <mappers>
-        <mapper class="org.apache.ibatis.submitted.cachetest.UseMapper"/>
+        <mapper class="org.apache.ibatis.submitted.cacheonetest.UseMapper"/>
     </mappers>
 
 </configuration>

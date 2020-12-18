@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package org.apache.ibatis.submitted.cachetest;
+package org.apache.ibatis.submitted.cacheonetest;
 
 public class User {
 

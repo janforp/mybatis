@@ -1,4 +1,4 @@
-package org.apache.ibatis.submitted.cachetest;
+package org.apache.ibatis.submitted.cacheonetest;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -25,14 +25,14 @@ public class LevelOneCacheTest {
     @Before
     public void setUp() throws Exception {
         // create an SqlSessionFactory
-        Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/cachetest/mybatis-config.xml");
+        Reader reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/cacheonetest/mybatis-config.xml");
         sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
         reader.close();
 
         // populate in-memory database
         SqlSession session = sqlSessionFactory.openSession();
         Connection conn = session.getConnection();
-        reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/cachetest/init.sql");
+        reader = Resources.getResourceAsReader("org/apache/ibatis/submitted/cacheonetest/init.sql");
         ScriptRunner runner = new ScriptRunner(conn);
         runner.setLogWriter(null);
         runner.runScript(reader);

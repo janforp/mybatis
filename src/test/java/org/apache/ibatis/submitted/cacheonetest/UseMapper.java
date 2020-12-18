@@ -1,4 +1,4 @@
-package org.apache.ibatis.submitted.cachetest;
+package org.apache.ibatis.submitted.cacheonetest;
 
 public interface UseMapper {
 
