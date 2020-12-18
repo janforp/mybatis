@@ -58,9 +58,12 @@ public class CachingExecutor implements Executor {
      * 通过该 映射sql的配置决定是否需要清除缓存
      * 这是用户在配置sql的地方指定是否需要刷新，是否使用缓存
      *
+     * 在默认的设置中SELECT语句不会刷新缓存，insert/update/delte会刷新缓存。进入该方法
+     *
      * @param mappedStatement 具体的映射语句
      */
     private void flushCacheIfRequired(MappedStatement mappedStatement) {
+        //刷新缓存
         Cache cache = mappedStatement.getCache();
         //在对应namespace的mapper文件加：<cache flushInterval="3600000"/>
         //在对应的sql添加 <select id="selectByIdFlush" resultMap="personMap" parameterType="int" flushCache="true">，则刷新，否则该sql不刷新
@@ -92,7 +95,7 @@ public class CachingExecutor implements Executor {
     @Override
     public <E> List<E> query(MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds,
             ResultHandler resultHandler, CacheKey cacheKey, BoundSql boundSql) throws SQLException {
-
+        //拿到二级缓存对象
         Cache cache = mappedStatement.getCache();
         //默认情况下是没有开启缓存的(二级缓存).要开启二级缓存,你需要在你的 SQL 映射文件中添加一行: <cache/>
         //简单的说，就是先查CacheKey，查不到再委托给实际的执行器去查
@@ -100,8 +103,8 @@ public class CachingExecutor implements Executor {
         //TODO <cache flushInterval="3600000"/> 则true?
         boolean isThisNamespaceUseCache = (cache != null);
         if (isThisNamespaceUseCache) {
-
             // <select id="selectByIdFlush" resultMap="personMap" parameterType="int" flushCache="true">
+            //判断是否需要刷新缓存
             flushCacheIfRequired(mappedStatement);
 
             //当该namespace开启了二级缓存，则里面的statement默认使用缓存，除非指定 useCache="false"
@@ -112,13 +115,13 @@ public class CachingExecutor implements Executor {
                 //Caching stored procedures with OUT params is not supported，所有参数的模式必须是 IN，否则不支持二级缓存
                 ensureNoOutParams(mappedStatement, parameterObject, boundSql);
                 //先从二级缓存拿
+                //在getObject方法中，会把获取值的职责一路传递，最终到PerpetualCache。如果没有查到，会把key加入Miss集合，这个主要是为了统计命中率。
                 @SuppressWarnings("unchecked")
                 List<E> list = (List<E>) transactionalCacheManager.getObject(cache, cacheKey);
                 if (list == null) {
-
-                    //二级缓存没命中，去被代理的执行器，在哪里会进行一级缓存查询
+                    //CachingExecutor继续往下走，如果查询到数据，则调用tcm.putObject方法，往缓存中放入值。
+                    //二级缓存没命中，去被代理的执行器，在那里会进行一级缓存查询
                     list = delegateExecutor.query(mappedStatement, parameterObject, rowBounds, null, cacheKey, boundSql);
-
                     //查询结果存入二级缓存
                     transactionalCacheManager.putObject(cache, cacheKey, list); // issue #578 and #116
                 }

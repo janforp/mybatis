@@ -221,7 +221,7 @@ public abstract class BaseExecutor implements Executor {
             queryStack++;
             //先根据cacheKey从localCache去查，如果有 resultHandler ，则无法使用缓存
             //如果 resultHandler 为空，则可以是要缓存，但是如果查询前刷新了缓存，则相当于不用缓存
-            //二级缓存
+            //一级缓存
             list = (resultHandler == null ? (List<E>) localCache.getObject(cacheKey) : null);
             if (list != null) {
                 //缓存命中
@@ -246,7 +246,7 @@ public abstract class BaseExecutor implements Executor {
             //在query方法执行的最后，会判断一级缓存级别是否是STATEMENT级别，如果是的话，就清空缓存，这也就是STATEMENT级别的一级缓存无法共享localCache的原因。代码如下所示：
             if (configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) {
                 // issue #482
-                //如果是STATEMENT，清本地缓存
+                //如果是STATEMENT，清除一级缓存
                 clearLocalCache();
             }
         }

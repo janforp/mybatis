@@ -12,12 +12,16 @@ import java.util.Map;
 /**
  * 事务缓存管理器，被CachingExecutor使用
  *
+ * TransactionalCache实现了Cache接口，CachingExecutor会默认使用他包装初始生成的Cache，作用是如果事务提交，对缓存的操作才会生效，如果事务回滚或者不提交事务，则不对缓存产生影响。
+ *
  * TransactionalCache实现了Cache接口，CachingExecutor会默认使用他包装初始生成的Cache，
  * 作用是如果事务提交，对缓存的操作才会生效，如果事务回滚或者不提交事务，则不对缓存产生影响
  */
 public class TransactionalCacheManager {
 
     /**
+     * 这个Map保存了Cache和用TransactionalCache包装后的Cache的映射关系。
+     *
      * 管理了许多TransactionalCache
      * key:TransactionalCache代理的/装饰的cache对象
      * value:无非就是把每一个缓存对象放到一个TransactionalCache实例中
