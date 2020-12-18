@@ -93,7 +93,7 @@ public class LevelTwoCacheTest {
      * sqlSessionB 使用耳机缓存
      * 可以看到
      * 1.sqlSessionA 去数据库查询了
-     * 2.sqlSessionB 妹有去数据库查询
+     * 2.sqlSessionB 没有去数据库查询
      */
     @Test
     public void testTwoSqlSessionFirstCommit() {
