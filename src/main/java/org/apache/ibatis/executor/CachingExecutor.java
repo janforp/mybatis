@@ -118,11 +118,13 @@ public class CachingExecutor implements Executor {
                 //在getObject方法中，会把获取值的职责一路传递，最终到PerpetualCache。如果没有查到，会把key加入Miss集合，这个主要是为了统计命中率。
                 @SuppressWarnings("unchecked")
                 List<E> list = (List<E>) transactionalCacheManager.getObject(cache, cacheKey);
+
+                //CachingExecutor继续往下走，如果查询到数据，则调用tcm.putObject方法，往缓存中放入值。
                 if (list == null) {
-                    //CachingExecutor继续往下走，如果查询到数据，则调用tcm.putObject方法，往缓存中放入值。
                     //二级缓存没命中，去被代理的执行器，在那里会进行一级缓存查询
                     list = delegateExecutor.query(mappedStatement, parameterObject, rowBounds, null, cacheKey, boundSql);
                     //查询结果存入二级缓存
+                    //transactionalCacheManager 的put方法也不是直接操作缓存，只是在把这次的数据和key放入待提交的Map中。
                     transactionalCacheManager.putObject(cache, cacheKey, list); // issue #578 and #116
                 }
                 return list;
@@ -157,6 +159,7 @@ public class CachingExecutor implements Executor {
     }
 
     @Override
+    //org.apache.ibatis.executor.CachingExecutor.commit
     public void commit(boolean required) throws SQLException {
         delegateExecutor.commit(required);
         transactionalCacheManager.commit();

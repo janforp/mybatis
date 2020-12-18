@@ -75,6 +75,7 @@ public class TransactionalCache implements Cache {
         // issue #116
         Object object = delegate.getObject(key);
         if (object == null) {
+            //如果没有查到，会把key加入Miss集合，这个主要是为了统计命中率
             entriesMissedInCache.add(key);
         }
         // issue #146
@@ -94,22 +95,11 @@ public class TransactionalCache implements Cache {
      * tcm的put方法也不是直接操作缓存，只是在把这次的数据和key放入待提交的Map中。
      *
      * @param key Can be any object but usually it is a {@link CacheKey}
-     * @param object
      */
     @Override
     public void putObject(Object key, Object object) {
+        //tcm的put方法也不是直接操作缓存，只是在把这次的数据和key放入待提交的Map中。
         entriesToAddOnCommit.put(key, object);
-    }
-
-    @Override
-    public Object removeObject(Object key) {
-        return null;
-    }
-
-    @Override
-    public void clear() {
-        clearOnCommit = true;
-        entriesToAddOnCommit.clear();
     }
 
     /**
@@ -125,17 +115,6 @@ public class TransactionalCache implements Cache {
         //如果不调用commit方法的话，由于 TransactionalCache 的作用，并不会对二级缓存造成直接的影响
         flushPendingEntries();
         reset();
-    }
-
-    public void rollback() {
-        unlockMissedEntries();
-        reset();
-    }
-
-    private void reset() {
-        clearOnCommit = false;
-        entriesToAddOnCommit.clear();
-        entriesMissedInCache.clear();
     }
 
     /**
@@ -156,6 +135,28 @@ public class TransactionalCache implements Cache {
                 delegate.putObject(entry, null);
             }
         }
+    }
+
+    @Override
+    public Object removeObject(Object key) {
+        return null;
+    }
+
+    @Override
+    public void clear() {
+        clearOnCommit = true;
+        entriesToAddOnCommit.clear();
+    }
+
+    public void rollback() {
+        unlockMissedEntries();
+        reset();
+    }
+
+    private void reset() {
+        clearOnCommit = false;
+        entriesToAddOnCommit.clear();
+        entriesMissedInCache.clear();
     }
 
     private void unlockMissedEntries() {
