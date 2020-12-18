@@ -39,6 +39,7 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
      * @param autoCommit 是否自动提交
      * @return SqlSession
      */
+    //为执行和数据库的交互，首先需要初始化SqlSession，通过DefaultSqlSessionFactory开启SqlSession
     private SqlSession openSessionFromDataSource(ExecutorType executorType, TransactionIsolationLevel level, boolean autoCommit) {
         Transaction transaction = null;
         try {

@@ -509,6 +509,7 @@ public class Configuration {
      * @param executorType 执行器类型，可以为空，如果空，则选择默认的类型
      * @return 一个执行器
      */
+    //在初始化SqlSesion时，会使用Configuration类创建一个全新的Executor，作为DefaultSqlSession构造函数的参数，创建Executor代码如下所示：
     public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
         executorType = (executorType == null ? defaultExecutorType : executorType);
         //这句再做一下保护,囧,防止粗心大意的人将defaultExecutorType设成null?

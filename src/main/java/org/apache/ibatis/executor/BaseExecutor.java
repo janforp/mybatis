@@ -183,11 +183,14 @@ public abstract class BaseExecutor implements Executor {
     }
 
     //SqlSession.selectList会调用此方法
+    //SqlSession把具体的查询职责委托给了Executor。如果只开启了一级缓存的话，首先会进入BaseExecutor的query方法。代码如下所示：
     @Override
     public <E> List<E> query(MappedStatement mappedStatement, Object parameter, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
         //得到绑定sql
         BoundSql boundSql = mappedStatement.getBoundSql(parameter);
         //创建缓存Key
+        //只要两条SQL的下列五个值相同，即可以认为是相同的SQL
+        //Statement Id + Offset + Limmit + Sql + Params
         CacheKey cacheKey = createCacheKey(mappedStatement, parameter, rowBounds, boundSql);
         //查询
         return query(mappedStatement, parameter, rowBounds, resultHandler, cacheKey, boundSql);

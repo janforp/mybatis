@@ -61,20 +61,18 @@ public class DefaultSqlSession implements SqlSession {
      * @return 查询列表结果
      */
     @Override
+    //SqlSession创建完毕后，根据Statment的不同类型，会进入SqlSession的不同方法中，如果是Select语句的话，最后会执行到SqlSession的selectList，代码如下所示：
     public <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds) {
         try {
             //根据statement id找到对应的MappedStatement
             MappedStatement mappedStatement = configuration.getMappedStatement(statement);
-
             //处理过的参数
             Object wrapCollection = wrapCollection(parameter);
             //转而用执行器来查询结果,注意这里传入的ResultHandler是null
-
             //所有的查询（selectOne, selectList, selectMap），都只关心这里即可
             List<E> objectList = executor.query(mappedStatement, wrapCollection, rowBounds, Executor.NO_RESULT_HANDLER);
             System.out.println(objectList);
             return objectList;
-
         } catch (Exception e) {
             throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);
         } finally {
