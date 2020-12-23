@@ -278,6 +278,7 @@ public class XMLMapperBuilder extends BaseBuilder {
             return;
         }
         //默认类型：永久
+        //如果某个namespace开启了二级缓存<cache/>,但是没有指定具体的类型，就默认使用 PERPETUAL 类型
         String type = cacheNode.getStringAttribute("type", "PERPETUAL");
         Class<? extends Cache> typeClass = typeAliasRegistry.resolveAlias(type);
         //回收策略
@@ -532,7 +533,7 @@ public class XMLMapperBuilder extends BaseBuilder {
         Class<?> javaTypeClass = resolveClass(javaType);
         @SuppressWarnings("unchecked")
         //该列的类型处理器
-                Class<? extends TypeHandler<?>> typeHandlerClass = (Class<? extends TypeHandler<?>>) resolveClass(typeHandler);
+        Class<? extends TypeHandler<?>> typeHandlerClass = (Class<? extends TypeHandler<?>>) resolveClass(typeHandler);
         JdbcType jdbcTypeEnum = resolveJdbcType(jdbcType);
         //又去调builderAssistant.buildResultMapping
         return builderAssistant.buildResultMapping(resultMapType, property, column, javaTypeClass, jdbcTypeEnum,
